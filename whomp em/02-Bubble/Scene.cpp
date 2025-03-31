@@ -57,7 +57,9 @@ void Scene::update(int deltaTime)
     float centerX = SCREEN_WIDTH / 8.0f;
     float centerY = SCREEN_HEIGHT / 8.0f;
 
-    glm::vec3 cameraPos = glm::vec3(playerPos.x - centerX, playerPos.y - centerY, 0.0f);
+    glm::vec3 cameraPos = glm::vec3(playerPos.x - centerX, 1460, 0.0f); //canviar
+
+	//printf("Player position: %f, %f\n", playerPos.x, playerPos.y);
 
     int mapWidth = SCREEN_WIDTH;
     int mapHeight = SCREEN_HEIGHT;
