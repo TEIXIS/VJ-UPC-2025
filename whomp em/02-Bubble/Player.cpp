@@ -159,7 +159,7 @@ void Player::update(int deltaTime)
     if (!Game::instance().getKey(GLFW_KEY_X)) isAttacking = false;
     else {
         if (isRightFacing()) {
-            lanza->changeAnimation(0);
+            if (lanza->animation() != 0) lanza->changeAnimation(0);
             if (Game::instance().getKey(GLFW_KEY_DOWN)) {
                 posLanza = glm::vec2(posPlayer.x + 26, posPlayer.y + 8);
             }
@@ -167,7 +167,7 @@ void Player::update(int deltaTime)
         }
 
         else if (isLeftFacing()) {
-            lanza->changeAnimation(1);
+            if(lanza->animation() != 1) lanza->changeAnimation(1);
             if (Game::instance().getKey(GLFW_KEY_DOWN)) {
                 posLanza = glm::vec2(posPlayer.x - 27, posPlayer.y + 8);
             }
@@ -466,4 +466,14 @@ glm::vec2 Player::getPosition() const
 
 float Player::getLives() const {
     return lives;
+}
+
+glm::vec2 Player::getLanzaPosition() const
+{
+    return posLanza;
+}
+
+glm::ivec2 Player::getLanzaSize() const
+{
+    return glm::ivec2(32, 32); // Tamaño de la lanza
 }

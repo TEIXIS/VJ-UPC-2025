@@ -23,6 +23,8 @@ public:
 	glm::vec2 getPosition() const;
 	float getLives() const;
 	string getWeapon() const;
+	glm::vec2 Player::getLanzaPosition() const;
+	glm::ivec2 getLanzaSize() const;
 	
 private:
 	void handleHorizontalMovement();
@@ -50,6 +52,7 @@ private:
 	Sprite* lanzaAdalt;
 	Sprite* lanzaAbaix;
 
+	
 };
 
 

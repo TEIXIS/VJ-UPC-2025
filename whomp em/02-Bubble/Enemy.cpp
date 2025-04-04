@@ -70,7 +70,7 @@ void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 //    sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 //}
 
-void Enemy::update(int deltaTime)
+void Enemy::update(int deltaTime, const Player& player)
 {
     sprite->update(deltaTime);
 
@@ -145,6 +145,19 @@ void Enemy::update(int deltaTime)
         }
     }
 
+
+    if (checkCollision(player.getPosition(), glm::ivec2(32, 32)))
+    {
+        std::cout << "Colision con el jugador!" << std::endl;
+        // Manejar la colisión con el jugador
+    }
+
+    if (checkCollision(player.getLanzaPosition(), player.getLanzaSize()))
+    {
+        std::cout << "Colision con la lanza!" << std::endl;
+        // Manejar la colisión con la lanza
+    }
+
 	if (movingRight)
 	{
 		if (!bJumping)
@@ -178,4 +191,13 @@ void Enemy::setPosition(const glm::vec2 &pos)
 {
     posEnemy = pos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+}
+
+bool Enemy::checkCollision(const glm::vec2& pos, const glm::ivec2& size) const
+{
+    glm::ivec2 enemySize(16, 16); // Tamaño del enemigo
+    return (posEnemy.x < pos.x + size.x &&
+        posEnemy.x + enemySize.x > pos.x &&
+        posEnemy.y < pos.y + size.y &&
+        posEnemy.y + enemySize.y > pos.y);
 }
