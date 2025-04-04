@@ -3,27 +3,41 @@
 #include <iostream>
 #include <GL/glew.h>
 
-#define MOVE_SPEED 1
-#define JUMP_ANGLE_STEP 4
-#define JUMP_HEIGHT 25
+#define MOVE_SPEED 2
+#define JUMP_ANGLE_STEP 8
+#define JUMP_HEIGHT 16
 #define FALL_STEP 5
+
+
+enum EnemyAnims {terraDreta, saltantDreta, terraEsquerra, saltantEsquerra};
 
 void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
     bJumping = false;
-    spritesheet.loadFromFile("images/enemy.png", TEXTURE_PIXEL_FORMAT_RGBA);
-        
-    sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.25, 0.25), &spritesheet, &shaderProgram);
-    sprite->setNumberAnimations(1);
-    sprite->setAnimationSpeed(0, 8);
-    sprite->addKeyframe(0, glm::vec2(0.f, 0.0f));
+    spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
+    groundTimer = 0;
+    sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
+    sprite->setNumberAnimations(4);
+
+    sprite->setAnimationSpeed(terraDreta, 8);
+    sprite->addKeyframe(terraDreta, glm::vec2(0.f, 0.0f));
+
+	sprite->setAnimationSpeed(saltantDreta, 8);
+	sprite->addKeyframe(saltantDreta, glm::vec2(0.0625f, 0.0f));
+
+	sprite->setAnimationSpeed(terraEsquerra, 8);
+	sprite->addKeyframe(terraEsquerra, glm::vec2(0.1875f, 0.0f));
+
+	sprite->setAnimationSpeed(saltantEsquerra, 8);
+	sprite->addKeyframe(saltantEsquerra, glm::vec2(0.125f, 0.0f));
+
     sprite->changeAnimation(0);
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
     movingRight = true;
 }
 
-
+//moures sense saltar
 //void Enemy::update(int deltaTime)
 //{
 //    sprite->update(deltaTime);
@@ -56,7 +70,6 @@ void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 //    sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 //}
 
-
 void Enemy::update(int deltaTime)
 {
     sprite->update(deltaTime);
@@ -68,6 +81,7 @@ void Enemy::update(int deltaTime)
         {
             bJumping = false;
             posEnemy.y = startY;
+            groundTimer = 1000; 
         }
         else
         {
@@ -79,48 +93,76 @@ void Enemy::update(int deltaTime)
                 {
                     bJumping = false;
                     jumpAngle = 180; 
+                    groundTimer = 1000;
                 }
             }
             else
             {
-                bJumping = !map->collisionMoveDown(posEnemy, glm::ivec2(16, 16), &posEnemy.y);
+                if (map->collisionMoveDown(posEnemy, glm::ivec2(16, 16), &posEnemy.y)) {
+					bJumping = false;
+                    groundTimer = 1000;
+                }
+				else bJumping = true;
             }
         }
     }
     else
     {
-        // Apply gravity
-        posEnemy.y += FALL_STEP;
-        if (map->collisionMoveDown(posEnemy, glm::ivec2(16, 16), &posEnemy.y))
+        if (groundTimer > 0)
         {
-            bJumping = true;
-            jumpAngle = 0;
-            startY = posEnemy.y;
+            groundTimer -= deltaTime; 
+        }
+        else
+        {
+            
+            posEnemy.y += FALL_STEP;
+            if (map->collisionMoveDown(posEnemy, glm::ivec2(16, 16), &posEnemy.y))
+            {
+                bJumping = true;
+                jumpAngle = 0;
+                startY = posEnemy.y;
+            }
+        }
+    }
+    if (groundTimer <= 0) {
+        if (movingRight)
+        {
+            posEnemy.x += MOVE_SPEED;
+            if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
+            {
+                posEnemy.x -= MOVE_SPEED;
+                movingRight = false;
+            }
+        }
+        else
+        {
+            posEnemy.x -= MOVE_SPEED;
+            if (map->collisionMoveLeft(posEnemy, glm::ivec2(16, 16)) || posEnemy.x == 0)
+            {
+                posEnemy.x += MOVE_SPEED;
+                movingRight = true;
+            }
         }
     }
 
-    if (movingRight)
-    {
-        posEnemy.x += MOVE_SPEED;
-        if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
-        {
-            posEnemy.x -= MOVE_SPEED;
-            movingRight = false;
-        }
-    }
-    else
-    {
-        posEnemy.x -= MOVE_SPEED;
-        if (map->collisionMoveLeft(posEnemy, glm::ivec2(16, 16)) || posEnemy.x == 0)
-        {
-            posEnemy.x += MOVE_SPEED;
-            movingRight = true;
-        }
-    }
+	if (movingRight)
+	{
+		if (!bJumping)
+			sprite->changeAnimation(terraDreta);
+		else
+			sprite->changeAnimation(saltantDreta);
+	}
+	else
+	{
+		if (!bJumping)
+			sprite->changeAnimation(terraEsquerra);
+        else 
+			sprite->changeAnimation(saltantEsquerra);
+	}
+   
 
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
-
 
 void Enemy::render()
 {

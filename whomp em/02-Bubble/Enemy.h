@@ -21,6 +21,7 @@ private:
     bool bJumping;
 	bool movingRight;
     int jumpAngle;
+    int groundTimer;
     Texture spritesheet;
     Sprite *sprite;
     TileMap *map;
