@@ -52,8 +52,10 @@ void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
     player->update(deltaTime);
+	enemy->update(deltaTime);
 
     glm::vec2 playerPos = player->getPosition();
+
 
     float centerX = SCREEN_WIDTH / 8.0f;
     float centerY = SCREEN_HEIGHT / 8.0f;

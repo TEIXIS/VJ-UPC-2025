@@ -14,10 +14,12 @@ public:
     void setTileMap(TileMap *tileMap);
     void setPosition(const glm::vec2 &pos);
 
+
 private:
     glm::ivec2 tileMapDispl, posEnemy;
     int startY;
     bool bJumping;
+	bool movingRight;
     int jumpAngle;
     Texture spritesheet;
     Sprite *sprite;

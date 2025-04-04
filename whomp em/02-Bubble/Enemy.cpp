@@ -3,6 +3,11 @@
 #include <iostream>
 #include <GL/glew.h>
 
+#define MOVE_SPEED 1
+#define JUMP_ANGLE_STEP 4
+#define JUMP_HEIGHT 25
+#define FALL_STEP 5
+
 void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
     bJumping = false;
@@ -15,14 +20,107 @@ void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     sprite->changeAnimation(0);
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+    movingRight = true;
 }
+
+
+//void Enemy::update(int deltaTime)
+//{
+//    sprite->update(deltaTime);
+//    // Lógica de movimiento y comportamiento del enemigo
+//
+//	if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
+//	{
+//		
+//		posEnemy.x -= MOVE_SPEED;
+//		movingRight = false;
+//	}
+//	else if (map->collisionMoveLeft(posEnemy, glm::ivec2(16, 16)) || posEnemy.x==0)
+//	{
+//		
+//		posEnemy.x += MOVE_SPEED;
+//		movingRight = true;
+//	}
+//	else if (movingRight)
+//	{
+//		
+//		posEnemy.x += MOVE_SPEED;
+//	}
+//	else
+//	{
+//		
+//		posEnemy.x -= MOVE_SPEED;
+//	}
+//
+//
+//    sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+//}
 
 
 void Enemy::update(int deltaTime)
 {
     sprite->update(deltaTime);
-    // Lógica de movimiento y comportamiento del enemigo
+
+    if (bJumping)
+    {
+        jumpAngle += JUMP_ANGLE_STEP;
+        if (jumpAngle == 180)
+        {
+            bJumping = false;
+            posEnemy.y = startY;
+        }
+        else
+        {
+            posEnemy.y = int(startY - JUMP_HEIGHT * sin(3.14159f * jumpAngle / 180.f));
+
+            if (jumpAngle < 90)
+            {
+                if (map->collisionMoveUp(posEnemy, glm::ivec2(16, 16), &posEnemy.y))
+                {
+                    bJumping = false;
+                    jumpAngle = 180; 
+                }
+            }
+            else
+            {
+                bJumping = !map->collisionMoveDown(posEnemy, glm::ivec2(16, 16), &posEnemy.y);
+            }
+        }
+    }
+    else
+    {
+        // Apply gravity
+        posEnemy.y += FALL_STEP;
+        if (map->collisionMoveDown(posEnemy, glm::ivec2(16, 16), &posEnemy.y))
+        {
+            bJumping = true;
+            jumpAngle = 0;
+            startY = posEnemy.y;
+        }
+    }
+
+    if (movingRight)
+    {
+        posEnemy.x += MOVE_SPEED;
+        if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
+        {
+            posEnemy.x -= MOVE_SPEED;
+            movingRight = false;
+        }
+    }
+    else
+    {
+        posEnemy.x -= MOVE_SPEED;
+        if (map->collisionMoveLeft(posEnemy, glm::ivec2(16, 16)) || posEnemy.x == 0)
+        {
+            posEnemy.x += MOVE_SPEED;
+            movingRight = true;
+        }
+    }
+
+    sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
+
 
 void Enemy::render()
 {
