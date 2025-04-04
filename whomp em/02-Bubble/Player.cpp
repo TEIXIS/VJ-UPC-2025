@@ -5,9 +5,9 @@
 #include "Game.h"
 
 // Constants
-#define JUMP_ANGLE_STEP 6
+#define JUMP_ANGLE_STEP 4
 #define JUMP_HEIGHT 70
-#define FALL_STEP 7
+#define FALL_STEP 5
 #define MOVE_SPEED 2
 
 // Animation indices
