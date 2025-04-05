@@ -156,6 +156,68 @@ void Player::update(int deltaTime, const Enemy& enemy)
 		if (plorantTimer <= 0) {
 			plorantTimer = 0;
 		}
+		if (Game::instance().getKey(GLFW_KEY_LEFT))
+		{
+			
+			posPlayer.x -= MOVE_SPEED;
+			if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32)))
+			{
+				posPlayer.x += MOVE_SPEED;
+			}
+		}
+		else if (Game::instance().getKey(GLFW_KEY_RIGHT))
+		{
+			
+
+			posPlayer.x += MOVE_SPEED;
+			if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32)))
+			{
+				posPlayer.x -= MOVE_SPEED;
+				
+			}
+		}
+		if (bJumping)
+		{
+			
+			jumpAngle += JUMP_ANGLE_STEP;
+			if (jumpAngle == 180)
+			{
+				bJumping = false;
+				posPlayer.y = startY;
+			}
+			else
+			{
+				posPlayer.y = int(startY - JUMP_HEIGHT * sin(3.14159f * jumpAngle / 180.f));
+
+				if (jumpAngle < 90)
+				{
+					if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
+					{
+						bJumping = false;
+						jumpAngle = 180; // fuerza que baje directo
+					}
+				}
+				else
+				{
+					bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
+				}
+			}
+		}
+		else
+		{
+			// Apply gravity
+			posPlayer.y += FALL_STEP;
+			if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
+			{
+				if (Game::instance().getKey(GLFW_KEY_Z))
+				{
+					bJumping = true;
+					jumpAngle = 0;
+					startY = posPlayer.y;
+				}
+			}
+			
+		}
 	}
 
 	sprite->update(deltaTime);
