@@ -52,8 +52,8 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
-    player->update(deltaTime);
-	enemy->update(deltaTime, *player);
+    player->update(deltaTime, *enemy);
+	enemy->update(deltaTime);
 
     glm::vec2 playerPos = player->getPosition();
 
