@@ -8,7 +8,8 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-#define INIT_PLAYER_X_TILES 2
+//#define INIT_PLAYER_X_TILES 2
+#define INIT_PLAYER_X_TILES 16
 #define INIT_PLAYER_Y_TILES 97
 
 Scene::Scene()
@@ -51,7 +52,7 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
-    player->update(deltaTime);
+    player->update(deltaTime, *enemy);
 	enemy->update(deltaTime);
 
     glm::vec2 playerPos = player->getPosition();

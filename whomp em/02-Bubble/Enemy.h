@@ -8,22 +8,25 @@
 class Enemy
 {
 public:
-    void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram);
+    void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
     void update(int deltaTime);
     void render();
-    void setTileMap(TileMap *tileMap);
-    void setPosition(const glm::vec2 &pos);
-
+    void setTileMap(TileMap* tileMap);
+    void setPosition(const glm::vec2& pos);
+    glm::vec2 getPosition() const;
+    void restarVida();
 
 private:
     glm::ivec2 tileMapDispl, posEnemy;
     int startY;
     bool bJumping;
-	bool movingRight;
+    bool movingRight;
     int jumpAngle;
+    int groundTimer;
     Texture spritesheet;
-    Sprite *sprite;
-    TileMap *map;
+    Sprite* sprite;
+    TileMap* map;
+    int vida = 1;
 };
 
 #endif // ENEMY_H
