@@ -29,7 +29,7 @@ private:
     Texture spritesheet;
     Sprite* sprite;
     TileMap* map;
-    int vida;
+    int vida = 1;
 };
 
 #endif // ENEMY_H

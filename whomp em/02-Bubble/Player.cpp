@@ -148,7 +148,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	plorantTimer = 0;
 }
 
-void Player::update(int deltaTime, const Enemy& enemy)
+void Player::update(int deltaTime, Enemy& enemy)
 {
 	// Actualiza el temporizador si está activo
 	if (plorantTimer > 0) {
@@ -303,7 +303,7 @@ void Player::update(int deltaTime, const Enemy& enemy)
 		if (checkCollisionLanza(enemy.getPosition(), glm::ivec2(16, 16)))
 		{
 			std::cout << "colision con la lanza!" << std::endl;
-			// manejar la colisión con la lanza
+			enemy.restarVida();
 		}
 
 		// Update sprite position

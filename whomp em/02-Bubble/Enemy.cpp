@@ -72,6 +72,7 @@ void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 void Enemy::update(int deltaTime)
 {
+	if (vida <= 0) return;
     sprite->update(deltaTime);
 
     if (bJumping)
@@ -180,6 +181,7 @@ void Enemy::update(int deltaTime)
 
 void Enemy::render()
 {
+	if (vida <= 0) return;
     sprite->render();
 }
 
@@ -206,4 +208,14 @@ void Enemy::setPosition(const glm::vec2& pos)
 glm::vec2 Enemy::getPosition() const
 {
     return posEnemy;
+}
+
+void Enemy::restarVida()
+{
+	if (vida > 0)
+        vida--;
+	if (vida <= 0) {
+		std::cout << "Enemy defeated!" << std::endl;
+		posEnemy.x = -100; 
+	}
 }
