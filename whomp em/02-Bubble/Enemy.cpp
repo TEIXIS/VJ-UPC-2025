@@ -8,7 +8,6 @@
 #define JUMP_HEIGHT 16
 #define FALL_STEP 5
 
-
 enum EnemyAnims { terraDreta, saltantDreta, terraEsquerra, saltantEsquerra };
 
 void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
@@ -37,42 +36,9 @@ void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     movingRight = true;
 }
 
-//moures sense saltar
-//void Enemy::update(int deltaTime)
-//{
-//    sprite->update(deltaTime);
-//    // Lógica de movimiento y comportamiento del enemigo
-//
-//	if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
-//	{
-//		
-//		posEnemy.x -= MOVE_SPEED;
-//		movingRight = false;
-//	}
-//	else if (map->collisionMoveLeft(posEnemy, glm::ivec2(16, 16)) || posEnemy.x==0)
-//	{
-//		
-//		posEnemy.x += MOVE_SPEED;
-//		movingRight = true;
-//	}
-//	else if (movingRight)
-//	{
-//		
-//		posEnemy.x += MOVE_SPEED;
-//	}
-//	else
-//	{
-//		
-//		posEnemy.x -= MOVE_SPEED;
-//	}
-//
-//
-//    sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
-//}
-
 void Enemy::update(int deltaTime)
 {
-	if (vida <= 0) return;
+    if (vida <= 0) return;
     sprite->update(deltaTime);
 
     if (bJumping)
@@ -115,7 +81,6 @@ void Enemy::update(int deltaTime)
         }
         else
         {
-
             posEnemy.y += FALL_STEP;
             if (map->collisionMoveDown(posEnemy, glm::ivec2(16, 16), &posEnemy.y))
             {
@@ -125,6 +90,7 @@ void Enemy::update(int deltaTime)
             }
         }
     }
+
     if (groundTimer <= 0) {
         if (movingRight)
         {
@@ -146,42 +112,22 @@ void Enemy::update(int deltaTime)
         }
     }
 
-
-    //if (checkCollision(player.getPosition(), glm::ivec2(32, 32)))
-    //{
-    //    std::cout << "Colision con el jugador!" << std::endl;
-    //    // Manejar la colisión con el jugador
-    //}
-
-
-    //if (checkCollision(player.getLanzaPosition(), player.getLanzaSize()))
-    //{
-    //    std::cout << "Colision con la lanza!" << std::endl;
-    //    // Manejar la colisión con la lanza
-    //}
-
+    // Update animation based on state
     if (movingRight)
     {
-        if (!bJumping)
-            sprite->changeAnimation(terraDreta);
-        else
-            sprite->changeAnimation(saltantDreta);
+        sprite->changeAnimation(bJumping ? saltantDreta : terraDreta);
     }
     else
     {
-        if (!bJumping)
-            sprite->changeAnimation(terraEsquerra);
-        else
-            sprite->changeAnimation(saltantEsquerra);
+        sprite->changeAnimation(bJumping ? saltantEsquerra : terraEsquerra);
     }
-
 
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
 
 void Enemy::render()
 {
-	if (vida <= 0) return;
+    if (vida <= 0) return;
     sprite->render();
 }
 
@@ -195,15 +141,6 @@ void Enemy::setPosition(const glm::vec2& pos)
     posEnemy = pos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
-//
-//bool Enemy::checkCollision(const glm::vec2& pos, const glm::ivec2& size) const
-//{
-//    glm::ivec2 enemySize(16, 16); // Tamaño del enemigo
-//    return (posEnemy.x < pos.x + size.x &&
-//        posEnemy.x + enemySize.x > pos.x &&
-//        posEnemy.y < pos.y + size.y &&
-//        posEnemy.y + enemySize.y > pos.y);
-//}
 
 glm::vec2 Enemy::getPosition() const
 {
@@ -212,10 +149,10 @@ glm::vec2 Enemy::getPosition() const
 
 void Enemy::restarVida()
 {
-	if (vida > 0)
+    if (vida > 0)
         vida--;
-	if (vida <= 0) {
-		std::cout << "Enemy defeated!" << std::endl;
-		posEnemy.x = -100; 
-	}
+    if (vida <= 0) {
+        std::cout << "Enemy defeated!" << std::endl;
+        posEnemy.x = -100;
+    }
 }

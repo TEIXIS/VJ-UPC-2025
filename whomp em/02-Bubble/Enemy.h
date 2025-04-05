@@ -4,18 +4,15 @@
 #include <glm/glm.hpp>
 #include "Sprite.h"
 #include "TileMap.h"
-//#include "Player.h"
 
 class Enemy
 {
 public:
     void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-    //void update(int deltaTime, const Player& player);
     void update(int deltaTime);
     void render();
     void setTileMap(TileMap* tileMap);
     void setPosition(const glm::vec2& pos);
-    //bool checkCollision(const glm::vec2& pos, const glm::ivec2& size) const;
     glm::vec2 getPosition() const;
     void restarVida();
 
