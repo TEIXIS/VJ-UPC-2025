@@ -237,8 +237,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix)
         // Handle horizontal movement
         handleHorizontalMovement();
 
-        // Handle vertical keys
-        handleVerticalKeys();
+        
 
         // Handle jumping and falling
         handleJumpingAndFalling();
@@ -258,6 +257,9 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix)
                 posLanza = glm::vec2(posPlayer.x - 27, Game::instance().getKey(GLFW_KEY_DOWN) ? posPlayer.y + 8 : posPlayer.y);
             }
         }
+
+        // Handle vertical keys
+        handleVerticalKeys();
 
         // Handle special attack positions
         if (sprite->animation() == ATK_JUMPING_UP_R) {
@@ -295,8 +297,23 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix)
             plorantTimer = 500;
         }
 
-        if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
-            seta.restarVida();
+        if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode) {
+            if (isRightFacing()) {
+                sprite->changeAnimation(PLORANT_DRETA);
+            }
+            else if (isLeftFacing()) {
+                sprite->changeAnimation(PLORANT_ESQUERRA);
+            }
+            plorantTimer = 500;
+        }
+
+        if (isAttacking || atacantAbaix || atacantAdalt) {
+            if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
+                seta.restarVida();
+            }
+            if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(32, 16))) {
+                fenix.restarVida();
+            }
         }
     }
 
@@ -511,18 +528,20 @@ void Player::render()
     sprite->render();
 
     // Render the weapon sprites if attacking
-    if (isAttacking) {
-        lanza->render();
-        renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
-    }
     if (atacantAdalt) {
         lanzaAdalt->render();
         renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
     }
-    if (atacantAbaix) {
+    else if (atacantAbaix) {
         lanzaAbaix->render();
         renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
     }
+    else if (isAttacking) {
+        lanza->render();
+        renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
+    }
+    
+    
 
     // Render hitboxes
     renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox

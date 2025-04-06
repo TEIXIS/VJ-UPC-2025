@@ -25,10 +25,12 @@ private:
     glm::ivec2 tileMapDispl, posEnemy;
     glm::vec2 originalHeight;
     Sprite* sprite;
+    Sprite* foc;
     TileMap* map;
     Texture spritesheet;
 	glm::vec2 posPlayer;
     bool habaixat;
+    bool focActiu;
 };
 
 

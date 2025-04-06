@@ -12,6 +12,7 @@ void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
     bJumping = false;
     attacking = true; // Comienza atacando
+	focActiu = false;
     spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
     groundTimer = 0;
     sprite = Sprite::createSprite(glm::ivec2(32, 16), glm::vec2(0.125, 0.0625), &spritesheet, &shaderProgram);
@@ -25,6 +26,15 @@ void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->addKeyframe(volantDreta, glm::vec2(0.375f, 0.3125f));
 	sprite->addKeyframe(volantDreta, glm::vec2(0.5f, 0.3125f));
 	sprite->addKeyframe(volantDreta, glm::vec2(0.625f, 0.3125f));
+
+	foc = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
+	foc->setNumberAnimations(1);
+	foc->setAnimationSpeed(0, 8);
+	foc->addKeyframe(0, glm::vec2(0.75f, 0.3125f));
+	foc->addKeyframe(0, glm::vec2(0.8125f, 0.3125f));
+	foc->addKeyframe(0, glm::vec2(0.875f, 0.3125f));
+
+
 
     sprite->changeAnimation(volantEsquerra);
     tileMapDispl = tileMapPos;
