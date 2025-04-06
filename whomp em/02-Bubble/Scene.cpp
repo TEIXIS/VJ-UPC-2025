@@ -39,11 +39,18 @@ void Scene::init()
     hud = new HUD();
     hud->init(texProgram, player);
 
-	enemy = new Enemy();
-	enemy->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	seta = new Seta();
+	seta->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
+	fenix = new Fenix();
+	fenix->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+    
 	//enemy->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), 26 * map->getTileSize()));
-    enemy->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
-	enemy->setTileMap(map);
+    seta->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
+    seta->setTileMap(map);
+
+    fenix->setPosition(glm::vec2((INIT_PLAYER_X_TILES + 8) * 16, (INIT_PLAYER_Y_TILES) * 16));
+    fenix->setTileMap(map);
 
     projection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
     currentTime = 0.0f;
@@ -52,8 +59,9 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
-    player->update(deltaTime, *enemy);
-	enemy->update(deltaTime);
+    player->update(deltaTime, *seta, *fenix);
+    seta->update(deltaTime);
+	fenix->update(deltaTime);
 
     glm::vec2 playerPos = player->getPosition();
 
@@ -91,8 +99,13 @@ void Scene::render()
     map->render();
     texProgram.use();
     // HUD usa coordenadas de pantalla
+    
+    
+    
+    seta->render();
+	fenix->render();
     player->render();
-	enemy->render();
+
     glm::mat4 hudProjection = glm::ortho(0.f, float(SCREEN_WIDTH)/2, float(SCREEN_HEIGHT)/2, 0.f);
     texProgram.setUniformMatrix4f("projection", hudProjection);
     texProgram.setUniformMatrix4f("view", glm::mat4(1.0f));

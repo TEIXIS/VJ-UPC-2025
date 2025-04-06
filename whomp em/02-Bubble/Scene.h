@@ -6,7 +6,8 @@
 #include "ShaderProgram.h"
 #include "TileMap.h"
 #include "Player.h"
-#include "Enemy.h"
+#include "Seta.h"
+#include "Fenix.h"
 #include "Hud.h"
 
 
@@ -31,7 +32,8 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	Enemy* enemy;
+	Seta* seta;
+	Fenix* fenix;
 	HUD* hud;
 	ShaderProgram texProgram;
 	float currentTime;
