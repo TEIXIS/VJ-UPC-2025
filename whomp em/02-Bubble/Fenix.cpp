@@ -10,9 +10,7 @@ enum FenixAnims { volantEsquerra, volantDreta };
 
 void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
-    bJumping = false;
-    attacking = true; // Comienza atacando
-	focActiu = false;
+    
     spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
     groundTimer = 0;
     sprite = Sprite::createSprite(glm::ivec2(32, 16), glm::vec2(0.125, 0.0625), &spritesheet, &shaderProgram);
@@ -34,22 +32,57 @@ void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	foc->addKeyframe(0, glm::vec2(0.8125f, 0.3125f));
 	foc->addKeyframe(0, glm::vec2(0.875f, 0.3125f));
 
+    foc2 = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
+    foc2->setNumberAnimations(1);
+    foc2->setAnimationSpeed(0, 8);
+    foc2->addKeyframe(0, glm::vec2(0.75f, 0.3125f));
+    foc2->addKeyframe(0, glm::vec2(0.8125f, 0.3125f));
+    foc2->addKeyframe(0, glm::vec2(0.875f, 0.3125f));
 
 
     sprite->changeAnimation(volantEsquerra);
+    foc->changeAnimation(0);
+    foc2->changeAnimation(0);
+
     tileMapDispl = tileMapPos;
     //originalHeight = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
     sprite->setPosition(originalHeight);
+    foc->setPosition(originalHeight);
+    foc2->setPosition(originalHeight);
     movingRight = false;
 	attacking = false;
 	habaixat = false;
+    bJumping = false;
+    focActiu = false;
+
     vida = 1;
 }
 
 void Fenix::update(int deltaTime)
 {
-    if (vida <= 0) return;
+    if (vida <= 0 && !focActiu) return;
+    else if (vida <= 0 && focActiu) {
+        if (groundTimer > 0) {
+            groundTimer -= deltaTime;
+            if (groundTimer <= 0) {
+                focActiu = false;
+				posFoc.x = -100;
+            }
+        }
+        else {
+            posFoc.x += 1;
+            posFoc.y += 2;
+            posFoc2.x -= 1;
+            posFoc2.y += 2;
+
+            if (map->collisionMoveDown(posFoc, glm::ivec2(16, 16), &posFoc.y)) {
+                groundTimer = 1000;
+            }
+        }
+    }
     sprite->update(deltaTime);
+    foc->update(deltaTime);
+    foc2->update(deltaTime);
 
 
 	if (posEnemy.x <= posPlayer.x + 40 && !attacking) {
@@ -92,13 +125,21 @@ void Fenix::update(int deltaTime)
 	else if (!movingRight && sprite->animation() != volantEsquerra)
 		sprite->changeAnimation(volantEsquerra);
 
+   
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+    foc->setPosition(glm::vec2(float(tileMapDispl.x + posFoc.x), float(tileMapDispl.y + posFoc.y)));
+    foc2->setPosition(glm::vec2(float(tileMapDispl.x + posFoc2.x), float(tileMapDispl.y + posFoc2.y)));
 }
 
 void Fenix::render()
 {
-    if (vida <= 0) return;
-    sprite->render();
+    if (vida <= 0 && !focActiu) return;
+    else if (vida <=0 && focActiu) {
+        foc->render();
+        foc2->render();
+    }
+    else
+        sprite->render();
 }
 
 void Fenix::setTileMap(TileMap* tileMap)
@@ -122,13 +163,21 @@ void Fenix::restarVida()
 {
     if (vida > 0)
         vida--;
-    if (vida <= 0) {
+    if (vida == 0) {
         std::cout << "Enemy defeated!" << std::endl;
-        posEnemy.x = -100;
+        focActiu = true;
+        posFoc = posEnemy;
+        posFoc2 = posEnemy;
+        vida--;
     }
 }
 
 void Fenix::getPosPlayer(glm::vec2 pos)
 {
 	posPlayer = pos;
+}
+
+glm::vec2 Fenix::getPosFoc() const
+{
+    return posFoc;
 }

@@ -307,6 +307,16 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix)
             plorantTimer = 500;
         }
 
+		if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode) {
+			if (isRightFacing()) {
+				sprite->changeAnimation(PLORANT_DRETA);
+			}
+			else if (isLeftFacing()) {
+				sprite->changeAnimation(PLORANT_ESQUERRA);
+			}
+			plorantTimer = 500;
+		}
+
         if (isAttacking || atacantAbaix || atacantAdalt) {
             if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
                 seta.restarVida();

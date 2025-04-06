@@ -14,7 +14,8 @@ public:
     void setPosition(const glm::vec2& pos);
     glm::vec2 getPosition() const;
     void restarVida();
-    void Fenix::getPosPlayer(glm::vec2 pos);
+    void getPosPlayer(glm::vec2 pos);
+    glm::vec2 getPosFoc() const;
 
 private:
     bool bJumping;
@@ -26,9 +27,12 @@ private:
     glm::vec2 originalHeight;
     Sprite* sprite;
     Sprite* foc;
+    Sprite* foc2;
     TileMap* map;
     Texture spritesheet;
 	glm::vec2 posPlayer;
+    glm::ivec2 posFoc;
+    glm::ivec2 posFoc2;
     bool habaixat;
     bool focActiu;
 };

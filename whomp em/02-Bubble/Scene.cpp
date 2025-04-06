@@ -101,9 +101,10 @@ void Scene::render()
     // HUD usa coordenadas de pantalla
     
     
-    player->render();
+    
     seta->render();
 	fenix->render();
+    player->render();
 
     glm::mat4 hudProjection = glm::ortho(0.f, float(SCREEN_WIDTH)/2, float(SCREEN_HEIGHT)/2, 0.f);
     texProgram.setUniformMatrix4f("projection", hudProjection);
