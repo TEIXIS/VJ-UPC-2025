@@ -153,6 +153,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
     lanzaAdalt->changeAnimation(0);
     lanzaAdalt->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
+
+    godMode = false;
 }
 
 void Player::update(int deltaTime, Enemy& enemy)
@@ -162,6 +164,18 @@ void Player::update(int deltaTime, Enemy& enemy)
     lanza->update(deltaTime);
     lanzaAbaix->update(deltaTime);
     lanzaAdalt->update(deltaTime);
+
+    static bool godModeKeyPressed = false;
+
+    if (Game::instance().getKey(GLFW_KEY_G)) {
+        if (!godModeKeyPressed) {
+            godMode = !godMode;
+            std::cout << "God mode: " << (godMode ? "ON" : "OFF") << std::endl;
+            godModeKeyPressed = true;
+        }
+    } else {
+        godModeKeyPressed = false;
+    }
 
     // Handle hurt state
     if (plorantTimer > 0) {
@@ -271,7 +285,7 @@ void Player::update(int deltaTime, Enemy& enemy)
         }
 
         // Check collisions with enemy
-        if (checkCollision(enemy.getPosition(), glm::ivec2(16, 16))) {
+        if (checkCollision(enemy.getPosition(), glm::ivec2(16, 16)) && !godMode) {
             if (isRightFacing()) {
                 sprite->changeAnimation(PLORANT_DRETA);
             }

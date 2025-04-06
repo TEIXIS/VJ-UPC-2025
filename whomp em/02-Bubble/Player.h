@@ -46,6 +46,8 @@ private:
     Sprite* lanzaAdalt;
     Sprite* lanzaAbaix;
     int plorantTimer;
+    bool godMode;
+	
 };
 
 #endif // _PLAYER_INCLUDE
