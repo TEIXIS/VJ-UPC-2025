@@ -18,7 +18,7 @@ enum PlayerAnims {
     ATK_LEFT_STANDING, ATK_RIGHT_STANDING,
     ATK_LEFT_MOVING, ATK_RIGHT_MOVING,
     ATK_LEFT_DOWN, ATK_RIGHT_DOWN,
-    ATK_JUMPING_UP_R, ATK_JUMPING_DOWN_R, ATK_JUMPING_UP_L, ATK_JUMPING_DOWN_L, PLORANT_DRETA, PLORANT_ESQUERRA
+    ATK_JUMPING_UP_R, ATK_JUMPING_DOWN_R, ATK_JUMPING_UP_L, ATK_JUMPING_DOWN_L, PLORANT_DRETA, PLORANT_ESQUERRA, COUNT
 };
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
@@ -33,7 +33,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
     // Initialize main sprite
     sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.125, 0.125), &spritesheet, &shaderProgram);
-    sprite->setNumberAnimations(20);
+    sprite->setNumberAnimations(COUNT);
 
     // Initialize weapon sprites
     lanza = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.125, 0.125), &spritesheet, &shaderProgram);

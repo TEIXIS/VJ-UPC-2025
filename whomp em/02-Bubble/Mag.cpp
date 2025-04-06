@@ -6,7 +6,9 @@
 #define MOVE_SPEED 1
 
 
-enum MagAnims {  };
+enum MagAnims {
+	caminarEsquerra, caminarDreta, tirarFocDepeuEsquerra, tirarFocDepeuDreta, escutEsquerra, escutDreta,
+    tirarFocAjupitEsquerra, tirarFocAjupitDreta, COUNT };
 
 void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
@@ -14,17 +16,21 @@ void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
     groundTimer = 0;
     sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.125, 0.125), &spritesheet, &shaderProgram);
-    sprite->setNumberAnimations(1);
+    sprite->setNumberAnimations(COUNT);
 
-    sprite->setAnimationSpeed(0, 8);
+    sprite->setAnimationSpeed(caminarEsquerra, 8);
     sprite->addKeyframe(0, glm::vec2(0.0f, 0.0625f));
+	sprite->addKeyframe(0, glm::vec2(0.125f, 0.0625f));
+
+	sprite->setAnimationSpeed(caminarDreta, 8);
+    sprite->addKeyframe(1, glm::vec2(0.875f, 0.1875));
+	sprite->addKeyframe(1, glm::vec2(0.750f, 0.1875f));
     
 
 
-    sprite->changeAnimation(0);
+    sprite->changeAnimation(caminarEsquerra);
 
     tileMapDispl = tileMapPos;
-    //originalHeight = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 
     movingRight = false;
@@ -56,9 +62,13 @@ void Mag::update(int deltaTime)
     else if (movingRight)
     {
         posEnemy.x += MOVE_SPEED;
+		if (sprite->animation() != caminarDreta)
+			sprite->changeAnimation(caminarDreta);
     }
     else
     {
+		if (sprite->animation() != caminarEsquerra)
+			sprite->changeAnimation(caminarEsquerra);
         posEnemy.x -= MOVE_SPEED;
     }
 
