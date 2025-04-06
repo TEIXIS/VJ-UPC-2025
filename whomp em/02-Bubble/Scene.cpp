@@ -59,16 +59,11 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
-<<<<<<< HEAD
-    player->update(deltaTime, *enemy);
-	enemy->update(deltaTime);
-    map->update(deltaTime / 1000.f);  // convertir ms → s
-
-=======
     player->update(deltaTime, *seta, *fenix);
     seta->update(deltaTime);
 	fenix->update(deltaTime);
->>>>>>> origin/main
+    map->update(deltaTime / 1000.f);  // convertir ms → s
+
 
     glm::vec2 playerPos = player->getPosition();
 
