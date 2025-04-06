@@ -28,6 +28,7 @@ public:
 
 	void render() const;
 	void free();
+	void update(float deltatime);
 	
 	int getTileSize() const { return tileSize; }
 
@@ -41,6 +42,8 @@ private:
 	void prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program);
 
 private:
+	glm::vec2 lastMinCoords;
+	ShaderProgram* lastProgram;
 	GLuint vao;
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
@@ -50,8 +53,8 @@ private:
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
-	set<int> collisions = {1,2,3,4,5,6,7,8,9,10,11,13,14,15,18,19,20,21,37,38,39,40,41,42,42,44,45,46,59,60,65,68,73,74,75,80,81,82,84,85,86,87,88,89,90};
-	set<int> lava = {18,19};
+	set<int> collisions = {1,2,3,4,5,6,7,8,9,10,11,13,14,15,18,19,20,21,37,38,39,40,41,42,42,44,45,46,59,60,65,68,73,74,75,80,81,82,84,85,86,87,88,89,90,97,98,99,100};
+	set<int> lava = {18,19,97,98,99,100};
 	set<int> ladder = {67,76,77};
 
 };

@@ -279,6 +279,7 @@ void Player::update(int deltaTime, Enemy& enemy)
                 sprite->changeAnimation(PLORANT_ESQUERRA);
             }
             plorantTimer = 500;
+            this->takeDamage(0.33f);
         }
 
         if (checkCollisionLanza(enemy.getPosition(), glm::ivec2(16, 16))) {
@@ -550,4 +551,8 @@ bool Player::checkCollisionLanza(const glm::vec2& pos, const glm::ivec2& size) c
         posLanza.x + lanzaSize.x > pos.x &&
         posLanza.y < pos.y + size.y &&
         posLanza.y + lanzaSize.y > pos.y);
+}
+
+void Player::takeDamage(float damage) {
+    lives -= damage;
 }

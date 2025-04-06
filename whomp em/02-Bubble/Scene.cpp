@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
 #include "Scene.h"
@@ -54,6 +54,8 @@ void Scene::update(int deltaTime)
     currentTime += deltaTime;
     player->update(deltaTime, *enemy);
 	enemy->update(deltaTime);
+    map->update(deltaTime / 1000.f);  // convertir ms → s
+
 
     glm::vec2 playerPos = player->getPosition();
 
