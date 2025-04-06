@@ -6,107 +6,49 @@
 #define MOVE_SPEED 1
 
 
-enum MagAnims { volantEsquerra, volantDreta };
+enum MagAnims {  };
 
 void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 
     spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
     groundTimer = 0;
-    sprite = Sprite::createSprite(glm::ivec2(32, 16), glm::vec2(0.125, 0.0625), &spritesheet, &shaderProgram);
-    sprite->setNumberAnimations(2);
-    sprite->setAnimationSpeed(volantEsquerra, 8);
-    sprite->addKeyframe(volantEsquerra, glm::vec2(0.0f, 0.3125f));
-    sprite->addKeyframe(volantEsquerra, glm::vec2(0.125f, 0.3125f));
-    sprite->addKeyframe(volantEsquerra, glm::vec2(0.25f, 0.3125f));
+    sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.125, 0.125), &spritesheet, &shaderProgram);
+    sprite->setNumberAnimations(1);
 
-    sprite->setAnimationSpeed(volantDreta, 8);
-    sprite->addKeyframe(volantDreta, glm::vec2(0.375f, 0.3125f));
-    sprite->addKeyframe(volantDreta, glm::vec2(0.5f, 0.3125f));
-    sprite->addKeyframe(volantDreta, glm::vec2(0.625f, 0.3125f));
-
-    foc = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
-    foc->setNumberAnimations(1);
-    foc->setAnimationSpeed(0, 8);
-    foc->addKeyframe(0, glm::vec2(0.75f, 0.3125f));
-    foc->addKeyframe(0, glm::vec2(0.8125f, 0.3125f));
-    foc->addKeyframe(0, glm::vec2(0.875f, 0.3125f));
-
-    foc2 = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
-    foc2->setNumberAnimations(1);
-    foc2->setAnimationSpeed(0, 8);
-    foc2->addKeyframe(0, glm::vec2(0.75f, 0.3125f));
-    foc2->addKeyframe(0, glm::vec2(0.8125f, 0.3125f));
-    foc2->addKeyframe(0, glm::vec2(0.875f, 0.3125f));
+    sprite->setAnimationSpeed(0, 8);
+    sprite->addKeyframe(0, glm::vec2(0.0f, 0.0625f));
+    
 
 
-    sprite->changeAnimation(volantEsquerra);
-    foc->changeAnimation(0);
-    foc2->changeAnimation(0);
+    sprite->changeAnimation(0);
 
     tileMapDispl = tileMapPos;
     //originalHeight = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
-    sprite->setPosition(originalHeight);
-    foc->setPosition(originalHeight);
-    foc2->setPosition(originalHeight);
+    sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+
     movingRight = false;
     attacking = false;
-    habaixat = false;
+    
     bJumping = false;
-    focActiu = false;
+    
 
     vida = 1;
 }
 
 void Mag::update(int deltaTime)
 {
-    if (vida <= 0 && !focActiu) return;
-    else if (vida <= 0 && focActiu) {
-        if (groundTimer > 0) {
-            groundTimer -= deltaTime;
-            if (groundTimer <= 0) {
-                focActiu = false;
-                posFoc.x = -100;
-            }
-        }
-        else {
-            posFoc.x += 1;
-            posFoc.y += 2;
-            posFoc2.x -= 1;
-            posFoc2.y += 2;
-
-            if (map->collisionMoveDown(posFoc, glm::ivec2(16, 16), &posFoc.y)) {
-                groundTimer = 1000;
-            }
-        }
-    }
+    if (vida <= 0) return;
+    
     sprite->update(deltaTime);
-    foc->update(deltaTime);
-    foc2->update(deltaTime);
+ 
 
-
-    if (posEnemy.x <= posPlayer.x + 40 && !attacking) {
-        if (posEnemy.y <= posPlayer.y - 5 && !habaixat) {
-            posEnemy.y += MOVE_SPEED;
-        }
-        else habaixat = true;
-        if (habaixat) {
-            posEnemy.y -= MOVE_SPEED;
-        }
-
-        if (posEnemy.y <= originalHeight.y) {
-            attacking = true;
-        }
-
-    }
-
-
-    if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
+    if (map->collisionMoveRight(posEnemy, glm::ivec2(32, 32)))
     {
         posEnemy.x -= MOVE_SPEED;
         movingRight = false;
     }
-    else if (map->collisionMoveLeft(posEnemy, glm::ivec2(16, 16)) || posEnemy.x == 0)
+    else if (map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32)) || posEnemy.x == 0)
     {
         posEnemy.x += MOVE_SPEED;
         movingRight = true;
@@ -120,24 +62,16 @@ void Mag::update(int deltaTime)
         posEnemy.x -= MOVE_SPEED;
     }
 
-    if (movingRight && sprite->animation() != volantDreta)
-        sprite->changeAnimation(volantDreta);
-    else if (!movingRight && sprite->animation() != volantEsquerra)
-        sprite->changeAnimation(volantEsquerra);
+    
 
 
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
-    foc->setPosition(glm::vec2(float(tileMapDispl.x + posFoc.x), float(tileMapDispl.y + posFoc.y)));
-    foc2->setPosition(glm::vec2(float(tileMapDispl.x + posFoc2.x), float(tileMapDispl.y + posFoc2.y)));
+    
 }
 
 void Mag::render()
 {
-    if (vida <= 0 && !focActiu) return;
-    else if (vida <= 0 && focActiu) {
-        foc->render();
-        foc2->render();
-    }
+    if (vida <= 0) return;
     else
         sprite->render();
 }
@@ -150,7 +84,6 @@ void Mag::setTileMap(TileMap* tileMap)
 void Mag::setPosition(const glm::vec2& pos)
 {
     posEnemy = pos;
-    originalHeight = pos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
 
@@ -165,19 +98,8 @@ void Mag::restarVida()
         vida--;
     if (vida == 0) {
         std::cout << "Enemy defeated!" << std::endl;
-        focActiu = true;
-        posFoc = posEnemy;
-        posFoc2 = posEnemy;
         vida--;
     }
 }
 
-void Mag::getPosPlayer(glm::vec2 pos)
-{
-    posPlayer = pos;
-}
 
-glm::vec2 Mag::getPosFoc() const
-{
-    return posFoc;
-}

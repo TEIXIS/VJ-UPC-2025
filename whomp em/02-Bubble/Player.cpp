@@ -165,6 +165,8 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix)
     lanzaAbaix->update(deltaTime);
     lanzaAdalt->update(deltaTime);
 
+    
+
     static bool godModeKeyPressed = false;
 
     if (Game::instance().getKey(GLFW_KEY_G)) {

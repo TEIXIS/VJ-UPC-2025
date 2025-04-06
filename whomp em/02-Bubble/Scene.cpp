@@ -44,6 +44,9 @@ void Scene::init()
 
 	fenix = new Fenix();
 	fenix->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
+	mag = new Mag();
+	mag->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
     
 	//enemy->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), 26 * map->getTileSize()));
     seta->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
@@ -51,6 +54,10 @@ void Scene::init()
 
     fenix->setPosition(glm::vec2((INIT_PLAYER_X_TILES + 8) * 16, (INIT_PLAYER_Y_TILES) * 16));
     fenix->setTileMap(map);
+
+	mag->setPosition(glm::vec2((INIT_PLAYER_X_TILES) * 16, (INIT_PLAYER_Y_TILES + 2) * 16));
+	mag->setTileMap(map);
+    
 
     projection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
     currentTime = 0.0f;
@@ -62,6 +69,7 @@ void Scene::update(int deltaTime)
     player->update(deltaTime, *seta, *fenix);
     seta->update(deltaTime);
 	fenix->update(deltaTime);
+	mag->update(deltaTime);
 
     glm::vec2 playerPos = player->getPosition();
 
@@ -101,10 +109,11 @@ void Scene::render()
     // HUD usa coordenadas de pantalla
     
     
-    
+	mag->render();
     seta->render();
 	fenix->render();
     player->render();
+
 
     glm::mat4 hudProjection = glm::ortho(0.f, float(SCREEN_WIDTH)/2, float(SCREEN_HEIGHT)/2, 0.f);
     texProgram.setUniformMatrix4f("projection", hudProjection);

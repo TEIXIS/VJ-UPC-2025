@@ -9,6 +9,7 @@
 #include "Seta.h"
 #include "Fenix.h"
 #include "Hud.h"
+#include "Mag.h"
 
 
 // Scene contains all the entities of our game.
@@ -34,6 +35,7 @@ private:
 	Player *player;
 	Seta* seta;
 	Fenix* fenix;
+	Mag* mag;
 	HUD* hud;
 	ShaderProgram texProgram;
 	float currentTime;
