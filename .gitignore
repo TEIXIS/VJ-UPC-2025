@@ -8,3 +8,4 @@
 *.pdb
 *.cache
 *.vsidx
+Debug/

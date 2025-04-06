@@ -153,15 +153,29 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
     lanzaAdalt->changeAnimation(0);
     lanzaAdalt->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
+
+    godMode = false;
 }
 
-void Player::update(int deltaTime, Enemy& enemy)
+void Player::update(int deltaTime, Seta& seta, Fenix& fenix)
 {
     // Update all sprites
     sprite->update(deltaTime);
     lanza->update(deltaTime);
     lanzaAbaix->update(deltaTime);
     lanzaAdalt->update(deltaTime);
+
+    static bool godModeKeyPressed = false;
+
+    if (Game::instance().getKey(GLFW_KEY_G)) {
+        if (!godModeKeyPressed) {
+            godMode = !godMode;
+            std::cout << "God mode: " << (godMode ? "ON" : "OFF") << std::endl;
+            godModeKeyPressed = true;
+        }
+    } else {
+        godModeKeyPressed = false;
+    }
 
     // Handle hurt state
     if (plorantTimer > 0) {
@@ -223,8 +237,7 @@ void Player::update(int deltaTime, Enemy& enemy)
         // Handle horizontal movement
         handleHorizontalMovement();
 
-        // Handle vertical keys
-        handleVerticalKeys();
+        
 
         // Handle jumping and falling
         handleJumpingAndFalling();
@@ -244,6 +257,9 @@ void Player::update(int deltaTime, Enemy& enemy)
                 posLanza = glm::vec2(posPlayer.x - 27, Game::instance().getKey(GLFW_KEY_DOWN) ? posPlayer.y + 8 : posPlayer.y);
             }
         }
+
+        // Handle vertical keys
+        handleVerticalKeys();
 
         // Handle special attack positions
         if (sprite->animation() == ATK_JUMPING_UP_R) {
@@ -271,7 +287,7 @@ void Player::update(int deltaTime, Enemy& enemy)
         }
 
         // Check collisions with enemy
-        if (checkCollision(enemy.getPosition(), glm::ivec2(16, 16))) {
+        if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode) {
             if (isRightFacing()) {
                 sprite->changeAnimation(PLORANT_DRETA);
             }
@@ -282,10 +298,37 @@ void Player::update(int deltaTime, Enemy& enemy)
             this->takeDamage(0.33f);
         }
 
-        if (checkCollisionLanza(enemy.getPosition(), glm::ivec2(16, 16))) {
-            enemy.restarVida();
+        if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode) {
+            if (isRightFacing()) {
+                sprite->changeAnimation(PLORANT_DRETA);
+            }
+            else if (isLeftFacing()) {
+                sprite->changeAnimation(PLORANT_ESQUERRA);
+            }
+            plorantTimer = 500;
+        }
+
+		if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode) {
+			if (isRightFacing()) {
+				sprite->changeAnimation(PLORANT_DRETA);
+			}
+			else if (isLeftFacing()) {
+				sprite->changeAnimation(PLORANT_ESQUERRA);
+			}
+			plorantTimer = 500;
+		}
+
+        if (isAttacking || atacantAbaix || atacantAdalt) {
+            if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
+                seta.restarVida();
+            }
+            if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(32, 16))) {
+                fenix.restarVida();
+            }
         }
     }
+
+	fenix.getPosPlayer(posPlayer);
 
     // Update sprite positions
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -492,17 +535,47 @@ void Player::setIdleAnimation()
 
 void Player::render()
 {
+    // Render the player sprite
     sprite->render();
-    if (isAttacking) {
-        lanza->render();
-    }
+
+    // Render the weapon sprites if attacking
     if (atacantAdalt) {
         lanzaAdalt->render();
+        renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
     }
-    if (atacantAbaix) {
+    else if (atacantAbaix) {
         lanzaAbaix->render();
+        renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
     }
+    else if (isAttacking) {
+        lanza->render();
+        renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
+    }
+    
+    
+
+    // Render hitboxes
+    renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
+   
 }
+
+
+//no funciona ns pq
+void Player::renderHitbox(const glm::vec2& position, const glm::ivec2& size)
+{
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(0.0f, 0.0f, 1.0f); 
+
+    glBegin(GL_LINE_LOOP);
+    glVertex2f(position.x, position.y);
+    glVertex2f(position.x + size.x, position.y);
+    glVertex2f(position.x + size.x, position.y + size.y);
+    glVertex2f(position.x, position.y + size.y);
+    glEnd();
+
+    glEnable(GL_TEXTURE_2D);
+}
+
 
 void Player::setTileMap(TileMap* tileMap)
 {
