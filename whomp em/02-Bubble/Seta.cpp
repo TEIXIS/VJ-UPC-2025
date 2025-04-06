@@ -1,4 +1,4 @@
-#include "Enemy.h"
+#include "Seta.h"
 #include <cmath>
 #include <iostream>
 #include <GL/glew.h>
@@ -8,9 +8,9 @@
 #define JUMP_HEIGHT 16
 #define FALL_STEP 5
 
-enum EnemyAnims { terraDreta, saltantDreta, terraEsquerra, saltantEsquerra };
+enum SetaAnims { terraDreta, saltantDreta, terraEsquerra, saltantEsquerra };
 
-void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
+void Seta::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
     bJumping = false;
     spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -36,7 +36,7 @@ void Enemy::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     movingRight = true;
 }
 
-void Enemy::update(int deltaTime)
+void Seta::update(int deltaTime)
 {
     if (vida <= 0) return;
     sprite->update(deltaTime);
@@ -125,29 +125,29 @@ void Enemy::update(int deltaTime)
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
 
-void Enemy::render()
+void Seta::render()
 {
     if (vida <= 0) return;
     sprite->render();
 }
 
-void Enemy::setTileMap(TileMap* tileMap)
+void Seta::setTileMap(TileMap* tileMap)
 {
     map = tileMap;
 }
 
-void Enemy::setPosition(const glm::vec2& pos)
+void Seta::setPosition(const glm::vec2& pos)
 {
     posEnemy = pos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
 
-glm::vec2 Enemy::getPosition() const
+glm::vec2 Seta::getPosition() const
 {
     return posEnemy;
 }
 
-void Enemy::restarVida()
+void Seta::restarVida()
 {
     if (vida > 0)
         vida--;

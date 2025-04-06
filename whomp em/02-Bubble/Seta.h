@@ -1,11 +1,11 @@
-#ifndef ENEMY_H
-#define ENEMY_H
+#ifndef SETA_H
+#define SETA_H
 
 #include <glm/glm.hpp>
 #include "Sprite.h"
 #include "TileMap.h"
 
-class Enemy
+class Seta
 {
 public:
     void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
@@ -29,4 +29,4 @@ private:
     int vida = 1;
 };
 
-#endif // ENEMY_H
+#endif // SETA_H

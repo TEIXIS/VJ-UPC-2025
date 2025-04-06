@@ -3,13 +3,14 @@
 
 #include "Sprite.h"
 #include "TileMap.h"
-#include "Enemy.h"
+#include "Seta.h"
+#include "Fenix.h"
 
 class Player
 {
 public:
     void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-    void update(int deltaTime, Enemy& enemy);
+    void update(int deltaTime, Seta& seta, Fenix& fenix);
     void render();
 
     void setTileMap(TileMap* tileMap);
@@ -20,6 +21,7 @@ public:
     glm::ivec2 getLanzaSize() const;
     bool checkCollision(const glm::vec2& pos, const glm::ivec2& size) const;
     bool checkCollisionLanza(const glm::vec2& pos, const glm::ivec2& size) const;
+    void renderHitbox(const glm::vec2& position, const glm::ivec2& size);
 
 private:
     // Helper methods for cleaner code organization
