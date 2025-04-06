@@ -6,7 +6,7 @@
 #define MOVE_SPEED 1
 
 
-enum FenixAnims { terraDreta, saltantDreta, terraEsquerra, saltantEsquerra };
+enum FenixAnims { volantEsquerra, volantDreta };
 
 void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
@@ -15,11 +15,18 @@ void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
     groundTimer = 0;
     sprite = Sprite::createSprite(glm::ivec2(32, 16), glm::vec2(0.125, 0.0625), &spritesheet, &shaderProgram);
-    sprite->setNumberAnimations(1);
-    sprite->setAnimationSpeed(0, 8);
-    sprite->addKeyframe(0, glm::vec2(0.0f, 0.3125f));
+    sprite->setNumberAnimations(2);
+    sprite->setAnimationSpeed(volantEsquerra, 8);
+    sprite->addKeyframe(volantEsquerra, glm::vec2(0.0f, 0.3125f));
+	sprite->addKeyframe(volantEsquerra, glm::vec2(0.125f, 0.3125f));
+	sprite->addKeyframe(volantEsquerra, glm::vec2(0.25f, 0.3125f));
 
-    sprite->changeAnimation(0);
+	sprite->setAnimationSpeed(volantDreta, 8);
+	sprite->addKeyframe(volantDreta, glm::vec2(0.375f, 0.3125f));
+	sprite->addKeyframe(volantDreta, glm::vec2(0.5f, 0.3125f));
+	sprite->addKeyframe(volantDreta, glm::vec2(0.625f, 0.3125f));
+
+    sprite->changeAnimation(volantEsquerra);
     tileMapDispl = tileMapPos;
     //originalHeight = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
     sprite->setPosition(originalHeight);
@@ -69,6 +76,11 @@ void Fenix::update(int deltaTime)
  	{	
  		posEnemy.x -= MOVE_SPEED;
  	}
+
+	if (movingRight && sprite->animation()!= volantDreta)
+		sprite->changeAnimation(volantDreta);
+	else if (!movingRight && sprite->animation() != volantEsquerra)
+		sprite->changeAnimation(volantEsquerra);
 
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
 }
