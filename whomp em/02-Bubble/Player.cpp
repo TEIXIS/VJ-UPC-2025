@@ -155,6 +155,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     lanzaAdalt->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
 
     godMode = false;
+	frameCount = 0;
 }
 
 void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
@@ -581,8 +582,11 @@ void Player::setIdleAnimation()
 
 void Player::render()
 {
+	frameCount++;
     // Render the player sprite
-    sprite->render();
+    if (plorantTimer <= 0 || (frameCount % 2 == 1)) {
+        sprite->render();
+    }
 
     // Render the weapon sprites if attacking
     if (atacantAdalt) {

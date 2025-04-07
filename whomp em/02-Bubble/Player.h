@@ -51,6 +51,7 @@ private:
     int plorantTimer;
     bool godMode;
     bool attackKeyPressed = false;
+    int frameCount;
 };
 
 #endif // _PLAYER_INCLUDE
