@@ -4,6 +4,8 @@
 #include "Scene.h"
 #include "Game.h"
 #include "Hud.h"
+#include "Platform1.h"
+#include "Platform2.h"
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
@@ -31,6 +33,13 @@ void Scene::init()
     initShaders();
     map = TileMap::createTileMap("levels/Level.csv", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
     player = new Player();
+    plataforma = new Platform1();
+    glm::vec2 plataformaPos = glm::vec2((INIT_PLAYER_X_TILES + 5) * 16, (INIT_PLAYER_Y_TILES ) * 16);
+    plataforma->init(plataformaPos, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y));
+
+    plataforma2 = new Platform2();
+    glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 10) * 16, (INIT_PLAYER_Y_TILES-1) * 16);
+    plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 40.f);
 
 
     player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -59,13 +68,63 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
-    player->update(deltaTime, *seta, *fenix);
     seta->update(deltaTime);
 	fenix->update(deltaTime);
     map->update(deltaTime / 1000.f);  // convertir ms → s
-
-
     glm::vec2 playerPos = player->getPosition();
+    int posNy = int(playerPos.y);
+    int* ptr = &posNy;  // puntero que apunta a la variable
+    float deltaY = plataforma2->getLastDeltaY();
+    if (plataforma->checkCollisionFromAbove(*player)) {
+        cout << "coll\n";
+        cout << player->isJumpingPlat() << endl;
+        // Si el jugador está encima, se mueve la plataforma hacia abajo.
+        if (!map->collisionMoveDown(playerPos, glm::ivec2(32, 32), ptr)) plataforma->moveWithCharacter(1.0f, *player);
+        else {
+            player->setPosition(glm::ivec2(playerPos.x, playerPos.y-1.0f));
+        }
+        //player->stopJump();// Puedes ajustar el valor según tu lógica.
+        //cout << "Down\n";
+        if (!player->isJumpingPlat()) {
+            cout << "Me poso\n";
+            player->stopJump();
+        }
+
+        player->setPlatform(true);
+    }
+    else if (plataforma->checkCollisionFromBelow(*player)) {
+        // Si se detecta colisión desde abajo, puedes evitar que el jugador suba o bloquear el movimiento.
+        // Aquí podrías, por ejemplo, evitar que el jugador avance hacia arriba.
+        // Esta parte dependerá de cómo gestiones la física y el movimiento del jugador.
+        //cout << "Up\n";
+        plataforma->returnToOriginalPosition(deltaTime);
+        player->stopJump();
+        cout << "DJG\n";
+        //player->setPlatform(false);
+    }
+    else if(!plataforma->checkCollisionFromBelow(*player) && !plataforma->checkCollisionFromAbove(*player) && (!plataforma2->checkCollisionFromAbove(*player) && !plataforma2->checkCollisionFromBelow(*player))) {
+        // Si no hay colisión, la plataforma vuelve gradualmente a su posición original.
+        plataforma->returnToOriginalPosition(deltaTime);
+        player->setPlatform(false);
+    }
+    else if (plataforma2->checkCollisionFromAbove(*player)) {
+        if (!player->isJumpingPlat()) {
+            player->stopJump();
+            cout << "nepe\n";
+        }
+        player->setPlatform(true);
+        glm::vec2 playerPos = player->getPosition();
+        deltaY *= 0.8;
+        player->setPosition(playerPos + glm::vec2(0.f, deltaY));
+    }
+    else if (plataforma2->checkCollisionFromBelow(*player)) {
+        player->stopJump();
+    }
+    else {
+        player->setPlatform(false);
+    }
+    plataforma2->update(deltaTime);
+    player->update(deltaTime, *seta, *fenix);
 
 
     float centerX = SCREEN_WIDTH / 8.0f;
@@ -103,10 +162,12 @@ void Scene::render()
     // HUD usa coordenadas de pantalla
     
     
-    
+    player->render();
     seta->render();
 	fenix->render();
-    player->render();
+    plataforma->render();
+    plataforma2->render();
+
 
     glm::mat4 hudProjection = glm::ortho(0.f, float(SCREEN_WIDTH)/2, float(SCREEN_HEIGHT)/2, 0.f);
     texProgram.setUniformMatrix4f("projection", hudProjection);

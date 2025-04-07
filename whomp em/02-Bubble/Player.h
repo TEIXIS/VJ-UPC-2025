@@ -23,6 +23,10 @@ public:
     bool checkCollisionLanza(const glm::vec2& pos, const glm::ivec2& size) const;
     void takeDamage(float damage);
     void renderHitbox(const glm::vec2& position, const glm::ivec2& size);
+    void stopJump();
+    void setPlatform(bool a);
+    bool isJumping();
+    bool isJumpingPlat();
 
 
 private:
@@ -51,6 +55,8 @@ private:
     Sprite* lanzaAbaix;
     int plorantTimer;
     bool godMode;
+    bool platform = false;
+    bool saltarPlata = false;
 	
 };
 
