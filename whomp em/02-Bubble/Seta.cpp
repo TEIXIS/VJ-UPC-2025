@@ -43,8 +43,10 @@ void Seta::update(int deltaTime)
 
     if (bJumping)
     {
+		//cout << "Jumping" << endl;
         jumpAngle += JUMP_ANGLE_STEP;
-        if (jumpAngle == 180)
+		//cout << jumpAngle << endl;
+        if (jumpAngle == 184)
         {
             bJumping = false;
             posEnemy.y = startY;
@@ -75,6 +77,17 @@ void Seta::update(int deltaTime)
     }
     else
     {
+        /*posEnemy.y += FALL_STEP;
+        if (map->collisionMoveDown(posEnemy, glm::ivec2(32, 32), &posEnemy.y)) {
+            
+            bJumping = true;
+            jumpAngle = 0;
+            startY = posEnemy.y;
+            
+        }*/
+
+
+
         if (groundTimer > 0)
         {
             groundTimer -= deltaTime;
@@ -90,7 +103,7 @@ void Seta::update(int deltaTime)
             }
         }
     }
-
+	//cout << "posEnemy: " << posEnemy.x << ", " << posEnemy.y << endl;
     if (groundTimer <= 0) {
         if (movingRight)
         {
