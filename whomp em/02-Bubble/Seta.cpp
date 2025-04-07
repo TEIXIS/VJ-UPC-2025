@@ -14,7 +14,7 @@ void Seta::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
     bJumping = false;
     spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
-    groundTimer = 0;
+    groundTimer = -1;
     sprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
     sprite->setNumberAnimations(4);
 
@@ -86,11 +86,19 @@ void Seta::update(int deltaTime)
             
         }*/
 
+        
+        
 
 
         if (groundTimer > 0)
         {
             groundTimer -= deltaTime;
+            posEnemy.y += FALL_STEP;
+            if (map->collisionMoveDown(posEnemy, glm::ivec2(16, 16), &posEnemy.y))
+            {
+                jumpAngle = 0;
+                startY = posEnemy.y;
+            }
         }
         else
         {
