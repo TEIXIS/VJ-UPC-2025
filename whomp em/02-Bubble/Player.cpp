@@ -167,6 +167,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 
     
 
+
     static bool godModeKeyPressed = false;
 
     if (Game::instance().getKey(GLFW_KEY_G)) {
@@ -175,7 +176,8 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
             std::cout << "God mode: " << (godMode ? "ON" : "OFF") << std::endl;
             godModeKeyPressed = true;
         }
-    } else {
+    }
+    else {
         godModeKeyPressed = false;
     }
 
@@ -239,10 +241,10 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
         // Handle horizontal movement
         handleHorizontalMovement();
 
-        
+
 
         // Handle jumping and falling
-        handleJumpingAndFalling();
+        
 
         // Handle weapon state
         if (!Game::instance().getKey(GLFW_KEY_X)) {
@@ -262,6 +264,8 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 
         // Handle vertical keys
         handleVerticalKeys();
+
+        handleJumpingAndFalling();
 
         // Handle special attack positions
         if (sprite->animation() == ATK_JUMPING_UP_R) {
@@ -290,6 +294,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 
         // Check collisions with enemy
         if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode) {
+			cout << "Collision with seta" << endl;  
             if (isRightFacing()) {
                 sprite->changeAnimation(PLORANT_DRETA);
             }
@@ -300,6 +305,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
         }
 
         if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode) {
+			cout << "Collision with fenix" << endl;
             if (isRightFacing()) {
                 sprite->changeAnimation(PLORANT_DRETA);
             }
@@ -309,7 +315,30 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
             plorantTimer = 500;
         }
 
-		if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode) {
+        if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode) {
+			cout << "Collision with fenix fire" << endl;
+            if (isRightFacing()) {
+                sprite->changeAnimation(PLORANT_DRETA);
+            }
+            else if (isLeftFacing()) {
+                sprite->changeAnimation(PLORANT_ESQUERRA);
+            }
+            plorantTimer = 500;
+        }
+
+		if (checkCollision(mag.getPosition(), glm::ivec2(32, 32)) && !godMode) {
+			cout << "Collision with mag" << endl;
+			if (isRightFacing()) {
+				sprite->changeAnimation(PLORANT_DRETA);
+			}
+			else if (isLeftFacing()) {
+				sprite->changeAnimation(PLORANT_ESQUERRA);
+			}
+			plorantTimer = 500;
+		}
+
+		if (checkCollision(mag.getPosProjectile(), glm::ivec2(8, 8)) && !godMode) {
+			cout << "Collision with mag projectile" << endl;
 			if (isRightFacing()) {
 				sprite->changeAnimation(PLORANT_DRETA);
 			}
@@ -326,11 +355,14 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
             if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(32, 16))) {
                 fenix.restarVida();
             }
+            if (checkCollisionLanza(mag.getPosition(), glm::ivec2(32, 32))) {
+                mag.restarVida();
+            }
         }
     }
 
-	fenix.getPosPlayer(posPlayer);
-	mag.getPosPlayer(posPlayer);
+    fenix.getPosPlayer(posPlayer);
+    mag.getPosPlayer(posPlayer);
 
     // Update sprite positions
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -553,12 +585,12 @@ void Player::render()
         lanza->render();
         renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
     }
-    
-    
+
+
 
     // Render hitboxes
     renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
-   
+
 }
 
 
@@ -566,7 +598,7 @@ void Player::render()
 void Player::renderHitbox(const glm::vec2& position, const glm::ivec2& size)
 {
     glDisable(GL_TEXTURE_2D);
-    glColor3f(0.0f, 0.0f, 1.0f); 
+    glColor3f(0.0f, 0.0f, 1.0f);
 
     glBegin(GL_LINE_LOOP);
     glVertex2f(position.x, position.y);

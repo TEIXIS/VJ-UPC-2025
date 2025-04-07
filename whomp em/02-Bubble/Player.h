@@ -50,7 +50,7 @@ private:
     Sprite* lanzaAbaix;
     int plorantTimer;
     bool godMode;
-	
+    bool attackKeyPressed = false;
 };
 
 #endif // _PLAYER_INCLUDE

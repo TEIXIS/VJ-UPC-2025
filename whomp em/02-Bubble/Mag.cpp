@@ -71,16 +71,32 @@ void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	posProjectile = glm::vec2(float(-100), float(tileMapDispl.y + posEnemy.y));
     movingRight = false;
     attacking = false;
-    
+    invulnerable = false;
+    invulnerableTimer = 0;
     bJumping = false;
     
 	atacTimer = 0;
-    vida = 1;
+    vida = 0;
 }
 
 void Mag::update(int deltaTime)
 {
     if (vida <= 0) return;
+
+    if (invulnerable) {
+        invulnerableTimer -= deltaTime;
+        if (invulnerableTimer <= 0) {
+            invulnerable = false;
+            invulnerableTimer = 0;
+        }
+    }
+
+	//cout << abs(posEnemy.x - posPlayer.x) << endl;
+
+    if (abs(posEnemy.x - posPlayer.x) > 200) {
+        vida = 0;
+
+    }
     
     sprite->update(deltaTime);
 	projectile->update(deltaTime);
@@ -160,10 +176,11 @@ void Mag::update(int deltaTime)
 
 void Mag::render()
 {
-	if (posProjectile.x <= posPlayer.x + 450 && posProjectile.x >= posPlayer.x - 210 && atacTimer <= 1500) projectile->render();
+	
     if (vida <= 0) return;
     else
         sprite->render();
+    if (posProjectile.x <= posPlayer.x + 450 && posProjectile.x >= posPlayer.x - 210 && atacTimer <= 1500) projectile->render();
 }
 
 void Mag::setTileMap(TileMap* tileMap)
@@ -184,16 +201,39 @@ glm::vec2 Mag::getPosition() const
 
 void Mag::restarVida()
 {
-    if (vida > 0)
+    if (!invulnerable && vida > 0) {
         vida--;
-    if (vida == 0) {
-        std::cout << "Enemy defeated!" << std::endl;
-        vida--;
+        if (vida == 0) {
+            std::cout << "Enemy defeated!" << std::endl;
+			posEnemy = glm::vec2(-100, -100);
+			posProjectile = glm::vec2(-100, -100);
+			spawnB = false;
+        }
+        else {
+            invulnerable = true;
+            invulnerableTimer = 500; // 0.5 segundos
+        }
     }
 }
+
 void Mag::getPosPlayer(glm::vec2 pos)
 {
     posPlayer = pos;
 }
 
+glm::vec2 Mag::getPosProjectile()
+{
+	return posProjectile;
+}
+
+void Mag::spawn()
+{
+	if (vida <= 0) {
+        setPosition(glm::vec2((20) * 16, (99) * 16));
+        cout << "Mag spawned" << endl;
+		//posEnemy = glm::vec2(16, 16);
+		vida = 3;
+		spawnB = true;
+	}
+}
 

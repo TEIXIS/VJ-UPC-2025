@@ -15,6 +15,8 @@ public:
     glm::vec2 getPosition() const;
     void restarVida();
     void getPosPlayer(glm::vec2 pos);
+    glm::vec2 getPosProjectile();
+    void spawn();
     
 
 private:
@@ -29,9 +31,11 @@ private:
 	glm::ivec2 posProjectile;
     Sprite* sprite;
 	Sprite* projectile;
-    
+    bool invulnerable;
+    int invulnerableTimer;
     TileMap* map;
     Texture spritesheet;
+    bool spawnB;
     
 };
 

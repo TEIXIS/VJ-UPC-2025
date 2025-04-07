@@ -9,7 +9,7 @@
 #define SCREEN_Y 16
 
 //#define INIT_PLAYER_X_TILES 2
-#define INIT_PLAYER_X_TILES 16
+#define INIT_PLAYER_X_TILES 70
 #define INIT_PLAYER_Y_TILES 97
 
 Scene::Scene()
@@ -52,10 +52,10 @@ void Scene::init()
     seta->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
     seta->setTileMap(map);
 
-    fenix->setPosition(glm::vec2((INIT_PLAYER_X_TILES + 8) * 16, (INIT_PLAYER_Y_TILES) * 16));
+    //fenix->setPosition(glm::vec2((INIT_PLAYER_X_TILES + 8) * 16, (INIT_PLAYER_Y_TILES) * 16));
     fenix->setTileMap(map);
 
-	mag->setPosition(glm::vec2((INIT_PLAYER_X_TILES) * 16, (INIT_PLAYER_Y_TILES + 2) * 16));
+	//mag->setPosition(glm::vec2((INIT_PLAYER_X_TILES) * 16, (INIT_PLAYER_Y_TILES + 2) * 16));
 	mag->setTileMap(map);
     
 
@@ -73,6 +73,17 @@ void Scene::update(int deltaTime)
 
     glm::vec2 playerPos = player->getPosition();
 
+    if (playerPos.x == 8*16) {
+        mag->spawn();
+        
+    }
+	if (playerPos.x == 78*16) {
+		fenix->spawn();
+		
+	}
+    if (playerPos.x == 0 * 16) {
+        //seta->spawn();
+    }
 
     float centerX = SCREEN_WIDTH / 8.0f;
     float centerY = SCREEN_HEIGHT / 8.0f;

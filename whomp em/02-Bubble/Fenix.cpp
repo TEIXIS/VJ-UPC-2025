@@ -55,12 +55,20 @@ void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     bJumping = false;
     focActiu = false;
 
-    vida = 1;
+    vida = 0;
 }
 
 void Fenix::update(int deltaTime)
 {
     if (vida <= 0 && !focActiu) return;
+
+    //cout << abs(posEnemy.x - posPlayer.x) << endl;
+    if (abs(posEnemy.x - posPlayer.x) > 190) {
+        vida = 0;
+		focActiu = false;
+    }
+
+    
     else if (vida <= 0 && focActiu) {
         if (groundTimer > 0) {
             groundTimer -= deltaTime;
@@ -87,11 +95,11 @@ void Fenix::update(int deltaTime)
 
 	if (posEnemy.x <= posPlayer.x + 40 && !attacking) {
 		if (posEnemy.y <= posPlayer.y - 5 && !habaixat) {
-            posEnemy.y += MOVE_SPEED;
+            posEnemy.y += MOVE_SPEED*2;
 		}
 		else habaixat = true;
 		if (habaixat) {
-			posEnemy.y -= MOVE_SPEED;
+			posEnemy.y -= MOVE_SPEED*2;
 		}
 
         if (posEnemy.y <= originalHeight.y) {
@@ -101,7 +109,7 @@ void Fenix::update(int deltaTime)
 	}
 	
     
-    if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
+    /*if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
  	{
  		posEnemy.x -= MOVE_SPEED;
  		movingRight = false;
@@ -110,7 +118,15 @@ void Fenix::update(int deltaTime)
  	{
  		posEnemy.x += MOVE_SPEED;
  		movingRight = true;
- 	}
+ 	}*/
+    if (posEnemy.x >= posPlayer.x + 175) {
+        posEnemy.x -= MOVE_SPEED;
+        movingRight = false;
+    }
+    else if (posEnemy.x <= posPlayer.x - 125) {
+		posEnemy.x += MOVE_SPEED;
+		movingRight = true;
+    }
  	else if (movingRight)
  	{
  		posEnemy.x += MOVE_SPEED;
@@ -169,6 +185,7 @@ void Fenix::restarVida()
         posFoc = posEnemy;
         posFoc2 = posEnemy;
         vida--;
+		posEnemy.x = -100;
     }
 }
 
@@ -180,4 +197,17 @@ void Fenix::getPosPlayer(glm::vec2 pos)
 glm::vec2 Fenix::getPosFoc() const
 {
     return posFoc;
+}
+void Fenix::spawn()
+{
+	if (vida <= 0) {
+		vida = 1;
+		spawnB = true;
+		focActiu = false;
+		posFoc.x = -100;
+        habaixat = false;
+		attacking = false;
+        setPosition(glm::vec2((90) * 16, (93) * 16));
+        cout << "Fenix spawned" << endl;
+	}
 }

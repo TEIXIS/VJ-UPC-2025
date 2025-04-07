@@ -16,6 +16,7 @@ public:
     void restarVida();
     void getPosPlayer(glm::vec2 pos);
     glm::vec2 getPosFoc() const;
+	void spawn();
 
 private:
     bool bJumping;
@@ -35,6 +36,7 @@ private:
     glm::ivec2 posFoc2;
     bool habaixat;
     bool focActiu;
+	bool spawnB;
 };
 
 
