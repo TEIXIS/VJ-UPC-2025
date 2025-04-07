@@ -254,11 +254,11 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
             isAttacking = true;
             if (isRightFacing()) {
                 if (lanza->animation() != 0) lanza->changeAnimation(0);
-                posLanza = glm::vec2(posPlayer.x + 26, Game::instance().getKey(GLFW_KEY_DOWN) ? posPlayer.y + 8 : posPlayer.y);
+                posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
             }
             else if (isLeftFacing()) {
                 if (lanza->animation() != 1) lanza->changeAnimation(1);
-                posLanza = glm::vec2(posPlayer.x - 27, Game::instance().getKey(GLFW_KEY_DOWN) ? posPlayer.y + 8 : posPlayer.y);
+                posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
             }
         }
 
@@ -512,7 +512,13 @@ void Player::handleJumpingAnimations()
             sprite->changeAnimation(ATK_JUMPING_DOWN_R);
         else if (isLeftFacing())
             sprite->changeAnimation(ATK_JUMPING_DOWN_L);
-    }
+	}
+	else if (Game::instance().getKey(GLFW_KEY_X)) {
+		if (isRightFacing())
+			sprite->changeAnimation(ATK_RIGHT_DOWN);
+		else if (isLeftFacing())
+			sprite->changeAnimation(ATK_LEFT_DOWN);
+	}
     else {
         if (isLeftFacing())
             sprite->changeAnimation(LOOK_DOWN_L);
@@ -535,6 +541,12 @@ void Player::handleFallingAnimations()
         else if (isLeftFacing())
             sprite->changeAnimation(ATK_JUMPING_DOWN_L);
     }
+	else if (Game::instance().getKey(GLFW_KEY_X)) {
+		if (isRightFacing())
+			sprite->changeAnimation(ATK_RIGHT_DOWN);
+		else if (isLeftFacing())
+			sprite->changeAnimation(ATK_LEFT_DOWN);
+	}
     else {
         if (isLeftFacing())
             sprite->changeAnimation(LOOK_DOWN_L);

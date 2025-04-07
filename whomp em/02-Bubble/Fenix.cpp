@@ -62,10 +62,13 @@ void Fenix::update(int deltaTime)
 {
     if (vida <= 0 && !focActiu) return;
 
+	//cout << posFoc.x << endl;
     //cout << abs(posEnemy.x - posPlayer.x) << endl;
-    if (abs(posEnemy.x - posPlayer.x) > 190) {
+    if (abs(posEnemy.x - posPlayer.x) > 190 && !focActiu) {
         vida = 0;
-		focActiu = false;
+		//focActiu = false;
+		posFoc.x = -100;
+		posFoc2.x = -100;
     }
 
     
@@ -75,13 +78,14 @@ void Fenix::update(int deltaTime)
             if (groundTimer <= 0) {
                 focActiu = false;
 				posFoc.x = -100;
+				posFoc2.x = -100;
             }
         }
         else {
             posFoc.x += 1;
-            posFoc.y += 2;
+            posFoc.y += 3;
             posFoc2.x -= 1;
-            posFoc2.y += 2;
+            posFoc2.y += 3;
 
             if (map->collisionMoveDown(posFoc, glm::ivec2(16, 16), &posFoc.y)) {
                 groundTimer = 1000;
