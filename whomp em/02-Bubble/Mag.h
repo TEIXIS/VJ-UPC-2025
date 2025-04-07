@@ -14,6 +14,7 @@ public:
     void setPosition(const glm::vec2& pos);
     glm::vec2 getPosition() const;
     void restarVida();
+    void getPosPlayer(glm::vec2 pos);
     
 
 private:
@@ -21,9 +22,9 @@ private:
     bool movingRight;
     bool attacking;
     int vida;
-    int groundTimer;
+    int atacTimer;
     glm::ivec2 tileMapDispl, posEnemy;
-
+    glm::vec2 posPlayer;
     Sprite* sprite;
     
     TileMap* map;

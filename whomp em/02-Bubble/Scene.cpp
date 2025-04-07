@@ -66,7 +66,7 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
-    player->update(deltaTime, *seta, *fenix);
+    player->update(deltaTime, *seta, *fenix, *mag);
     seta->update(deltaTime);
 	fenix->update(deltaTime);
 	mag->update(deltaTime);

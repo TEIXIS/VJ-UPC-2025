@@ -14,7 +14,6 @@ void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
 
     spritesheet.loadFromFile("images/enemies.png", TEXTURE_PIXEL_FORMAT_RGBA);
-    groundTimer = 0;
     sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.125, 0.125), &spritesheet, &shaderProgram);
     sprite->setNumberAnimations(COUNT);
 
@@ -23,8 +22,32 @@ void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->addKeyframe(0, glm::vec2(0.125f, 0.0625f));
 
 	sprite->setAnimationSpeed(caminarDreta, 8);
-    sprite->addKeyframe(1, glm::vec2(0.875f, 0.1875));
+    sprite->addKeyframe(1, glm::vec2(0.875f, 0.1875f));
 	sprite->addKeyframe(1, glm::vec2(0.750f, 0.1875f));
+
+	sprite->setAnimationSpeed(tirarFocDepeuEsquerra, 8);
+	sprite->addKeyframe(2, glm::vec2(0.250f, 0.0625f));
+	sprite->addKeyframe(2, glm::vec2(0.375f, 0.0625f));
+
+	sprite->setAnimationSpeed(tirarFocDepeuDreta, 8);
+	sprite->addKeyframe(3, glm::vec2(0.625f, 0.1875f));
+	sprite->addKeyframe(3, glm::vec2(0.500f, 0.1875f));
+
+	sprite->setAnimationSpeed(escutEsquerra, 8);
+	sprite->addKeyframe(4, glm::vec2(0.500f, 0.0625f));
+	sprite->addKeyframe(4, glm::vec2(0.625f, 0.0625f));
+
+	sprite->setAnimationSpeed(escutDreta, 8);
+	sprite->addKeyframe(5, glm::vec2(0.375f, 0.1875f));
+	sprite->addKeyframe(5, glm::vec2(0.250f, 0.1875f));
+
+	sprite->setAnimationSpeed(tirarFocAjupitEsquerra, 2);
+	sprite->addKeyframe(6, glm::vec2(0.750f, 0.0625f));
+	sprite->addKeyframe(6, glm::vec2(0.875f, 0.0625f));
+
+	sprite->setAnimationSpeed(tirarFocAjupitDreta, 2);
+	sprite->addKeyframe(7, glm::vec2(0.125f, 0.1875f));
+	sprite->addKeyframe(7, glm::vec2(0.0f, 0.1875f));
     
 
 
@@ -38,7 +61,7 @@ void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     
     bJumping = false;
     
-
+	atacTimer = 0;
     vida = 1;
 }
 
@@ -47,30 +70,55 @@ void Mag::update(int deltaTime)
     if (vida <= 0) return;
     
     sprite->update(deltaTime);
- 
 
-    if (map->collisionMoveRight(posEnemy, glm::ivec2(32, 32)))
+
+    if (atacTimer > 0)
     {
-        posEnemy.x -= MOVE_SPEED;
-        movingRight = false;
-    }
-    else if (map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32)) || posEnemy.x == 0)
-    {
-        posEnemy.x += MOVE_SPEED;
-        movingRight = true;
-    }
-    else if (movingRight)
-    {
-        posEnemy.x += MOVE_SPEED;
-		if (sprite->animation() != caminarDreta)
-			sprite->changeAnimation(caminarDreta);
+        atacTimer -= deltaTime;
+        if (atacTimer <= 1000) {
+            if (map->collisionMoveRight(posEnemy, glm::ivec2(32, 32)))
+            {
+                posEnemy.x -= MOVE_SPEED;
+                movingRight = false;
+            }
+            else if (map->collisionMoveLeft(posEnemy, glm::ivec2(32, 32)) || posEnemy.x == 0)
+            {
+                posEnemy.x += MOVE_SPEED;
+                movingRight = true;
+            }
+            else if (movingRight)
+            {
+                posEnemy.x += MOVE_SPEED;
+                if (sprite->animation() != caminarDreta)
+                    sprite->changeAnimation(caminarDreta);
+            }
+            else
+            {
+                if (sprite->animation() != caminarEsquerra)
+                    sprite->changeAnimation(caminarEsquerra);
+                posEnemy.x -= MOVE_SPEED;
+            }
+        }
+        
     }
     else
     {
-		if (sprite->animation() != caminarEsquerra)
-			sprite->changeAnimation(caminarEsquerra);
-        posEnemy.x -= MOVE_SPEED;
+        atacTimer = 2000;
+        if (posEnemy.x <= posPlayer.x) {
+			movingRight = true;
+			if (sprite->animation() != tirarFocAjupitDreta)
+				sprite->changeAnimation(tirarFocAjupitDreta);
+        }
+        else {
+			movingRight = false;
+			if (sprite->animation() != tirarFocAjupitEsquerra)
+				sprite->changeAnimation(tirarFocAjupitEsquerra);
+        }
+
     }
+ 
+
+    
 
     
 
@@ -110,6 +158,10 @@ void Mag::restarVida()
         std::cout << "Enemy defeated!" << std::endl;
         vida--;
     }
+}
+void Mag::getPosPlayer(glm::vec2 pos)
+{
+    posPlayer = pos;
 }
 
 

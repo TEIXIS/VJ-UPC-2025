@@ -157,7 +157,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     godMode = false;
 }
 
-void Player::update(int deltaTime, Seta& seta, Fenix& fenix)
+void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 {
     // Update all sprites
     sprite->update(deltaTime);
@@ -330,6 +330,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix)
     }
 
 	fenix.getPosPlayer(posPlayer);
+	mag.getPosPlayer(posPlayer);
 
     // Update sprite positions
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
