@@ -50,12 +50,25 @@ void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->addKeyframe(7, glm::vec2(0.0f, 0.1875f));
     
 
+	projectile = Sprite::createSprite(glm::ivec2(8, 8), glm::vec2(0.03125, 0.03125), &spritesheet, &shaderProgram);
+	projectile->setNumberAnimations(2);
+	
+    projectile->setAnimationSpeed(0, 8);
+	projectile->addKeyframe(0, glm::vec2(0.25f, 0.0f));
+	projectile->addKeyframe(0, glm::vec2(0.28125f, 0.0f));
 
+	projectile->setAnimationSpeed(1, 8);
+	projectile->addKeyframe(1, glm::vec2(0.25f, 0.03125f));
+	projectile->addKeyframe(1, glm::vec2(0.28125f, 0.03125f));
+
+
+
+	projectile->changeAnimation(0);
     sprite->changeAnimation(caminarEsquerra);
 
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
-
+	posProjectile = glm::vec2(float(-100), float(tileMapDispl.y + posEnemy.y));
     movingRight = false;
     attacking = false;
     
@@ -70,12 +83,24 @@ void Mag::update(int deltaTime)
     if (vida <= 0) return;
     
     sprite->update(deltaTime);
-
+	projectile->update(deltaTime);
 
     if (atacTimer > 0)
     {
         atacTimer -= deltaTime;
+
+        if (atacTimer <= 1500) {
+            if (projectilDreta) {
+                posProjectile.x += 3;
+            }
+            else {
+                posProjectile.x -= 3;
+            }
+        }
+        
+
         if (atacTimer <= 1000) {
+
             if (map->collisionMoveRight(posEnemy, glm::ivec2(32, 32)))
             {
                 posEnemy.x -= MOVE_SPEED;
@@ -104,15 +129,21 @@ void Mag::update(int deltaTime)
     else
     {
         atacTimer = 2000;
+        posProjectile = posEnemy;
+        posProjectile.y += 16;
         if (posEnemy.x <= posPlayer.x) {
 			movingRight = true;
+			projectilDreta = true;
 			if (sprite->animation() != tirarFocAjupitDreta)
 				sprite->changeAnimation(tirarFocAjupitDreta);
+			projectile->changeAnimation(1);
         }
         else {
 			movingRight = false;
+			projectilDreta = false;
 			if (sprite->animation() != tirarFocAjupitEsquerra)
 				sprite->changeAnimation(tirarFocAjupitEsquerra);
+			projectile->changeAnimation(0);
         }
 
     }
@@ -122,13 +153,14 @@ void Mag::update(int deltaTime)
 
     
 
-
+	projectile->setPosition(glm::vec2(float(tileMapDispl.x + posProjectile.x), float(tileMapDispl.y + posProjectile.y)));
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
     
 }
 
 void Mag::render()
 {
+	if (posProjectile.x <= posPlayer.x + 450 && posProjectile.x >= posPlayer.x - 210 && atacTimer <= 1500) projectile->render();
     if (vida <= 0) return;
     else
         sprite->render();

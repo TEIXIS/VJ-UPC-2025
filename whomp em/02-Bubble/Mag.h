@@ -20,12 +20,15 @@ public:
 private:
     bool bJumping;
     bool movingRight;
+    bool projectilDreta;
     bool attacking;
     int vida;
     int atacTimer;
     glm::ivec2 tileMapDispl, posEnemy;
     glm::vec2 posPlayer;
+	glm::ivec2 posProjectile;
     Sprite* sprite;
+	Sprite* projectile;
     
     TileMap* map;
     Texture spritesheet;
