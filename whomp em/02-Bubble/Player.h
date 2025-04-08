@@ -37,7 +37,7 @@ public:
     void checkImmortalTimer(int deltaTime);
     void setImmortalTimer(float t);
     void setCapaActiva(bool a);
-	bool getCapaActiva() const;
+    bool getCapaActiva() const;
     void setPlorantTimer();
     bool playerIsPlorant();
 
@@ -48,6 +48,7 @@ private:
     void handleJumpingAndFalling();
     void handleJumpingAnimations();
     void handleFallingAnimations();
+    void handleLadderMovement(); // New method for ladder movement
 
     // State checking methods
     bool isRightFacing() const;
@@ -73,15 +74,16 @@ private:
     int frameCount;
     bool platform = false;
     bool saltarPlata = false;
-	bool totemFocActiu = false;
-	int offsetTotem = 0;
+    bool totemFocActiu = false;
+    int offsetTotem = 0;
     int calabazas = 1;
     int lamps = 1;
     float inmortalTimer = 0.f;
     bool capaActiva = false;
     bool levitar = false;
     bool lava = false;
-	
+    bool isClimbingLadder = false; // New variable to track ladder climbing state
+
 };
 
 #endif // _PLAYER_INCLUDE

@@ -138,6 +138,7 @@ void Scene::update(int deltaTime)
 		if (Game::instance().getKey(GLFW_KEY_SPACE)) {
 			jocComencat = true;
 		}
+        
 		return;
 	}
     if (Game::instance().getKey(GLFW_KEY_R)) {
