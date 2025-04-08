@@ -91,6 +91,7 @@ void Scene::update(int deltaTime)
 	fenix->update(deltaTime);
 	mag->update(deltaTime);
     map->update(deltaTime / 1000.f);  
+	hud->update(deltaTime);
     
     glm::vec2 playerPos = player->getPosition();
     int posNy = int(playerPos.y);
