@@ -34,15 +34,16 @@ void Scene::init()
     map = TileMap::createTileMap("levels/Level.csv", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
     player = new Player();
 
-
+    jocComencat = false;
 
     spritesheet.loadFromFile("images/titol.png", TEXTURE_PIXEL_FORMAT_RGBA);
-    pantallaTitol = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &spritesheet, &texProgram);
+    pantallaTitol = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), glm::vec2(1.f, 1.f), &spritesheet, &texProgram);
 	pantallaTitol->setNumberAnimations(1);
 	pantallaTitol->setAnimationSpeed(0, 1);
 	pantallaTitol->addKeyframe(0, glm::vec2(0.f, 0.f));
-    pantallaTitol->setPosition(glm::vec2(-500.f, -500.f));
-	jocComencat = false;
+    pantallaTitol->setPosition(glm::vec2(0.f, 0.f));
+
+
 
     // Suponiendo que texProgram, SCREEN_X, SCREEN_Y están definidos y accesibles aquí
 
@@ -76,6 +77,9 @@ void Scene::init()
 
 	capa = new Capa();
 	capa->init(glm::vec2((INIT_PLAYER_X_TILES + 35) * 16, (INIT_PLAYER_Y_TILES - 5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/capa.png");
+
+    flam = new Llamarada();
+	flam->init(glm::vec2((INIT_PLAYER_X_TILES + 40) * 16, (INIT_PLAYER_Y_TILES-1) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::UP);
 
     player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
     player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
@@ -134,12 +138,16 @@ void Scene::update(int deltaTime)
 		}
 		return;
 	}
+    if (Game::instance().getKey(GLFW_KEY_R)) {
+        resetLevel();  // Al pulsar R reinicia todo
+    }
     currentTime += deltaTime;
     /*seta->update(deltaTime);
 	fenix->update(deltaTime);*/
 	mag->update(deltaTime);
 	mag2->update(deltaTime);
     map->update(deltaTime / 1000.f);  
+    flam->update(deltaTime);
 	hud->update(deltaTime);
 
     for (auto& fenn : fenixes) {
@@ -246,7 +254,20 @@ void Scene::update(int deltaTime)
         player->setPlatform(false);
         for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
     }
+
+
     player->update(deltaTime, setas, fenixes, *mag, *mag2);
+
+    if (player->getLives() <= 0) {
+        resetLevel();
+    }
+
+
+
+    if (flam->collidesWithPlayer(*player) && !player->getCapaActiva() && !player->playerIsPlorant()) {
+        player->setPlorantTimer();
+        player->takeDamage(0.66f); // o el método que uses
+    }
     cor1->applyGravity(deltaTime, map);
     if (!cor1->isCollected() && cor1->collidesWith(*player)) {
         cor1->onCollect(*player);
@@ -322,6 +343,9 @@ void Scene::update(int deltaTime)
 
 void Scene::render()
 {
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // gris oscuro o lo que prefieras
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	if (!jocComencat) {
 		pantallaTitol->render();
 		return;
@@ -343,6 +367,7 @@ void Scene::render()
     calabaza1->render();
     lamp->render();
 	capa->render();
+    flam->render();
     // HUD usa coordenadas de pantalla
     
     
@@ -397,3 +422,49 @@ void Scene::initShaders()
     vShader.free();
     fShader.free();
 }
+
+void Scene::resetLevel()
+{
+    // 🧹 Borrar todo lo anterior
+    delete player;
+    player = nullptr;
+
+    delete map;
+    map = nullptr;
+
+    delete hud;
+    hud = nullptr;
+
+    delete mag;
+    delete mag2;
+    mag = mag2 = nullptr;
+
+    for (auto* f : fenixes) delete f;
+    fenixes.clear();
+
+    for (auto* s : setas) delete s;
+    setas.clear();
+
+    for (auto* p : plataformas1) delete p;
+    plataformas1.clear();
+
+    for (auto* p : plataformas2) delete p;
+    plataformas2.clear();
+
+    delete cor1;
+    delete cor2;
+    delete calabaza1;
+    delete lamp;
+    delete capa;
+    delete flam;
+
+    cor1 = nullptr; cor2 = nullptr; calabaza1 = nullptr; lamp = nullptr; capa = nullptr; flam = nullptr;
+
+    // 🌀 Reiniciar tiempo y estado
+    currentTime = 0.0f;
+    jocComencat = false;
+
+    // 🔄 Volver a iniciar todo
+    init();
+}
+

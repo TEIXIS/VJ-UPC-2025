@@ -323,10 +323,40 @@ bool TileMap::collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, i
 				*posY = tileTop - size.y;
 
 				// Chequeo opcional de lava, etc.
-				if (lava.find(map[y * mapSize.x + x]) != lava.end()) {
-					std::cout << "lava\n";
-				}
 
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool TileMap::collisionLava(const glm::ivec2& pos, const glm::ivec2& size) const
+{
+	int x0, x1, y;
+
+	// Calculamos el tile en X que ocupa la parte izquierda y derecha del bounding box
+	x0 = pos.x / tileSize;
+	x1 = (pos.x + size.x - 1) / tileSize;
+
+	// Calculamos el tile en Y que ocupa la parte inferior del bounding box
+	y = (pos.y + size.y - 1) / tileSize;
+
+	for (int x = x0; x <= x1; x++)
+	{
+		// Verificamos si el tile en [y, x] es sólido
+		if (lava.find(map[y * mapSize.x + x]) != lava.end())
+		{
+			// Calcula la coordenada en píxeles de la parte superior de ese tile
+			int tileTop = y * tileSize;
+
+			// Calcula la parte inferior del bounding box
+			int boxBottom = pos.y + size.y;
+			std::cout << "Tile debajo del jugador: " << map[y * mapSize.x + x] << std::endl;
+			// Si la parte inferior del bounding box está por debajo de la parte superior del tile...
+			if (boxBottom > tileTop)
+			{
+				
 				return true;
 			}
 		}

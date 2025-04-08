@@ -285,6 +285,16 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
         else {
             // 🔹 Aplica gravedad normalmente
             posPlayer.y += FALL_STEP;
+            if (map->collisionLava(posPlayer,glm::ivec2(32.f,32.f))) {
+                lava = true;
+            }
+            else lava = false;
+            if (lava && !godMode && inmortalTimer <= 0) {
+                if (plorantTimer <= 0) {
+                    plorantTimer = 1000;
+                    this->takeDamage(0.33f);
+                }
+            }
             if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
                 if (Game::instance().getKey(GLFW_KEY_Z)) {
                     bJumping = true;
@@ -653,6 +663,16 @@ void Player::handleJumpingAndFalling()
     else {
         // 🔹 Aplica gravedad normalmente
         posPlayer.y += FALL_STEP;
+        if (map->collisionLava(posPlayer, glm::ivec2(32.f, 32.f))) {
+            lava = true;
+        }
+        else lava = false;
+            if (lava && !godMode && inmortalTimer <= 0) {
+                if (plorantTimer <= 0) {
+                    plorantTimer = 1000;
+                    this->takeDamage(0.33f);
+                }
+            }
         if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
             if (Game::instance().getKey(GLFW_KEY_Z)) {
                 bJumping = true;
@@ -935,4 +955,14 @@ void Player::setCapaActiva(bool capa) {
 
 bool Player::getCapaActiva() const {
 	return capaActiva;
+}
+
+void Player::setPlorantTimer() {
+	plorantTimer = 1000;
+}
+
+
+bool Player::playerIsPlorant() {
+	if (plorantTimer > 0) return true;
+	return false;
 }

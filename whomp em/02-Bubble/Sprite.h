@@ -34,6 +34,8 @@ public:
 	int animation() const;
 	
 	void setPosition(const glm::vec2 &pos);
+	void setKeyframe(int frame);  // nuevo
+	int getCurrentKeyframe() const;  // opcional si querés consultarlo
 
 private:
 	Texture *texture;

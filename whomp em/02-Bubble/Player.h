@@ -38,6 +38,8 @@ public:
     void setImmortalTimer(float t);
     void setCapaActiva(bool a);
 	bool getCapaActiva() const;
+    void setPlorantTimer();
+    bool playerIsPlorant();
 
 private:
     // Helper methods for cleaner code organization
@@ -58,7 +60,7 @@ private:
     Texture spritesheet;
     Sprite* sprite;
     TileMap* map;
-    float lives = 2.67;
+    float lives = 4;
     float hMax = 4;
     bool isAttacking, atacantAdalt, atacantAbaix;
     Sprite* lanza;
@@ -77,6 +79,7 @@ private:
     int lamps = 1;
     float inmortalTimer = 0.f;
     bool capaActiva = false;
+    bool lava = false;
 	
 };
 
