@@ -1,4 +1,4 @@
-#include <cmath>
+﻿#include <cmath>
 #include <iostream>
 #include <GL/glew.h>
 #include "Player.h"
@@ -227,7 +227,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
         else {
             // Apply gravity
             posPlayer.y += FALL_STEP;
-            if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
+            if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y) || platform) {
                 if (Game::instance().getKey(GLFW_KEY_Z)) {
                     bJumping = true;
                     jumpAngle = 0;
@@ -303,6 +303,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
                 sprite->changeAnimation(PLORANT_ESQUERRA);
             }
             plorantTimer = 500;
+            this->takeDamage(0.33f);
         }
 
         if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode) {
@@ -463,6 +464,7 @@ void Player::handleVerticalKeys()
 void Player::handleJumpingAndFalling()
 {
     if (bJumping) {
+        saltarPlata = false;
         handleJumpingAnimations();
 
         jumpAngle += JUMP_ANGLE_STEP;
@@ -484,21 +486,36 @@ void Player::handleJumpingAndFalling()
             }
         }
     }
+    else if (platform) {
+        // 🔹 Si está sobre una plataforma, no aplicar gravedad
+        if (Game::instance().getKey(GLFW_KEY_Z)) {
+            platform = false;
+            cout << "Salto\n";
+            bJumping = true;
+            jumpAngle = 0;
+            startY = posPlayer.y;
+            saltarPlata = true;
+        }
+    }
     else {
-        // Apply gravity
+        // 🔹 Aplica gravedad normalmente
         posPlayer.y += FALL_STEP;
         if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
             if (Game::instance().getKey(GLFW_KEY_Z)) {
                 bJumping = true;
                 jumpAngle = 0;
                 startY = posPlayer.y;
+                saltarPlata = false;
             }
+            saltarPlata = false;
         }
         else {
             handleFallingAnimations();
+            saltarPlata = false;
         }
     }
 }
+
 
 void Player::handleJumpingAnimations()
 {
@@ -674,4 +691,30 @@ bool Player::checkCollisionLanza(const glm::vec2& pos, const glm::ivec2& size) c
         posLanza.x + lanzaSize.x > pos.x &&
         posLanza.y < pos.y + size.y &&
         posLanza.y + lanzaSize.y > pos.y);
+}
+
+void Player::takeDamage(float damage) {
+    lives -= damage;
+}
+
+void Player::stopJump() {
+    bJumping = false;
+    jumpAngle = 180;
+}
+
+void Player::setPlatform(bool a) {
+    platform = a;
+}
+
+bool Player::isJumping() {
+    return bJumping;
+}
+
+bool Player::isJumpingPlat() {
+    return saltarPlata;
+}
+
+void Player::heal1Live() {
+    lives += 1;
+    lives = min(lives, hMax);
 }

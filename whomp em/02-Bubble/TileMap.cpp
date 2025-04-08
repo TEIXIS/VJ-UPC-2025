@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -6,6 +6,17 @@
 
 
 using namespace std;
+
+struct AnimatedTile {
+	glm::ivec2 pos;              // posición del tile (i, j)
+	std::vector<int> frames;     // secuencia de tile IDs
+	int currentFrame = 0;
+	float timePerFrame = 0.4f;   // tiempo entre frames
+	float timer = 0.0f;
+};
+
+vector<AnimatedTile> animatedTiles;
+
 
 
 TileMap *TileMap::createTileMap(const string &levelFile, const glm::vec2 &minCoords, ShaderProgram &program)
@@ -54,13 +65,13 @@ bool TileMap::loadLevel(const std::string &levelFile)
 	}
 
 	std::string line;
-	// Leer la primera l�nea: "TILEMAP"
+	// Leer la primera línea: "TILEMAP"
 	if (!std::getline(fin, line))
 		return false;
 	if (line != "TILEMAP")
 		return false;
 
-	// Leer la segunda l�nea: dimensiones del mapa (ancho, alto)
+	// Leer la segunda línea: dimensiones del mapa (ancho, alto)
 	if (!std::getline(fin, line))
 		return false;
 	{
@@ -72,7 +83,7 @@ bool TileMap::loadLevel(const std::string &levelFile)
 			mapSize.y = std::stoi(token);
 	}
 
-	// Leer la tercera l�nea: tama�o del tile y blockSize (16,16)
+	// Leer la tercera línea: tamaño del tile y blockSize (16,16)
 	if (!std::getline(fin, line))
 		return false;
 	{
@@ -84,7 +95,7 @@ bool TileMap::loadLevel(const std::string &levelFile)
 			blockSize = std::stoi(token);
 	}
 
-	// Leer la cuarta l�nea: ruta al tilesheet
+	// Leer la cuarta línea: ruta al tilesheet
 	if (!std::getline(fin, line))
 		return false;
 	std::string tilesheetFile = line;
@@ -95,7 +106,7 @@ bool TileMap::loadLevel(const std::string &levelFile)
 	tilesheet.setMinFilter(GL_NEAREST);
 	tilesheet.setMagFilter(GL_NEAREST);
 
-	// Leer la quinta l�nea: dimensiones del tilesheet (columnas, filas)
+	// Leer la quinta línea: dimensiones del tilesheet (columnas, filas)
 	if (!std::getline(fin, line))
 		return false;
 	{
@@ -112,7 +123,7 @@ bool TileMap::loadLevel(const std::string &levelFile)
 	int totalTiles = mapSize.x * mapSize.y;
 	map = new int[totalTiles];
 
-	// Leer los datos del mapa: una l�nea por cada fila, con los valores separados por comas.
+	// Leer los datos del mapa: una línea por cada fila, con los valores separados por comas.
 	for (int j = 0; j < mapSize.y; j++) {
 		if (!std::getline(fin, line))
 			break;  // O retornar false si se requiere tener todas las filas
@@ -127,14 +138,75 @@ bool TileMap::loadLevel(const std::string &levelFile)
 		}
 	}
 
+	for (int j = 0; j < mapSize.y; ++j) {
+		for (int i = 0; i < mapSize.x; ++i) {
+			int index = j * mapSize.x + i;
+			int tile = map[index];
+
+			if (tile == 18) {
+				map[index] = 97;  // Cambiar inmediatamente el tile en el mapa
+
+				AnimatedTile anim;
+				anim.pos = { i, j };
+				anim.frames = { 97, 99 };
+				animatedTiles.push_back(anim);
+			}
+			else if (tile == 19) {
+				map[index] = 98;
+
+				AnimatedTile anim;
+				anim.pos = { i, j };
+				anim.frames = { 98, 100 };
+				animatedTiles.push_back(anim);
+			}
+		}
+	}
+
+
+
+
 	fin.close();
 	return true;
 }
+
+void TileMap::update(float deltaTime)
+{
+	bool changed = false;
+
+	for (auto& tile : animatedTiles) {
+		tile.timer += deltaTime;
+		if (tile.timer >= tile.timePerFrame) {
+			tile.timer = 0.0f;
+			tile.currentFrame = (tile.currentFrame + 1) % tile.frames.size();
+
+			int index = tile.pos.y * mapSize.x + tile.pos.x;
+			map[index] = tile.frames[tile.currentFrame];
+
+			/*std::cout << "Tile en (" << tile.pos.x << ", " << tile.pos.y << ") cambia a "
+				<< tile.frames[tile.currentFrame] << std::endl;*/
+
+			changed = true;
+		}
+	}
+
+
+	if (changed) {
+		//std::cout << "Recalculando vértices para tiles animados\n";
+		prepareArrays(lastMinCoords, *lastProgram);
+	}
+
+}
+
+
 
 
 
 void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 {
+	// Al comienzo de prepareArrays
+	lastMinCoords = minCoords;
+	lastProgram = &program;
+
 	int tile;
 	glm::vec2 posTile, texCoordTile[2], halfTexel;
 	vector<float> vertices;
@@ -196,8 +268,11 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	y1 = (pos.y + size.y - 1) / tileSize;
 	for(int y=y0; y<=y1; y++)
 	{
-		if(collisions.find(map[y*mapSize.x+x]) != collisions.end())
+		if (collisions.find(map[y * mapSize.x + x]) != collisions.end()) {
+			cout << map[y * mapSize.x + x] << '\n';
 			return true;
+		}
+			
 	}
 	
 	return false;
@@ -219,27 +294,46 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	return false;
 }
 
-bool TileMap::collisionMoveDown(const glm::ivec2 &pos, const glm::ivec2 &size, int *posY) const
+bool TileMap::collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const
 {
 	int x0, x1, y;
-	
+
+	// Calculamos el tile en X que ocupa la parte izquierda y derecha del bounding box
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
+
+	// Calculamos el tile en Y que ocupa la parte inferior del bounding box
 	y = (pos.y + size.y - 1) / tileSize;
-	for(int x=x0; x<=x1; x++)
+
+	for (int x = x0; x <= x1; x++)
 	{
-		if(collisions.find(map[y*mapSize.x + x]) != collisions.end())
+		// Verificamos si el tile en [y, x] es sólido
+		if (collisions.find(map[y * mapSize.x + x]) != collisions.end())
 		{
-			if(*posY - tileSize * y + size.y <= 16)
+			// Calcula la coordenada en píxeles de la parte superior de ese tile
+			int tileTop = y * tileSize;
+
+			// Calcula la parte inferior del bounding box
+			int boxBottom = *posY + size.y;
+
+			// Si la parte inferior del bounding box está por debajo de la parte superior del tile...
+			if (boxBottom > tileTop)
 			{
-				*posY = tileSize * y - size.y;
+				// ... corregimos la posición para que "toque" justo el tile
+				*posY = tileTop - size.y;
+
+				// Chequeo opcional de lava, etc.
+				if (lava.find(map[y * mapSize.x + x]) != lava.end()) {
+					std::cout << "lava\n";
+				}
+
 				return true;
 			}
 		}
 	}
-	
 	return false;
 }
+
 
 bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int* posY) const
 {

@@ -13,7 +13,12 @@
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="Fenix.h" />
+<<<<<<< HEAD
     <ClInclude Include="Mag.h" />
+=======
+    <ClInclude Include="Platform1.h" />
+    <ClInclude Include="Platform2.h" />
+>>>>>>> feature/environment
     <ClInclude Include="Seta.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Hud.h" />
@@ -27,7 +32,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fenix.cpp" />
+<<<<<<< HEAD
     <ClCompile Include="Mag.cpp" />
+=======
+    <ClCompile Include="Platform1.cpp" />
+    <ClCompile Include="Platform2.cpp" />
+>>>>>>> feature/environment
     <ClCompile Include="Seta.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Hud.cpp" />

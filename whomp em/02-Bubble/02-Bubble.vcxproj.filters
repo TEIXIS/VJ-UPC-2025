@@ -51,7 +51,14 @@
     <ClInclude Include="Fenix.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Mag.h">
+=======
+    <ClInclude Include="Platform1.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform2.h">
+>>>>>>> feature/environment
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,7 +99,14 @@
     <ClCompile Include="Fenix.cpp">
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Mag.cpp">
+=======
+    <ClCompile Include="Platform1.cpp">
+      <Filter>Archivos de código fuente</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform2.cpp">
+>>>>>>> feature/environment
       <Filter>Archivos de código fuente</Filter>
     </ClCompile>
   </ItemGroup>

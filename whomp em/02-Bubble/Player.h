@@ -22,7 +22,14 @@ public:
     glm::ivec2 getLanzaSize() const;
     bool checkCollision(const glm::vec2& pos, const glm::ivec2& size) const;
     bool checkCollisionLanza(const glm::vec2& pos, const glm::ivec2& size) const;
+    void takeDamage(float damage);
     void renderHitbox(const glm::vec2& position, const glm::ivec2& size);
+    void stopJump();
+    void setPlatform(bool a);
+    bool isJumping();
+    bool isJumpingPlat();
+    void heal1Live();
+
 
 private:
     // Helper methods for cleaner code organization
@@ -44,6 +51,7 @@ private:
     Sprite* sprite;
     TileMap* map;
     float lives = 2.67;
+    float hMax = 4;
     bool isAttacking, atacantAdalt, atacantAbaix;
     Sprite* lanza;
     Sprite* lanzaAdalt;
@@ -52,6 +60,9 @@ private:
     bool godMode;
     bool attackKeyPressed = false;
     int frameCount;
+    bool platform = false;
+    bool saltarPlata = false;
+	
 };
 
 #endif // _PLAYER_INCLUDE
