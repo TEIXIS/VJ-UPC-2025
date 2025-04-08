@@ -56,12 +56,15 @@ private:
     Sprite* lanza;
     Sprite* lanzaAdalt;
     Sprite* lanzaAbaix;
+    Sprite* totemFoc;
     int plorantTimer;
     bool godMode;
     bool attackKeyPressed = false;
     int frameCount;
     bool platform = false;
     bool saltarPlata = false;
+	bool totemFocActiu = false;
+	int offsetTotem = 0;
 	
 };
 

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <iostream>
 
 HUD::HUD() {
 
@@ -33,9 +34,38 @@ void HUD::init(ShaderProgram& shaderProgram, Player* p)
     heartSprite->setAnimationSpeed(EMPTY, 8);
     heartSprite->addKeyframe(EMPTY, glm::vec2(0.75f, 0.f));
 
-    weaponSprite->setNumberAnimations(1);
+    weaponSprite->setNumberAnimations(2);
     weaponSprite->setAnimationSpeed(0, 8);
     weaponSprite->addKeyframe(0, glm::vec2(0.f, 0.25f));
+    
+	weaponSprite->setAnimationSpeed(1, 8);
+	weaponSprite->addKeyframe(1, glm::vec2(0.5f, 0.25f));
+
+    weaponSprite->changeAnimation(0);
+}
+
+void HUD::update(int deltaTime)
+{
+	heartSprite->update(deltaTime);
+	weaponSprite->update(deltaTime);
+
+    static bool totemKey = false;
+
+    if (Game::instance().getKey(GLFW_KEY_T)) {
+        if (!totemKey) {
+			cout << "canvi arma" << endl;
+			if (weaponSprite->animation() == 0) {
+				weaponSprite->changeAnimation(1);
+			}
+			else {
+				weaponSprite->changeAnimation(0);
+			}
+            totemKey = true;
+        }
+    }
+    else {
+        totemKey = false;
+    }
 }
 
 void HUD::render()
@@ -70,6 +100,6 @@ void HUD::render()
 
     // arma al lado de los corazones (alineada al primero)
     weaponSprite->setPosition(glm::vec2(10.f, 10.f));
-    weaponSprite->changeAnimation(0);
+ 
     weaponSprite->render();
 }
