@@ -350,7 +350,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
                 sprite->changeAnimation(PLORANT_ESQUERRA);
             }
             plorantTimer = 500;
-            this->takeDamage(0.33f);
+            this->takeDamage(0.66f);
         }
 
         if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode) {
@@ -362,6 +362,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
                 sprite->changeAnimation(PLORANT_ESQUERRA);
             }
             plorantTimer = 500;
+            this->takeDamage(0.66f);
         }
 
         if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode) {
@@ -373,6 +374,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
                 sprite->changeAnimation(PLORANT_ESQUERRA);
             }
             plorantTimer = 500;
+            this->takeDamage(0.33f);
         }
 
 		if (checkCollision(mag.getPosition(), glm::ivec2(32, 32)) && !godMode) {
@@ -384,6 +386,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 				sprite->changeAnimation(PLORANT_ESQUERRA);
 			}
 			plorantTimer = 500;
+            this->takeDamage(0.66f);
 		}
 
 		if (checkCollision(mag.getPosProjectile(), glm::ivec2(8, 8)) && !godMode) {
@@ -395,6 +398,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 				sprite->changeAnimation(PLORANT_ESQUERRA);
 			}
 			plorantTimer = 500;
+            this->takeDamage(0.33f);
 		}
 
         if (isAttacking || atacantAbaix || atacantAdalt) {
