@@ -302,7 +302,14 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
         // Handle horizontal movement
         handleHorizontalMovement();
 
+        if (Game::instance().getKey(GLFW_KEY_W)) {
+			posPlayer.y -= MOVE_SPEED;
+        }
+		else if (Game::instance().getKey(GLFW_KEY_S)) {
+			posPlayer.y += MOVE_SPEED;
+		}
 
+		cout << "PosPlayer: " << posPlayer.x << ", " << posPlayer.y << endl;
 
         // Handle jumping and falling
         
@@ -650,7 +657,7 @@ void Player::handleJumpingAndFalling()
             saltarPlata = true;
         }
     }
-    else {
+    else if (!levitar) {
         // 🔹 Aplica gravedad normalmente
         posPlayer.y += FALL_STEP;
         if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {

@@ -10,9 +10,11 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-//#define INIT_PLAYER_X_TILES 2
 #define INIT_PLAYER_X_TILES 1
+//#define INIT_PLAYER_X_TILES 70
 #define INIT_PLAYER_Y_TILES 97
+//#define INIT_PLAYER_X_TILES 2128/16
+//#define INIT_PLAYER_Y_TILES 154/16
 
 Scene::Scene()
 {
@@ -303,9 +305,18 @@ void Scene::update(int deltaTime)
 
     float centerX = SCREEN_WIDTH / 8.0f;
     float centerY = SCREEN_HEIGHT / 8.0f;
-
-    glm::vec3 cameraPos = glm::vec3(playerPos.x - centerX, 1460, 0.0f); //canviar
-
+    glm::vec3 cameraPos;
+    if(playerPos.x < 2050)
+        cameraPos = glm::vec3(playerPos.x - centerX, 1460, 0.0f);
+    else if (playerPos.x >= 2050 && playerPos.x<2300) {
+        if (playerPos.y > 136) cameraPos = glm::vec3(2150 - centerX, playerPos.y - centerY - 60, 0.0f);
+        else cameraPos = glm::vec3(2150 - centerX, 45, 0.0f);
+    }
+	else if (playerPos.x >= 2300)
+		cameraPos = glm::vec3(playerPos.x - centerX, 45, 0.0f);
+	
+    //2158,1542
+    // 2350 54
 	//printf("Player position: %f, %f\n", playerPos.x, playerPos.y);
 
     int mapWidth = SCREEN_WIDTH;

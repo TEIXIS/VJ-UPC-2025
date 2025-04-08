@@ -77,6 +77,7 @@ private:
     int lamps = 1;
     float inmortalTimer = 0.f;
     bool capaActiva = false;
+    bool levitar = false;
 	
 };
 
