@@ -29,7 +29,9 @@ public:
     bool isJumping();
     bool isJumpingPlat();
     void heal1Live();
-
+    void healallLives();
+    int getHmax();
+    void actCalabaza();
 
 private:
     // Helper methods for cleaner code organization
@@ -62,6 +64,7 @@ private:
     int frameCount;
     bool platform = false;
     bool saltarPlata = false;
+    int calabazas = 1;
 	
 };
 

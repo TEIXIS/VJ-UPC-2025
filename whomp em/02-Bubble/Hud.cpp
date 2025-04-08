@@ -41,7 +41,7 @@ void HUD::init(ShaderProgram& shaderProgram, Player* p)
 void HUD::render()
 {
 
-    int numHearts = 4;
+    int numHearts = player->getHmax();
     float health = player->getLives();
     vector<int> x(numHearts);
     for (int i = 0; i < numHearts; ++i) {
