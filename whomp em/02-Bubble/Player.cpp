@@ -324,10 +324,23 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 
         // Handle horizontal movement
         
-        if (map->isOnLadder(posPlayer, glm::ivec2(32,32))) {
+        if (map->isOnLadder(posPlayer, glm::ivec2(32,32)) && !map->collisionMoveDown(posPlayer, glm::ivec2(32, 33), &posPlayer.y)) {
+			
             handleLadderMovement();
         }
+        
         else {
+			if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
+                if (Game::instance().getKey(GLFW_KEY_DOWN)) {
+                    posPlayer.y += 5;
+                }
+                else if (Game::instance().getKey(GLFW_KEY_UP)) {
+                    posPlayer.y -= 5;
+                }
+			}
+            
+
+
             if (Game::instance().getKey(GLFW_KEY_W)) {
                 posPlayer.y -= MOVE_SPEED;
             }
@@ -613,44 +626,58 @@ void Player::handleHorizontalMovement()
 void Player::handleVerticalKeys()
 {
     if (Game::instance().getKey(GLFW_KEY_UP)) {
-        if (Game::instance().getKey(GLFW_KEY_X)) {
-            if (sprite->animation() == LOOK_UP_R)
-                sprite->changeAnimation(ATK_RIGHT_STANDING);
-            else if (sprite->animation() == LOOK_UP_L)
-                sprite->changeAnimation(ATK_LEFT_STANDING);
-        }
-        else if (Game::instance().getKey(GLFW_KEY_Z)) {
-            if (sprite->animation() == LOOK_UP_R)
-                sprite->changeAnimation(ATK_JUMPING_UP_R);
-            else if (sprite->animation() == LOOK_UP_L)
-                sprite->changeAnimation(ATK_JUMPING_UP_L);
-        }
-        else {
-            if (isRightFacing())
-                sprite->changeAnimation(LOOK_UP_R);
-            else if (isLeftFacing())
-                sprite->changeAnimation(LOOK_UP_L);
-        }
+		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
+			posPlayer.y -= MOVE_SPEED;
+			//animacio
+		}
+		else {
+			if (Game::instance().getKey(GLFW_KEY_X)) {
+				if (sprite->animation() == LOOK_UP_R)
+					sprite->changeAnimation(ATK_RIGHT_STANDING);
+				else if (sprite->animation() == LOOK_UP_L)
+					sprite->changeAnimation(ATK_LEFT_STANDING);
+			}
+			else if (Game::instance().getKey(GLFW_KEY_Z)) {
+				if (sprite->animation() == LOOK_UP_R)
+					sprite->changeAnimation(ATK_JUMPING_UP_R);
+				else if (sprite->animation() == LOOK_UP_L)
+					sprite->changeAnimation(ATK_JUMPING_UP_L);
+			}
+			else {
+				if (isRightFacing())
+					sprite->changeAnimation(LOOK_UP_R);
+				else if (isLeftFacing())
+					sprite->changeAnimation(LOOK_UP_L);
+			}
+		}
+        
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
-        if (Game::instance().getKey(GLFW_KEY_X)) {
-            if (sprite->animation() == LOOK_DOWN_R)
-                sprite->changeAnimation(ATK_RIGHT_DOWN);
-            else if (sprite->animation() == LOOK_DOWN_L)
-                sprite->changeAnimation(ATK_LEFT_DOWN);
-        }
-        else if (Game::instance().getKey(GLFW_KEY_Z)) {
-            if (sprite->animation() == LOOK_DOWN_R)
-                sprite->changeAnimation(ATK_JUMPING_DOWN_R);
-            else if (sprite->animation() == LOOK_DOWN_L)
-                sprite->changeAnimation(ATK_JUMPING_DOWN_L);
+        if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
+			posPlayer.y += MOVE_SPEED;
+            //animacio
         }
         else {
-            if (isRightFacing())
-                sprite->changeAnimation(LOOK_DOWN_R);
-            else if (isLeftFacing())
-                sprite->changeAnimation(LOOK_DOWN_L);
+            if (Game::instance().getKey(GLFW_KEY_X)) {
+                if (sprite->animation() == LOOK_DOWN_R)
+                    sprite->changeAnimation(ATK_RIGHT_DOWN);
+                else if (sprite->animation() == LOOK_DOWN_L)
+                    sprite->changeAnimation(ATK_LEFT_DOWN);
+            }
+            else if (Game::instance().getKey(GLFW_KEY_Z)) {
+                if (sprite->animation() == LOOK_DOWN_R)
+                    sprite->changeAnimation(ATK_JUMPING_DOWN_R);
+                else if (sprite->animation() == LOOK_DOWN_L)
+                    sprite->changeAnimation(ATK_JUMPING_DOWN_L);
+            }
+            else {
+                if (isRightFacing())
+                    sprite->changeAnimation(LOOK_DOWN_R);
+                else if (isLeftFacing())
+                    sprite->changeAnimation(LOOK_DOWN_L);
+            }
         }
+       
     }
 }
 
@@ -723,16 +750,28 @@ void Player::handleJumpingAndFalling()
 void Player::handleJumpingAnimations()
 {
     if (Game::instance().getKey(GLFW_KEY_UP)) {
-        if (isRightFacing())
-            sprite->changeAnimation(ATK_JUMPING_UP_R);
-        else if (isLeftFacing())
-            sprite->changeAnimation(ATK_JUMPING_UP_L);
+		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
+			posPlayer.y -= MOVE_SPEED;
+		}
+		else {
+            if (isRightFacing())
+                sprite->changeAnimation(ATK_JUMPING_UP_R);
+            else if (isLeftFacing())
+                sprite->changeAnimation(ATK_JUMPING_UP_L);
+		}
+       
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
-        if (isRightFacing())
-            sprite->changeAnimation(ATK_JUMPING_DOWN_R);
-        else if (isLeftFacing())
-            sprite->changeAnimation(ATK_JUMPING_DOWN_L);
+		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
+			posPlayer.y += MOVE_SPEED;
+		}
+		else {
+			if (isRightFacing())
+				sprite->changeAnimation(ATK_JUMPING_DOWN_R);
+			else if (isLeftFacing())
+				sprite->changeAnimation(ATK_JUMPING_DOWN_L);
+		}
+        
 	}
 	else if (Game::instance().getKey(GLFW_KEY_X)) {
 		if (isRightFacing())
@@ -751,16 +790,28 @@ void Player::handleJumpingAnimations()
 void Player::handleFallingAnimations()
 {
     if (Game::instance().getKey(GLFW_KEY_UP)) {
-        if (isRightFacing())
-            sprite->changeAnimation(ATK_JUMPING_UP_R);
-        else if (isLeftFacing())
-            sprite->changeAnimation(ATK_JUMPING_UP_L);
+		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
+			posPlayer.y -= MOVE_SPEED;
+		}
+		else {
+			if (isRightFacing())
+				sprite->changeAnimation(ATK_JUMPING_UP_R);
+			else if (isLeftFacing())
+				sprite->changeAnimation(ATK_JUMPING_UP_L);
+		}
+        
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
-        if (isRightFacing())
-            sprite->changeAnimation(ATK_JUMPING_DOWN_R);
-        else if (isLeftFacing())
-            sprite->changeAnimation(ATK_JUMPING_DOWN_L);
+		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
+			posPlayer.y += MOVE_SPEED;
+		}
+		else {
+            if (isRightFacing())
+                sprite->changeAnimation(ATK_JUMPING_DOWN_R);
+            else if (isLeftFacing())
+                sprite->changeAnimation(ATK_JUMPING_DOWN_L);
+		}
+       
     }
 	else if (Game::instance().getKey(GLFW_KEY_X)) {
 		if (isRightFacing())
@@ -1005,58 +1056,49 @@ void Player::handleLadderMovement()
         posPlayer.y -= MOVE_SPEED;
 
         // Set appropriate animation
-        if (isRightFacing()) {
-            sprite->changeAnimation(LOOK_UP_R);
-        }
-        else {
-            sprite->changeAnimation(LOOK_UP_L);
-        }
+       
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
         // Move down on ladder
         posPlayer.y += MOVE_SPEED;
 
         // Set appropriate animation
-        if (isRightFacing()) {
-            sprite->changeAnimation(LOOK_DOWN_R);
-        }
-        else {
-            sprite->changeAnimation(LOOK_DOWN_L);
-        }
+        
     }
     else {
         // If not moving, use idle animation
-        if (isRightFacing()) {
-            sprite->changeAnimation(STAND_RIGHT);
-        }
-        else {
-            sprite->changeAnimation(STAND_LEFT);
-        }
+       
     }
 
     // Allow attacking to the sides while on ladder
     if (Game::instance().getKey(GLFW_KEY_X)) {
         isAttacking = true;
-        if (isRightFacing()) {
-            sprite->changeAnimation(ATK_RIGHT_STANDING);
-            posLanza = glm::vec2(posPlayer.x + 26, posPlayer.y);
-        }
-        else {
-            sprite->changeAnimation(ATK_LEFT_STANDING);
-            posLanza = glm::vec2(posPlayer.x - 27, posPlayer.y);
-        }
+        
+        sprite->changeAnimation(ATK_RIGHT_STANDING);
+        posLanza = glm::vec2(posPlayer.x + 26, posPlayer.y);
+        
+
+        
     }
     else {
         isAttacking = false;
     }
 
-    // Allow left/right movement to get off the ladder
+ 
     if (Game::instance().getKey(GLFW_KEY_LEFT)) {
-        posPlayer.x -= MOVE_SPEED;
-        sprite->changeAnimation(STAND_LEFT);
+        if (Game::instance().getKey(GLFW_KEY_X)) {
+            isAttacking = true;
+
+            sprite->changeAnimation(ATK_RIGHT_STANDING);
+            posLanza = glm::vec2(posPlayer.x -27, posPlayer.y);
+
+
+
+        }
+        else {
+            isAttacking = false;
+        }
+		
     }
-    else if (Game::instance().getKey(GLFW_KEY_RIGHT)) {
-        posPlayer.x += MOVE_SPEED;
-        sprite->changeAnimation(STAND_RIGHT);
-    }
+    
 }
