@@ -185,6 +185,19 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
     
     this->checkImmortalTimer(deltaTime);
 
+
+    static bool levitateKey = false;
+
+    if (Game::instance().getKey(GLFW_KEY_L)) {
+        if (!levitateKey) {
+            levitar = !levitar;
+            levitateKey = true;
+        }
+    }
+    else {
+        levitateKey = false;
+    }
+
     static bool healKey = false;
 
     if (Game::instance().getKey(GLFW_KEY_H)) {

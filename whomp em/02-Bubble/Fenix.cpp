@@ -64,7 +64,7 @@ void Fenix::update(int deltaTime)
 
 	//cout << posFoc.x << endl;
     //cout << abs(posEnemy.x - posPlayer.x) << endl;
-    if (abs(posEnemy.x - posPlayer.x) > 195 && !focActiu) {
+    if (abs(posEnemy.x - posPlayer.x) > 195 && !focActiu || abs(posEnemy.y - posPlayer.y) > 195 && !focActiu) {
         vida = 0;
 		//focActiu = false;
 		posFoc.x = -100;

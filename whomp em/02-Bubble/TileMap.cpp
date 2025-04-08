@@ -324,7 +324,7 @@ bool TileMap::collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, i
 
 				// Chequeo opcional de lava, etc.
 				if (lava.find(map[y * mapSize.x + x]) != lava.end()) {
-					std::cout << "lava\n";
+					//std::cout << "lava\n";
 				}
 
 				return true;

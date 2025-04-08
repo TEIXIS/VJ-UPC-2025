@@ -11,8 +11,8 @@
 #define SCREEN_Y 16
 
 #define INIT_PLAYER_X_TILES 1
-//#define INIT_PLAYER_X_TILES 70
 #define INIT_PLAYER_Y_TILES 97
+//#define INIT_PLAYER_X_TILES 70
 //#define INIT_PLAYER_X_TILES 2128/16
 //#define INIT_PLAYER_Y_TILES 154/16
 
@@ -113,14 +113,14 @@ void Scene::init()
     projection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
     currentTime = 0.0f;
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
         Fenix* fen = new Fenix();
         fen->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
         fen->setTileMap(map);
         fenixes.push_back(fen);
     }
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
 		Seta* seta = new Seta();
 		seta->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		seta->setTileMap(map);
@@ -295,13 +295,43 @@ void Scene::update(int deltaTime)
 		fenixes[3]->spawn(104, 93);
 	}
     
-    if (playerPos.x == 117 * 16) {
-        mag2->spawn(129, 97);
+    if (playerPos.x == 3040) {
+        mag2->spawn(200, 8);
     }
 
-    if (playerPos.x == 2 * 16) {
-        setas[0]->spawn(2,97);
+    
+    if (playerPos.y == 740) {
+        setas[1]->spawn(133, 36);
     }
+	if (playerPos.y == 574) {
+		setas[2]->spawn(133, 30);
+	}
+    if (playerPos.y == 546) {
+        setas[3]->spawn(136, 24);
+    }
+    if (playerPos.y == 442) {
+        setas[4]->spawn(135, 17);
+    }
+    if (playerPos.y == 368) {
+        setas[5]->spawn(135, 13);
+        setas[6]->spawn(140, 13);
+    }
+    if (playerPos.y == 104) {
+        fenixes[4]->spawn(141, 2);
+    }
+    if (playerPos.x == 2810) {
+        fenixes[5]->spawn(185, 1);
+        fenixes[6]->spawn(187, 3);
+    }
+    if (playerPos.x == 3214) {
+        fenixes[7]->spawn(210, 1);
+    }
+    if (playerPos.x == 3278) {
+        setas[7]->spawn(213, 2);
+    }
+
+
+
 
     float centerX = SCREEN_WIDTH / 8.0f;
     float centerY = SCREEN_HEIGHT / 8.0f;
@@ -312,8 +342,12 @@ void Scene::update(int deltaTime)
         if (playerPos.y > 136) cameraPos = glm::vec3(2150 - centerX, playerPos.y - centerY - 60, 0.0f);
         else cameraPos = glm::vec3(2150 - centerX, 45, 0.0f);
     }
-	else if (playerPos.x >= 2300)
-		cameraPos = glm::vec3(playerPos.x - centerX, 45, 0.0f);
+	else if (playerPos.x >= 2300 && playerPos.x <3400)
+		cameraPos = glm::vec3(playerPos.x - centerX, 20, 0.0f);
+    else if (playerPos.x >=3400 && playerPos.x <3588)
+        cameraPos = glm::vec3(3400 - centerX, 20, 0.0f);
+    else if (playerPos.x >=3588)
+        cameraPos = glm::vec3(3630 - centerX, 20, 0.0f);
 	
     //2158,1542
     // 2350 54
