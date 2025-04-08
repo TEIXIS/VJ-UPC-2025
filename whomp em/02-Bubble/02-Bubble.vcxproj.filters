@@ -20,6 +20,8 @@
     <ClCompile Include="LittleHeart.cpp" />
     <ClCompile Include="BigHeart.cpp" />
     <ClCompile Include="Calabaza.cpp" />
+    <ClCompile Include="Lampara.cpp" />
+    <ClCompile Include="Capa.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
@@ -41,5 +43,7 @@
     <ClInclude Include="LittleHeart.h" />
     <ClInclude Include="BigHeart.h" />
     <ClInclude Include="Calabaza.h" />
+    <ClInclude Include="Lampara.h" />
+    <ClInclude Include="Capa.h" />
   </ItemGroup>
 </Project>

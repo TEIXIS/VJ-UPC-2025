@@ -16,6 +16,8 @@
 #include "LittleHeart.h"
 #include "BigHeart.h"
 #include "Calabaza.h"
+#include "Lampara.h"
+#include "Capa.h"
 
 
 // Scene contains all the entities of our game.
@@ -45,6 +47,8 @@ private:
 	LittleHeart* cor1;
 	BigHeart* cor2;
 	Calabaza* calabaza1;
+	Lampara* lamp;
+	Capa* capa;
 	vector<Platform1*> plataformas1;
 	vector<Platform2*> plataformas2;
 	HUD* hud;

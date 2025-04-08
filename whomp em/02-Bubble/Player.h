@@ -32,6 +32,12 @@ public:
     void healallLives();
     int getHmax();
     void actCalabaza();
+    int getLamps();
+    void actLamp();
+    void checkImmortalTimer(int deltaTime);
+    void setImmortalTimer(float t);
+    void setCapaActiva(bool a);
+	bool getCapaActiva() const;
 
 private:
     // Helper methods for cleaner code organization
@@ -68,6 +74,9 @@ private:
 	bool totemFocActiu = false;
 	int offsetTotem = 0;
     int calabazas = 1;
+    int lamps = 1;
+    float inmortalTimer = 0.f;
+    bool capaActiva = false;
 	
 };
 

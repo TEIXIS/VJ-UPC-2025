@@ -14,8 +14,10 @@
     <ClInclude Include="AnimKeyframes.h" />
     <ClInclude Include="BigHeart.h" />
     <ClInclude Include="Calabaza.h" />
+    <ClInclude Include="Capa.h" />
     <ClInclude Include="Collectible.h" />
     <ClInclude Include="Fenix.h" />
+    <ClInclude Include="Lampara.h" />
     <ClInclude Include="LittleHeart.h" />
     <ClInclude Include="Mag.h" />
     <ClInclude Include="Platform1.h" />
@@ -34,8 +36,10 @@
   <ItemGroup>
     <ClCompile Include="BigHeart.cpp" />
     <ClCompile Include="Calabaza.cpp" />
+    <ClCompile Include="Capa.cpp" />
     <ClCompile Include="Collectible.cpp" />
     <ClCompile Include="Fenix.cpp" />
+    <ClCompile Include="Lampara.cpp" />
     <ClCompile Include="LittleHeart.cpp" />
     <ClCompile Include="Mag.cpp" />
     <ClCompile Include="Platform1.cpp" />
