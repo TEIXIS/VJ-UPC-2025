@@ -48,6 +48,9 @@ private:
 	float currentTime;
 	glm::mat4 projection;
 	glm::mat4 view;
+	Sprite* pantallaTitol;
+	bool jocComencat;
+	Texture spritesheet;
 
 };
 

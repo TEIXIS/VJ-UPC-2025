@@ -33,6 +33,17 @@ void Scene::init()
     initShaders();
     map = TileMap::createTileMap("levels/Level.csv", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
     player = new Player();
+
+
+
+    spritesheet.loadFromFile("images/titol.png", TEXTURE_PIXEL_FORMAT_RGBA);
+    pantallaTitol = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &spritesheet, &texProgram);
+	pantallaTitol->setNumberAnimations(1);
+	pantallaTitol->setAnimationSpeed(0, 1);
+	pantallaTitol->addKeyframe(0, glm::vec2(0.f, 0.f));
+    pantallaTitol->setPosition(glm::vec2(-500.f, -500.f));
+	jocComencat = false;
+
     // Suponiendo que texProgram, SCREEN_X, SCREEN_Y están definidos y accesibles aquí
 
 // Crear varias plataformas del tipo Platform1
@@ -85,6 +96,12 @@ void Scene::init()
 
 void Scene::update(int deltaTime)
 {
+	if (!jocComencat) {
+		if (Game::instance().getKey(GLFW_KEY_SPACE)) {
+			jocComencat = true;
+		}
+		return;
+	}
     currentTime += deltaTime;
     player->update(deltaTime, *seta, *fenix, *mag);
     seta->update(deltaTime);
@@ -226,6 +243,11 @@ void Scene::update(int deltaTime)
 
 void Scene::render()
 {
+	if (!jocComencat) {
+		pantallaTitol->render();
+		return;
+	}
+
     glm::mat4 modelview;
 
     texProgram.use();
@@ -240,6 +262,8 @@ void Scene::render()
     // HUD usa coordenadas de pantalla
     
     
+
+
 	mag->render();
     player->render();
     seta->render();
