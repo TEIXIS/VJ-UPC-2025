@@ -190,7 +190,7 @@ void Scene::update(int deltaTime)
         for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
     }
 
-    player->update(deltaTime, *seta, *fenix);
+    
 
     if (playerPos.x == 8*16) {
         mag->spawn();
