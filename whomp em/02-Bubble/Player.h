@@ -27,6 +27,7 @@ public:
     void setPlatform(bool a);
     bool isJumping();
     bool isJumpingPlat();
+    void heal1Live();
 
 
 private:
@@ -49,6 +50,7 @@ private:
     Sprite* sprite;
     TileMap* map;
     float lives = 2.67;
+    float hMax = 4;
     bool isAttacking, atacantAdalt, atacantAbaix;
     Sprite* lanza;
     Sprite* lanzaAdalt;

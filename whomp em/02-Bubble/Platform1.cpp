@@ -22,11 +22,11 @@ void Platform1::init(const glm::vec2& position, ShaderProgram& shaderProgram, co
     originalPos = position;
     tileMapDispl = tileMapOffset;
 
-    if (!spritesheet.loadFromFile("images/platform1.png", TEXTURE_PIXEL_FORMAT_RGBA)) {
+    if (!spritesheet.loadFromFile("images/platform2.png", TEXTURE_PIXEL_FORMAT_RGBA)) {
         std::cerr << "Error al cargar la textura de la plataforma." << std::endl;
     }
 
-    sprite = Sprite::createSprite(glm::ivec2(32, 16), glm::vec2(1.0f, 1.0f), &spritesheet, &shaderProgram);
+    sprite = Sprite::createSprite(glm::ivec2(24, 14), glm::vec2(1.0f, 1.0f), &spritesheet, &shaderProgram);
     sprite->setPosition(glm::vec2(tileMapDispl.x + pos.x, tileMapDispl.y + pos.y));
 }
 

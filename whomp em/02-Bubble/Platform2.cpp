@@ -1,7 +1,7 @@
 ﻿#include "Platform2.h"
 #include <iostream>
 
-Platform2::Platform2() : sprite(nullptr), speed(100.0f), movingUp(true), lastDeltaY(0.0f) {}
+Platform2::Platform2() : sprite(nullptr), speed(250.0f), movingUp(true), lastDeltaY(0.0f) {}
 
 Platform2::~Platform2() {
     if (sprite) delete sprite;
@@ -13,7 +13,7 @@ void Platform2::init(const glm::vec2& position, ShaderProgram& shaderProgram, co
     tileMapDispl = tileMapOffset;
     maxOffset = maxOffset_;
 
-    if (!spritesheet.loadFromFile("images/platform2.png", TEXTURE_PIXEL_FORMAT_RGBA)) {
+    if (!spritesheet.loadFromFile("images/platform1.png", TEXTURE_PIXEL_FORMAT_RGBA)) {
         std::cerr << "Error al cargar la textura de Platform2.\n";
     }
 

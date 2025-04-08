@@ -39,6 +39,8 @@ private:
 	Fenix* fenix;
 	Platform1* plataforma;
 	Platform2* plataforma2;
+	vector<Platform1*> plataformas1;
+	vector<Platform2*> plataformas2;
 	HUD* hud;
 	ShaderProgram texProgram;
 	float currentTime;

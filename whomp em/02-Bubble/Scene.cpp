@@ -33,13 +33,24 @@ void Scene::init()
     initShaders();
     map = TileMap::createTileMap("levels/Level.csv", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
     player = new Player();
-    plataforma = new Platform1();
-    glm::vec2 plataformaPos = glm::vec2((INIT_PLAYER_X_TILES + 5) * 16, (INIT_PLAYER_Y_TILES ) * 16);
-    plataforma->init(plataformaPos, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y));
+    // Suponiendo que texProgram, SCREEN_X, SCREEN_Y están definidos y accesibles aquí
 
-    plataforma2 = new Platform2();
-    glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 10) * 16, (INIT_PLAYER_Y_TILES-1) * 16);
-    plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 40.f);
+// Crear varias plataformas del tipo Platform1
+    for (int i = 0; i < 5; ++i) {
+        Platform1* plataforma = new Platform1();
+        glm::vec2 plataformaPos = glm::vec2((INIT_PLAYER_X_TILES + 85 + i * 4) * 16, (INIT_PLAYER_Y_TILES) * 16+i*2);
+        plataforma->init(plataformaPos, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y));
+        plataformas1.push_back(plataforma);
+    }
+
+    // Crear varias plataformas del tipo Platform2
+    for (int i = 0; i < 2; ++i) {
+        Platform2* plataforma2 = new Platform2();
+        glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 100 + i * 6) * 16, (INIT_PLAYER_Y_TILES - 80) * 16);
+        plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 40.f);
+        plataformas2.push_back(plataforma2);
+    }
+
 
 
     player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -70,60 +81,105 @@ void Scene::update(int deltaTime)
     currentTime += deltaTime;
     seta->update(deltaTime);
 	fenix->update(deltaTime);
-    map->update(deltaTime / 1000.f);  // convertir ms → s
+    map->update(deltaTime / 1000.f);  
     glm::vec2 playerPos = player->getPosition();
     int posNy = int(playerPos.y);
-    int* ptr = &posNy;  // puntero que apunta a la variable
-    float deltaY = plataforma2->getLastDeltaY();
-    if (plataforma->checkCollisionFromAbove(*player)) {
-        cout << "coll\n";
-        cout << player->isJumpingPlat() << endl;
-        // Si el jugador está encima, se mueve la plataforma hacia abajo.
-        if (!map->collisionMoveDown(playerPos, glm::ivec2(32, 32), ptr)) plataforma->moveWithCharacter(1.0f, *player);
-        else {
-            player->setPosition(glm::ivec2(playerPos.x, playerPos.y-1.0f));
+    int* ptr = &posNy;  
+    float deltaY = 0.f;
+    bool collisionDetected = false;
+
+    // Revisar colisiones desde arriba con plataformas1
+    for (auto& plataforma : plataformas1) {
+        if (plataforma->checkCollisionFromAbove(*player)) {
+            if (!map->collisionMoveDown(playerPos, glm::ivec2(32, 32), ptr)) {
+                plataforma->moveWithCharacter(1.0f, *player);
+            }
+            else {
+                player->setPosition(glm::ivec2(playerPos.x, playerPos.y - 1.0f));
+            }
+
+            if (!player->isJumpingPlat()) {
+                cout << "Me poso\n";
+                player->stopJump();
+            }
+
+            player->setPlatform(true);
+            collisionDetected = true;
         }
-        //player->stopJump();// Puedes ajustar el valor según tu lógica.
-        //cout << "Down\n";
-        if (!player->isJumpingPlat()) {
-            cout << "Me poso\n";
-            player->stopJump();
+    }
+
+    // Revisar colisiones desde abajo con plataformas1
+    if (!collisionDetected) {
+        for (auto& plataforma : plataformas1) {
+            if (plataforma->checkCollisionFromBelow(*player)) {
+                plataforma->returnToOriginalPosition(deltaTime);
+                player->stopJump();
+                cout << "DJG\n";
+                collisionDetected = true;
+                break;
+            }
+        }
+    }
+
+    // Si no hay colisión con ninguna plataforma1 ni plataforma2
+    if (!collisionDetected) {
+        bool anyCollision = false;
+        for (auto& plataforma : plataformas1) {
+            if (plataforma->checkCollisionFromAbove(*player) || plataforma->checkCollisionFromBelow(*player)) {
+                anyCollision = true;
+                break;
+            }
+        }
+        for (auto& plataforma : plataformas2) {
+            if (plataforma->checkCollisionFromAbove(*player) || plataforma->checkCollisionFromBelow(*player)) {
+                anyCollision = true;
+                break;
+            }
         }
 
-        player->setPlatform(true);
-    }
-    else if (plataforma->checkCollisionFromBelow(*player)) {
-        // Si se detecta colisión desde abajo, puedes evitar que el jugador suba o bloquear el movimiento.
-        // Aquí podrías, por ejemplo, evitar que el jugador avance hacia arriba.
-        // Esta parte dependerá de cómo gestiones la física y el movimiento del jugador.
-        //cout << "Up\n";
-        plataforma->returnToOriginalPosition(deltaTime);
-        player->stopJump();
-        cout << "DJG\n";
-        //player->setPlatform(false);
-    }
-    else if(!plataforma->checkCollisionFromBelow(*player) && !plataforma->checkCollisionFromAbove(*player) && (!plataforma2->checkCollisionFromAbove(*player) && !plataforma2->checkCollisionFromBelow(*player))) {
-        // Si no hay colisión, la plataforma vuelve gradualmente a su posición original.
-        plataforma->returnToOriginalPosition(deltaTime);
-        player->setPlatform(false);
-    }
-    else if (plataforma2->checkCollisionFromAbove(*player)) {
-        if (!player->isJumpingPlat()) {
-            player->stopJump();
-            cout << "nepe\n";
+        if (!anyCollision) {
+            for (auto& plataforma : plataformas1) plataforma->returnToOriginalPosition(deltaTime);
+            for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
+
+            if (!plataformas2.empty())
+                deltaY = plataformas2[0]->getLastDeltaY(); // Podrías sumar todos los deltaY si hay más
+            player->setPlatform(false);
         }
-        player->setPlatform(true);
-        glm::vec2 playerPos = player->getPosition();
-        deltaY *= 0.8;
-        player->setPosition(playerPos + glm::vec2(0.f, deltaY));
     }
-    else if (plataforma2->checkCollisionFromBelow(*player)) {
-        player->stopJump();
+
+    // Revisar colisiones desde arriba con plataformas2
+    for (auto& plataforma : plataformas2) {
+        if (plataforma->checkCollisionFromAbove(*player)) {
+            if (!player->isJumpingPlat()) {
+                player->stopJump();
+            }
+            player->setPlatform(true);
+            glm::vec2 currentPos = player->getPosition();
+            plataforma->update(deltaTime);
+            deltaY = plataforma->getLastDeltaY();
+            player->setPosition(currentPos + glm::vec2(0.f, deltaY));
+            collisionDetected = true;
+        }
     }
-    else {
+
+    // Revisar colisiones desde abajo con plataformas2
+    if (!collisionDetected) {
+        for (auto& plataforma : plataformas2) {
+            if (plataforma->checkCollisionFromBelow(*player)) {
+                player->stopJump();
+                for (auto& plataformaaux : plataformas2) plataformaaux->update(deltaTime);
+                collisionDetected = true;
+                break;
+            }
+        }
+    }
+
+    // Si no pasó nada con plataformas2, igual se actualizan
+    if (!collisionDetected) {
         player->setPlatform(false);
+        for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
     }
-    plataforma2->update(deltaTime);
+
     player->update(deltaTime, *seta, *fenix);
 
 
@@ -165,8 +221,9 @@ void Scene::render()
     player->render();
     seta->render();
 	fenix->render();
-    plataforma->render();
-    plataforma2->render();
+    for (auto* p : plataformas1) p->render();
+    for (auto* p : plataformas2) p->render();
+
 
 
     glm::mat4 hudProjection = glm::ortho(0.f, float(SCREEN_WIDTH)/2, float(SCREEN_HEIGHT)/2, 0.f);

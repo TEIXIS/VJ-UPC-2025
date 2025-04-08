@@ -662,3 +662,8 @@ bool Player::isJumping() {
 bool Player::isJumpingPlat() {
     return saltarPlata;
 }
+
+void Player::heal1Live() {
+    lives += 1;
+    lives = min(lives, hMax);
+}
