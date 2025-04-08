@@ -39,9 +39,12 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	Seta* seta;
-	Fenix* fenix;
+	//Seta* seta;
+	vector<Seta*> setas;
+	//Fenix* fenix;
+	vector<Fenix*> fenixes;
 	Mag* mag;
+	Mag* mag2;
 	LittleHeart* cor1;
 	BigHeart* cor2;
 	Calabaza* calabaza1;
@@ -52,6 +55,9 @@ private:
 	float currentTime;
 	glm::mat4 projection;
 	glm::mat4 view;
+	Sprite* pantallaTitol;
+	bool jocComencat;
+	Texture spritesheet;
 
 };
 

@@ -39,6 +39,12 @@ void Seta::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 void Seta::update(int deltaTime)
 {
     if (vida <= 0) return;
+
+    if (abs(posEnemy.x - posPlayer.x) > 200) {
+        vida = 0;
+
+    }
+
     sprite->update(deltaTime);
 
     if (bJumping)
@@ -176,4 +182,18 @@ void Seta::restarVida()
         std::cout << "Enemy defeated!" << std::endl;
         posEnemy.x = -100;
     }
+}
+void Seta::spawn(int x, int y)
+{
+    if (vida <= 0) {
+        setPosition(glm::vec2((x) * 16, (y) * 16));
+        cout << "Seta spawned" << endl;
+        //posEnemy = glm::vec2(16, 16);
+        vida = 1;
+        
+    }
+}
+void Seta::getPosPlayer(glm::vec2 pos)
+{
+    posPlayer = pos;
 }

@@ -33,6 +33,17 @@ void Scene::init()
     initShaders();
     map = TileMap::createTileMap("levels/Level.csv", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
     player = new Player();
+
+
+
+    spritesheet.loadFromFile("images/titol.png", TEXTURE_PIXEL_FORMAT_RGBA);
+    pantallaTitol = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH, SCREEN_HEIGHT), glm::vec2(1.f, 1.f), &spritesheet, &texProgram);
+	pantallaTitol->setNumberAnimations(1);
+	pantallaTitol->setAnimationSpeed(0, 1);
+	pantallaTitol->addKeyframe(0, glm::vec2(0.f, 0.f));
+    pantallaTitol->setPosition(glm::vec2(-500.f, -500.f));
+	jocComencat = false;
+
     // Suponiendo que texProgram, SCREEN_X, SCREEN_Y están definidos y accesibles aquí
 
 // Crear varias plataformas del tipo Platform1
@@ -66,38 +77,71 @@ void Scene::init()
     hud = new HUD();
     hud->init(texProgram, player);
 
-	seta = new Seta();
+	/*seta = new Seta();
 	seta->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 
 	fenix = new Fenix();
-	fenix->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	fenix->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);*/
 
 	mag = new Mag();
 	mag->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
+	mag2 = new Mag();
+	mag2->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	
     
 	//enemy->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), 26 * map->getTileSize()));
-    seta->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
-    seta->setTileMap(map);
+    //seta->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
+    //seta->setTileMap(map);
 
     //fenix->setPosition(glm::vec2((INIT_PLAYER_X_TILES + 8) * 16, (INIT_PLAYER_Y_TILES) * 16));
-    fenix->setTileMap(map);
+    //fenix->setTileMap(map);
 
 	//mag->setPosition(glm::vec2((INIT_PLAYER_X_TILES) * 16, (INIT_PLAYER_Y_TILES + 2) * 16));
 	mag->setTileMap(map);
+	mag2->setTileMap(map);
     
 
     projection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
     currentTime = 0.0f;
+
+    for (int i = 0; i < 5; ++i) {
+        Fenix* fen = new Fenix();
+        fen->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+        fen->setTileMap(map);
+        fenixes.push_back(fen);
+    }
+
+    for (int i = 0; i < 5; ++i) {
+		Seta* seta = new Seta();
+		seta->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+		seta->setTileMap(map);
+		setas.push_back(seta);
+    }
 }
 
 void Scene::update(int deltaTime)
 {
+	if (!jocComencat) {
+		if (Game::instance().getKey(GLFW_KEY_SPACE)) {
+			jocComencat = true;
+		}
+		return;
+	}
     currentTime += deltaTime;
-    seta->update(deltaTime);
-	fenix->update(deltaTime);
+    /*seta->update(deltaTime);
+	fenix->update(deltaTime);*/
 	mag->update(deltaTime);
+	mag2->update(deltaTime);
     map->update(deltaTime / 1000.f);  
 	hud->update(deltaTime);
+
+    for (auto& fenn : fenixes) {
+		fenn->update(deltaTime);
+    }
+	for (auto& seta : setas) {
+		seta->update(deltaTime);
+	}
     
     glm::vec2 playerPos = player->getPosition();
     int posNy = int(playerPos.y);
@@ -196,7 +240,7 @@ void Scene::update(int deltaTime)
         player->setPlatform(false);
         for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
     }
-    player->update(deltaTime, *seta, *fenix, *mag);
+    player->update(deltaTime, setas, fenixes, *mag, *mag2);
     cor1->applyGravity(deltaTime, map);
     if (!cor1->isCollected() && cor1->collidesWith(*player)) {
         cor1->onCollect(*player);
@@ -214,15 +258,29 @@ void Scene::update(int deltaTime)
     calabaza1->update(deltaTime);
 
     if (playerPos.x == 8*16) {
-        mag->spawn();
+        mag->spawn(20,99);
         
     }
-	if (playerPos.x == 78*16) {
-		fenix->spawn();
+	if (playerPos.x == 82*16) {
+		fenixes[0]->spawn(94,93);
 		
 	}
-    if (playerPos.x == 0 * 16) {
-        //seta->spawn();
+    if (playerPos.x == 86 * 16) {
+        fenixes[1]->spawn(98, 93);
+    }
+	if (playerPos.x == 90 * 16) {
+		fenixes[2]->spawn(100, 93);
+	}
+	if (playerPos.x == 94 * 16) {
+		fenixes[3]->spawn(104, 93);
+	}
+    
+    if (playerPos.x == 117 * 16) {
+        mag2->spawn(129, 97);
+    }
+
+    if (playerPos.x == 2 * 16) {
+        setas[0]->spawn(2,97);
     }
 
     float centerX = SCREEN_WIDTH / 8.0f;
@@ -246,6 +304,11 @@ void Scene::update(int deltaTime)
 
 void Scene::render()
 {
+	if (!jocComencat) {
+		pantallaTitol->render();
+		return;
+	}
+
     glm::mat4 modelview;
 
     texProgram.use();
@@ -263,10 +326,15 @@ void Scene::render()
     // HUD usa coordenadas de pantalla
     
     
+
+
 	mag->render();
+	mag2->render();
     player->render();
-    seta->render();
-	fenix->render();
+    /*seta->render();
+	fenix->render();*/
+	for (auto& seta : setas) seta->render();
+	for (auto& fenn : fenixes) fenn->render();
     for (auto* p : plataformas1) p->render();
     for (auto* p : plataformas2) p->render();
 

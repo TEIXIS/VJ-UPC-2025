@@ -64,11 +64,12 @@ void Fenix::update(int deltaTime)
 
 	//cout << posFoc.x << endl;
     //cout << abs(posEnemy.x - posPlayer.x) << endl;
-    if (abs(posEnemy.x - posPlayer.x) > 190 && !focActiu) {
+    if (abs(posEnemy.x - posPlayer.x) > 195 && !focActiu) {
         vida = 0;
 		//focActiu = false;
 		posFoc.x = -100;
 		posFoc2.x = -100;
+		posEnemy.x = -100;
     }
 
     
@@ -202,7 +203,7 @@ glm::vec2 Fenix::getPosFoc() const
 {
     return posFoc;
 }
-void Fenix::spawn()
+void Fenix::spawn(int x, int y)
 {
 	if (vida <= 0) {
 		vida = 1;
@@ -211,7 +212,7 @@ void Fenix::spawn()
 		posFoc.x = -100;
         habaixat = false;
 		attacking = false;
-        setPosition(glm::vec2((90) * 16, (93) * 16));
+        setPosition(glm::vec2((x) * 16, (y) * 16));
         cout << "Fenix spawned" << endl;
 	}
 }

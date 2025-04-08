@@ -16,7 +16,7 @@ public:
     void restarVida();
     void getPosPlayer(glm::vec2 pos);
     glm::vec2 getPosProjectile();
-    void spawn();
+    void spawn(int x, int y);
     
 
 private:

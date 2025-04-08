@@ -174,7 +174,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	frameCount = 0;
 }
 
-void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
+void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes, Mag& mag, Mag& mag2)
 {
     // Update all sprites
     sprite->update(deltaTime);
@@ -189,7 +189,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 
     if (Game::instance().getKey(GLFW_KEY_H)) {
         if (!healKey) {
-			lives = 4;
+			lives = hMax;
             //falta les llanternes
             healKey = true;
         }
@@ -355,41 +355,50 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
         }
 
         // Check collisions with enemy
-        if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode) {
-			cout << "Collision with seta" << endl;  
-            if (isRightFacing()) {
-                sprite->changeAnimation(PLORANT_DRETA);
+        for (int i = 0; i < setas.size();i++) {
+            Seta& seta = *setas[i];
+            if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode) {
+                cout << "Collision with seta" << endl;
+                if (isRightFacing()) {
+                    sprite->changeAnimation(PLORANT_DRETA);
+                }
+                else if (isLeftFacing()) {
+                    sprite->changeAnimation(PLORANT_ESQUERRA);
+                }
+                plorantTimer = 500;
+                this->takeDamage(0.66f);
             }
-            else if (isLeftFacing()) {
-                sprite->changeAnimation(PLORANT_ESQUERRA);
-            }
-            plorantTimer = 500;
-            this->takeDamage(0.66f);
         }
 
-        if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode) {
-			cout << "Collision with fenix" << endl;
-            if (isRightFacing()) {
-                sprite->changeAnimation(PLORANT_DRETA);
-            }
-            else if (isLeftFacing()) {
-                sprite->changeAnimation(PLORANT_ESQUERRA);
-            }
-            plorantTimer = 500;
-            this->takeDamage(0.66f);
-        }
+        
 
-        if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode) {
-			cout << "Collision with fenix fire" << endl;
-            if (isRightFacing()) {
-                sprite->changeAnimation(PLORANT_DRETA);
+        for (int i = 0; i < fenixes.size(); i++) {
+			Fenix& fenix = *fenixes[i];
+            if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode) {
+                cout << "Collision with fenix" << endl;
+                if (isRightFacing()) {
+                    sprite->changeAnimation(PLORANT_DRETA);
+                }
+                else if (isLeftFacing()) {
+                    sprite->changeAnimation(PLORANT_ESQUERRA);
+                }
+                plorantTimer = 500;
+                this->takeDamage(0.66f);
             }
-            else if (isLeftFacing()) {
-                sprite->changeAnimation(PLORANT_ESQUERRA);
+
+            if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode) {
+                cout << "Collision with fenix fire" << endl;
+                if (isRightFacing()) {
+                    sprite->changeAnimation(PLORANT_DRETA);
+                }
+                else if (isLeftFacing()) {
+                    sprite->changeAnimation(PLORANT_ESQUERRA);
+                }
+                plorantTimer = 500;
+                this->takeDamage(0.33f);
             }
-            plorantTimer = 500;
-            this->takeDamage(0.33f);
         }
+        
 
 		if (checkCollision(mag.getPosition(), glm::ivec2(32, 32)) && !godMode) {
 			cout << "Collision with mag" << endl;
@@ -401,6 +410,18 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 			}
 			plorantTimer = 500;
             this->takeDamage(0.66f);
+		}
+
+		if (checkCollision(mag2.getPosition(), glm::ivec2(32, 32)) && !godMode) {
+			cout << "Collision with mag2" << endl;
+			if (isRightFacing()) {
+				sprite->changeAnimation(PLORANT_DRETA);
+			}
+			else if (isLeftFacing()) {
+				sprite->changeAnimation(PLORANT_ESQUERRA);
+			}
+			plorantTimer = 500;
+			this->takeDamage(0.66f);
 		}
 
 		if (checkCollision(mag.getPosProjectile(), glm::ivec2(8, 8)) && !godMode) {
@@ -415,21 +436,55 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
             this->takeDamage(0.33f);
 		}
 
+		if (checkCollision(mag2.getPosProjectile(), glm::ivec2(8, 8)) && !godMode) {
+			cout << "Collision with mag2 projectile" << endl;
+			if (isRightFacing()) {
+				sprite->changeAnimation(PLORANT_DRETA);
+			}
+            else if (isLeftFacing()) {
+                sprite->changeAnimation(PLORANT_ESQUERRA);
+            }
+            plorantTimer = 500;
+            this->takeDamage(0.33f);
+        }
+
+
         if (isAttacking || atacantAbaix || atacantAdalt) {
-            if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
-                seta.restarVida();
+            for (int i = 0; i < setas.size();i++) {
+                Seta& seta = *setas[i];
+                if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
+                    seta.restarVida();
+                }
             }
-            if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(32, 16))) {
-                fenix.restarVida();
-            }
+
+            
+			for (int i = 0; i < fenixes.size(); i++) {
+				Fenix& fenix = *fenixes[i];
+				if (checkCollisionLanza(fenix.getPosFoc(), glm::ivec2(16, 16))) {
+					fenix.restarVida();
+				}
+			}
             if (checkCollisionLanza(mag.getPosition(), glm::ivec2(32, 32))) {
                 mag.restarVida();
             }
+			if (checkCollisionLanza(mag2.getPosition(), glm::ivec2(32, 32))) {
+				mag2.restarVida();
+			}
+
+
         }
     }
 
-    fenix.getPosPlayer(posPlayer);
+    for (int i = 0; i < fenixes.size(); i++) {
+        Fenix& fenix = *fenixes[i];
+        fenix.getPosPlayer(posPlayer);
+    }
     mag.getPosPlayer(posPlayer);
+	mag2.getPosPlayer(posPlayer);
+    for (int i = 0; i < setas.size(); i++) {
+        Seta& seta = *setas[i];
+        seta.getPosPlayer(posPlayer);
+    }
 
     // Update sprite positions
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -667,6 +722,7 @@ void Player::render()
 {
     // Render hitboxes
     renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
+    renderHitbox(posLanza, glm::ivec2(32, 32));
 	frameCount++;
     // Render the player sprite
     if (plorantTimer <= 0 || (frameCount % 2 == 1)) {
