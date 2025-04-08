@@ -45,6 +45,9 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     lanzaAdalt = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.125, 0.125), &spritesheet, &shaderProgram);
     lanzaAdalt->setNumberAnimations(1);
 
+	totemFoc = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
+	totemFoc->setNumberAnimations(2);
+
     // Weapon animations
     // Right
     lanza->setAnimationSpeed(0, 8);
@@ -65,6 +68,14 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     // Down
     lanzaAbaix->setAnimationSpeed(0, 8);
     lanzaAbaix->addKeyframe(0, glm::vec2(0.625f, 0.625f));
+
+	totemFoc->setAnimationSpeed(0, 8);
+	totemFoc->addKeyframe(0, glm::vec2(0.5f, 0.5f));
+	totemFoc->addKeyframe(0, glm::vec2(0.5f, 0.5625f));
+
+	totemFoc->setAnimationSpeed(1, 8);
+	totemFoc->addKeyframe(1, glm::vec2(0.5625f, 0.5f));
+	totemFoc->addKeyframe(1, glm::vec2(0.5625f, 0.5625f));
 
     // Standing animations
     sprite->setAnimationSpeed(STAND_RIGHT, 8);
@@ -153,6 +164,11 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
     lanzaAdalt->changeAnimation(0);
     lanzaAdalt->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
+    
+	totemFoc->changeAnimation(0);
+	totemFoc->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
+
+
 
     godMode = false;
 	frameCount = 0;
@@ -165,8 +181,22 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
     lanza->update(deltaTime);
     lanzaAbaix->update(deltaTime);
     lanzaAdalt->update(deltaTime);
-
+	totemFoc->update(deltaTime);
     
+
+
+    static bool totemKey = false;
+
+    if (Game::instance().getKey(GLFW_KEY_T)) {
+        if (!totemKey) {
+            totemFocActiu = !totemFocActiu;
+            std::cout << "Totem: " << (totemFocActiu ? "ON" : "OFF") << std::endl;
+            totemKey = true;
+        }
+    }
+    else {
+        totemKey = false;
+    }
 
 
     static bool godModeKeyPressed = false;
@@ -254,11 +284,28 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
         else {
             isAttacking = true;
             if (isRightFacing()) {
-                if (lanza->animation() != 0) lanza->changeAnimation(0);
+                if (totemFocActiu) {
+					lanza->changeAnimation(0);
+					if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
+                    offsetTotem = 8;
+                }
+                else {
+                    if (lanza->animation() != 0) lanza->changeAnimation(0);
+                }
+                
                 posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
             }
             else if (isLeftFacing()) {
-                if (lanza->animation() != 1) lanza->changeAnimation(1);
+                if (totemFocActiu) {
+                    lanza->changeAnimation(1);
+					if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
+                    
+					offsetTotem = 8;
+                }
+				else {
+					if (lanza->animation() != 1) lanza->changeAnimation(1);
+				}
+
                 posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
             }
         }
@@ -371,6 +418,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
     lanza->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
     lanzaAdalt->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
     lanzaAbaix->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
+	totemFoc->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x + offsetTotem), float(tileMapDispl.y + posLanza.y + 10)));
 }
 
 void Player::handleHorizontalMovement()
@@ -599,6 +647,8 @@ void Player::setIdleAnimation()
 
 void Player::render()
 {
+    // Render hitboxes
+    renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
 	frameCount++;
     // Render the player sprite
     if (plorantTimer <= 0 || (frameCount % 2 == 1)) {
@@ -615,14 +665,14 @@ void Player::render()
         renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
     }
     else if (isAttacking) {
+        renderHitbox(posLanza, glm::ivec2(32, 32));
         lanza->render();
-        renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
+		if (totemFocActiu) totemFoc->render();
     }
 
 
 
-    // Render hitboxes
-    renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
+    
 
 }
 
