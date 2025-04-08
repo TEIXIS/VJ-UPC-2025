@@ -19,6 +19,7 @@
     <ClInclude Include="Fenix.h" />
     <ClInclude Include="Lampara.h" />
     <ClInclude Include="LittleHeart.h" />
+    <ClInclude Include="Llamarada.h" />
     <ClInclude Include="Mag.h" />
     <ClInclude Include="Platform1.h" />
     <ClInclude Include="Platform2.h" />
@@ -41,6 +42,7 @@
     <ClCompile Include="Fenix.cpp" />
     <ClCompile Include="Lampara.cpp" />
     <ClCompile Include="LittleHeart.cpp" />
+    <ClCompile Include="LLamarada.cpp" />
     <ClCompile Include="Mag.cpp" />
     <ClCompile Include="Platform1.cpp" />
     <ClCompile Include="Platform2.cpp" />

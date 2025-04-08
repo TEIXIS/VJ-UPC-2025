@@ -18,6 +18,7 @@
 #include "Calabaza.h"
 #include "Lampara.h"
 #include "Capa.h"
+#include "LLamarada.h"
 
 
 // Scene contains all the entities of our game.
@@ -37,6 +38,7 @@ public:
 
 private:
 	void initShaders();
+	void resetLevel();
 
 private:
 	TileMap *map;
@@ -52,6 +54,7 @@ private:
 	Calabaza* calabaza1;
 	Lampara* lamp;
 	Capa* capa;
+	Llamarada* flam;
 	vector<Platform1*> plataformas1;
 	vector<Platform2*> plataformas2;
 	HUD* hud;
