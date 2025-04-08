@@ -10,11 +10,11 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-#define INIT_PLAYER_X_TILES 1
+//#define INIT_PLAYER_X_TILES 1
 //#define INIT_PLAYER_X_TILES 70
-#define INIT_PLAYER_Y_TILES 97
-//#define INIT_PLAYER_X_TILES 2128/16
-//#define INIT_PLAYER_Y_TILES 154/16
+//#define INIT_PLAYER_Y_TILES 97
+#define INIT_PLAYER_X_TILES 2128/16
+#define INIT_PLAYER_Y_TILES 154/16
 
 Scene::Scene()
 {
@@ -120,7 +120,7 @@ void Scene::init()
         fenixes.push_back(fen);
     }
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
 		Seta* seta = new Seta();
 		seta->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 		seta->setTileMap(map);
@@ -302,6 +302,24 @@ void Scene::update(int deltaTime)
     if (playerPos.x == 2 * 16) {
         setas[0]->spawn(2,97);
     }
+    if (playerPos.y == 740) {
+        setas[1]->spawn(133, 36);
+    }
+	if (playerPos.y == 574) {
+		setas[2]->spawn(133, 30);
+	}
+    if (playerPos.y == 546) {
+        setas[3]->spawn(136, 24);
+    }
+    if (playerPos.y == 442) {
+        setas[4]->spawn(135, 17);
+    }
+    if (playerPos.y == 368) {
+        setas[5]->spawn(135, 13);
+        setas[6]->spawn(140, 13);
+    }
+
+
 
     float centerX = SCREEN_WIDTH / 8.0f;
     float centerY = SCREEN_HEIGHT / 8.0f;

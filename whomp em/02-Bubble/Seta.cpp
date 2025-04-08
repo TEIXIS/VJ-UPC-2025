@@ -33,14 +33,15 @@ void Seta::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     sprite->changeAnimation(0);
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
-    movingRight = true;
+    movingRight = false;
 }
 
 void Seta::update(int deltaTime)
 {
     if (vida <= 0) return;
 
-    if (abs(posEnemy.x - posPlayer.x) > 200) {
+    //cout << abs(posEnemy.y - posPlayer.y) << endl;
+    if (abs(posEnemy.x - posPlayer.x) > 200 || abs(posEnemy.y - posPlayer.y)>180) {
         vida = 0;
 
     }
