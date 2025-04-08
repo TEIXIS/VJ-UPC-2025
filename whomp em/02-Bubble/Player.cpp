@@ -460,7 +460,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
             
 			for (int i = 0; i < fenixes.size(); i++) {
 				Fenix& fenix = *fenixes[i];
-				if (checkCollisionLanza(fenix.getPosFoc(), glm::ivec2(16, 16))) {
+				if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(16, 16))) {
 					fenix.restarVida();
 				}
 			}
@@ -483,7 +483,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 	mag2.getPosPlayer(posPlayer);
     for (int i = 0; i < setas.size(); i++) {
         Seta& seta = *setas[i];
-        seta.getPosPlayer(posPlayer);
+		seta.getPosPlayer(posPlayer);
     }
 
     // Update sprite positions
