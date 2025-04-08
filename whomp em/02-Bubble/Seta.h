@@ -17,6 +17,8 @@ public:
     void restarVida();
     void spawn(int x, int y);
     void getPosPlayer(glm::vec2 pos);
+    bool spawnItem();
+    glm::vec2 getPositionSpawn() const;
 
 private:
     glm::ivec2 tileMapDispl, posEnemy;
@@ -30,6 +32,8 @@ private:
     TileMap* map;
     int vida = -1;
     glm::vec2 posPlayer;
+    glm::ivec2 posSpawnItem;
+    bool defeated = false;
 };
 
 #endif // SETA_H

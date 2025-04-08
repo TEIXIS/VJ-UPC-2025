@@ -39,6 +39,7 @@ public:
 private:
 	void initShaders();
 	void resetLevel();
+	void spawnRandomCollectible(const glm::vec2& position);
 
 private:
 	TileMap *map;
@@ -57,15 +58,21 @@ private:
 	Llamarada* flam;
 	vector<Platform1*> plataformas1;
 	vector<Platform2*> plataformas2;
+	vector<Llamarada*> llamas;
+	vector<Collectible*> collectibles;
 	HUD* hud;
 	ShaderProgram texProgram;
 	float currentTime;
 	glm::mat4 projection;
 	glm::mat4 view;
 	Sprite* pantallaTitol;
-	bool jocComencat;
-	Texture spritesheet;
+	Sprite* pantallaControles;
+	bool jocComencat = false;
+	Texture spritesheet;           // Usado para el título
+	Texture spritesheetControls;   // Usado para los controles
 	bool s = false;
+	bool showControls = false;
+	bool spacePressed = false;
 };
 
 

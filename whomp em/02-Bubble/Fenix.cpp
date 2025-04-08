@@ -47,6 +47,7 @@ void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     tileMapDispl = tileMapPos;
     //originalHeight = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
     sprite->setPosition(originalHeight);
+	posSpawnItem = originalHeight;
     foc->setPosition(originalHeight);
     foc2->setPosition(originalHeight);
     movingRight = false;
@@ -110,7 +111,6 @@ void Fenix::update(int deltaTime)
         if (posEnemy.y <= originalHeight.y) {
 			attacking = true;
         }
-		
 	}
 	
     
@@ -148,6 +148,7 @@ void Fenix::update(int deltaTime)
 
    
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+    posSpawnItem = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
     foc->setPosition(glm::vec2(float(tileMapDispl.x + posFoc.x), float(tileMapDispl.y + posFoc.y)));
     foc2->setPosition(glm::vec2(float(tileMapDispl.x + posFoc2.x), float(tileMapDispl.y + posFoc2.y)));
 }
@@ -186,12 +187,21 @@ void Fenix::restarVida()
         vida--;
     if (vida == 0) {
         std::cout << "Enemy defeated!" << std::endl;
+		defeated = true;
         focActiu = true;
         posFoc = posEnemy;
         posFoc2 = posEnemy;
         vida--;
 		posEnemy.x = -100;
     }
+}
+
+bool Fenix::spawnItem() {
+    if (defeated) {
+        defeated = false;
+        return true;
+    }
+    else return false;
 }
 
 void Fenix::getPosPlayer(glm::vec2 pos)
@@ -215,4 +225,9 @@ void Fenix::spawn(int x, int y)
         setPosition(glm::vec2((x) * 16, (y) * 16));
         cout << "Fenix spawned" << endl;
 	}
+}
+
+glm::vec2 Fenix::getPositionSpawn() const
+{
+	return glm::vec2(posSpawnItem.x,posSpawnItem.y-5.f);
 }

@@ -33,6 +33,7 @@ void Seta::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     sprite->changeAnimation(0);
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+	posSpawnItem = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
     movingRight = false;
 }
 
@@ -151,6 +152,7 @@ void Seta::update(int deltaTime)
     }
 
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+	posSpawnItem = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
 }
 
 void Seta::render()
@@ -181,6 +183,7 @@ void Seta::restarVida()
         vida--;
     if (vida <= 0) {
         std::cout << "Enemy defeated!" << std::endl;
+		defeated = true;
         posEnemy.x = -100;
     }
 }
@@ -197,4 +200,17 @@ void Seta::spawn(int x, int y)
 void Seta::getPosPlayer(glm::vec2 pos)
 {
     posPlayer = pos;
+}
+
+bool Seta::spawnItem() {
+    if (defeated) {
+        defeated = false;
+        return true;
+    }
+    else return false;
+}
+
+glm::vec2 Seta::getPositionSpawn() const
+{
+    return glm::vec2(posSpawnItem.x, posSpawnItem.y - 5.f);
 }

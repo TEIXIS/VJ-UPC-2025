@@ -68,6 +68,7 @@ void Mag::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+	posSpawnItem = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
 	posProjectile = glm::vec2(float(-100), float(tileMapDispl.y + posEnemy.y));
     movingRight = false;
     attacking = false;
@@ -172,6 +173,7 @@ void Mag::update(int deltaTime)
 
 	projectile->setPosition(glm::vec2(float(tileMapDispl.x + posProjectile.x), float(tileMapDispl.y + posProjectile.y)));
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y)));
+	posSpawnItem = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
     
 }
 
@@ -206,6 +208,7 @@ void Mag::restarVida()
         vida--;
         if (vida == 0) {
             std::cout << "Enemy defeated!" << std::endl;
+			defeated = true;
 			posEnemy = glm::vec2(-100, -100);
 			posProjectile = glm::vec2(-100, -100);
 			spawnB = false;
@@ -238,3 +241,15 @@ void Mag::spawn(int x, int y)
 	}
 }
 
+bool Mag::spawnItem() {
+    if (defeated) {
+        defeated = false;
+        return true;
+    }
+    else return false;
+}
+
+glm::vec2 Mag::getPositionSpawn() const
+{
+    return glm::vec2(posSpawnItem.x, posSpawnItem.y - 5.f);
+}

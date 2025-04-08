@@ -6,6 +6,8 @@
 #include "Hud.h"
 #include "Platform1.h"
 #include "Platform2.h"
+#include "Llamarada.h"
+#include <iostream>
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
@@ -37,7 +39,8 @@ void Scene::init()
     player = new Player();
 
     jocComencat = false;
-
+    showControls = false;
+    spacePressed = false;
     
     spritesheet.loadFromFile("images/titol.png", TEXTURE_PIXEL_FORMAT_RGBA);
     pantallaTitol = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), glm::vec2(1.f, 1.f), &spritesheet, &texProgram);
@@ -45,6 +48,14 @@ void Scene::init()
 	pantallaTitol->setAnimationSpeed(0, 1);
 	pantallaTitol->addKeyframe(0, glm::vec2(0.f, 0.f));
     pantallaTitol->setPosition(glm::vec2(0.f, 0.f));
+
+    spritesheetControls.loadFromFile("images/controls.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	pantallaControles = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), glm::vec2(1.f, 1.f), &spritesheetControls, &texProgram);
+	pantallaControles->setNumberAnimations(1);
+	pantallaControles->setAnimationSpeed(0, 1);
+	pantallaControles->addKeyframe(0, glm::vec2(0.f, 0.f));
+	pantallaControles->setPosition(glm::vec2(0.f, 0.f));
+
 
     // ⚡ Cámara inicial para primer render
     glm::vec2 playerPos = player->getPosition();
@@ -56,9 +67,15 @@ void Scene::init()
     // Suponiendo que texProgram, SCREEN_X, SCREEN_Y están definidos y accesibles aquí
 
 // Crear varias plataformas del tipo Platform1
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 3; ++i) {
         Platform1* plataforma = new Platform1();
         glm::vec2 plataformaPos = glm::vec2((1 + 100 + i * 4) * 16, (98) * 16+i*2);
+        plataforma->init(plataformaPos, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y));
+        plataformas1.push_back(plataforma);
+    }
+    for (int i = 3; i < 5; ++i) {
+        Platform1* plataforma = new Platform1();
+        glm::vec2 plataformaPos = glm::vec2((1 + 104 + i * 4) * 16, (98-2) * 16 + i * 2);
         plataforma->init(plataformaPos, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y));
         plataformas1.push_back(plataforma);
     }
@@ -66,12 +83,12 @@ void Scene::init()
     // Crear varias plataformas del tipo Platform2
     for (int i = 0; i < 2; ++i) {
         Platform2* plataforma2 = new Platform2();
-        glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 150 + i * 6) * 16, (INIT_PLAYER_Y_TILES - 80) * 16);
+        glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 158 + i * 9) * 16, (INIT_PLAYER_Y_TILES - 86) * 16);
         plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 40.f);
         plataformas2.push_back(plataforma2);
     }
 
-    cor1 = new LittleHeart();
+    /*cor1 = new LittleHeart();
     cor1->init(glm::vec2((INIT_PLAYER_X_TILES + 10) * 16, (INIT_PLAYER_Y_TILES-5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/heart1.png");
 
     cor2 = new BigHeart();
@@ -88,6 +105,27 @@ void Scene::init()
 
     flam = new Llamarada();
 	flam->init(glm::vec2((INIT_PLAYER_X_TILES + 40) * 16, (INIT_PLAYER_Y_TILES-1) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::UP);
+    */
+
+    
+        Llamarada* flame = new Llamarada();
+        // Calcula la posición de cada llama; en este ejemplo se desplazan en x
+        glm::vec2 flamePos = glm::vec2((INIT_PLAYER_X_TILES + 136) * 16, (INIT_PLAYER_Y_TILES - 24) * 16);
+        flame->init(flamePos, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::UP);
+        llamas.push_back(flame);
+
+        Llamarada* flame1 = new Llamarada();
+        // Calcula la posición de cada llama; en este ejemplo se desplazan en x
+         flamePos = glm::vec2((INIT_PLAYER_X_TILES + 134) * 16, (INIT_PLAYER_Y_TILES - 27) * 16);
+        flame1->init(flamePos, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::UP);
+        llamas.push_back(flame1);
+
+        Llamarada* flame2 = new Llamarada();
+        // Calcula la posición de cada llama; en este ejemplo se desplazan en x
+         flamePos = glm::vec2((INIT_PLAYER_X_TILES + 132) * 16, (INIT_PLAYER_Y_TILES - 30) * 16);
+        flame2->init(flamePos, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::DOWN);
+        llamas.push_back(flame2);
+    
 
     player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
     player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
@@ -141,17 +179,26 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     glm::vec2 playerPos = player->getPosition();
-	if (!jocComencat) {
-		if (Game::instance().getKey(GLFW_KEY_SPACE)) {
-			jocComencat = true;
-            
-		}
-        if (pantallaTitol == nullptr)
-            std::cout << "[ERROR] pantallaTitol no se ha creado correctamente\n";
-        else
-            std::cout << "[OK] pantallaTitol creada\n";
-        std::cout << "[DEBUG] Renderizando pantalla de título\n";
-	}
+    if (!jocComencat) {
+        bool currentSpace = Game::instance().getKey(GLFW_KEY_SPACE);
+
+        // Solo actúa si SPACE se acaba de presionar (flanco de bajada)
+        if (currentSpace && !spacePressed) {
+            if (showControls) {
+                jocComencat = true;  // Si ya se muestran controles, inicia el juego
+                std::cout << "[DEBUG] Iniciando el nivel\n";
+            }
+            else {
+                showControls = true;  // De lo contrario, se muestra la pantalla de controles
+                std::cout << "[DEBUG] Mostrando controles\n";
+            }
+        }
+
+        // Actualiza el estado anterior de la tecla SPACE
+        spacePressed = currentSpace;
+
+        return;  // No ejecutar la lógica del juego si aún no se ha iniciado
+    }
     else {
         if (Game::instance().getKey(GLFW_KEY_R)) {
             resetLevel();  // Al pulsar R reinicia todo
@@ -162,7 +209,9 @@ void Scene::update(int deltaTime)
         mag->update(deltaTime);
         mag2->update(deltaTime);
         map->update(deltaTime / 1000.f);
-        flam->update(deltaTime);
+        for (auto flame : llamas) {
+            flame->update(deltaTime);
+        }
         hud->update(deltaTime);
 
         for (auto& fenn : fenixes) {
@@ -189,7 +238,6 @@ void Scene::update(int deltaTime)
                 }
 
                 if (!player->isJumpingPlat()) {
-                    cout << "Me poso\n";
                     player->stopJump();
                 }
 
@@ -229,7 +277,7 @@ void Scene::update(int deltaTime)
 
             if (!anyCollision) {
                 for (auto& plataforma : plataformas1) plataforma->returnToOriginalPosition(deltaTime);
-                for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
+                //for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
 
                 if (!plataformas2.empty())
                     deltaY = plataformas2[0]->getLastDeltaY(); // Podrías sumar todos los deltaY si hay más
@@ -248,8 +296,13 @@ void Scene::update(int deltaTime)
                 plataforma->update(deltaTime);
                 deltaY = plataforma->getLastDeltaY();
                 player->setPosition(currentPos + glm::vec2(0.f, deltaY));
+				playerPos = player->getPosition();
+				if (map->collisionMoveDown(playerPos, glm::ivec2(32, 32), ptr)) {
+					player->setPosition(glm::ivec2(playerPos.x, playerPos.y - 1.0f));
+				}
                 collisionDetected = true;
             }
+			else plataforma->update(deltaTime);
         }
 
         // Revisar colisiones desde abajo con plataformas2
@@ -261,17 +314,43 @@ void Scene::update(int deltaTime)
                     collisionDetected = true;
                     break;
                 }
+				//else plataforma->update(deltaTime);
             }
         }
 
         // Si no pasó nada con plataformas2, igual se actualizan
         if (!collisionDetected) {
             player->setPlatform(false);
-            for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
+            //for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
         }
 
 
         player->update(deltaTime, setas, fenixes, *mag, *mag2);
+
+        if (mag->spawnItem()) {
+			spawnRandomCollectible(mag->getPositionSpawn());
+        }
+		if (mag2->spawnItem()) {
+			spawnRandomCollectible(mag2->getPositionSpawn());
+		}
+		for (auto& seta : setas) {
+			if (seta->spawnItem()) {
+				spawnRandomCollectible(seta->getPositionSpawn());
+			}
+		}
+		for (auto& fenix : fenixes) {
+			if (fenix->spawnItem()) {
+				spawnRandomCollectible(fenix->getPositionSpawn());
+			}
+		}
+		for (auto& collectible : collectibles) {
+			collectible->applyGravity(deltaTime,map);
+			if (!collectible->isCollected() && collectible->collidesWith(*player)) {
+				collectible->onCollect(*player);
+			}
+            collectible->update(deltaTime);
+		}
+
 
         if (player->getLives() <= 0) {
             if (player->getLamps() == 0) resetLevel();
@@ -281,38 +360,13 @@ void Scene::update(int deltaTime)
             }
         }
 
-
-        if (flam->collidesWithPlayer(*player) && !player->getCapaActiva() && !player->playerIsPlorant() && !player->isGod()) {
-            player->setPlorantTimer();
-            player->takeDamage(0.66f); // o el método que uses
+        for (auto flame : llamas) {
+            if (flame->collidesWithPlayer(*player) && !player->getCapaActiva() && !player->playerIsPlorant() && !player->isGod()) {
+                player->setPlorantTimer();
+                player->takeDamage(0.66f); // o el método que uses
+            }
         }
-        cor1->applyGravity(deltaTime, map);
-        if (!cor1->isCollected() && cor1->collidesWith(*player)) {
-            cor1->onCollect(*player);
-        }
-        cor1->update(deltaTime);
-        cor2->applyGravity(deltaTime, map);
-        if (!cor2->isCollected() && cor2->collidesWith(*player)) {
-            cor2->onCollect(*player);
-        }
-        cor2->update(deltaTime);
-        calabaza1->applyGravity(deltaTime, map);
-        if (!calabaza1->isCollected() && calabaza1->collidesWith(*player)) {
-            calabaza1->onCollect(*player);
-        }
-        calabaza1->update(deltaTime);
-
-        lamp->applyGravity(deltaTime, map);
-        if (!lamp->isCollected() && lamp->collidesWith(*player)) {
-            lamp->onCollect(*player);
-        }
-        lamp->update(deltaTime);
-
-        capa->applyGravity(deltaTime, map);
-        if (!capa->isCollected() && capa->collidesWith(*player)) {
-            capa->onCollect(*player);
-        }
-        capa->update(deltaTime);
+        
 
         if (playerPos.x == 8 * 16) {
             mag->spawn(20, 99);
@@ -417,8 +471,11 @@ void Scene::render()
         texProgram.setUniformMatrix4f("modelview", glm::mat4(1.0f));
         texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
         texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);  // Asegurarse de que no se aplica ningún desplazamiento
-		pantallaTitol->render();
-		return;
+        if (showControls)
+            pantallaControles->render();
+        else
+            pantallaTitol->render();
+        return;
 	}
 
     glm::mat4 modelview;
@@ -432,12 +489,18 @@ void Scene::render()
     texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
     map->render();
     texProgram.use();
-    cor1->render();
+    /*r1->render();
     cor2->render();
     calabaza1->render();
     lamp->render();
-	capa->render();
-    flam->render();
+	capa->render();*/
+	for (auto& collectible : collectibles) {
+		collectible->render();
+	}
+
+    for (auto flame : llamas) {
+        flame->render();
+    }
     // HUD usa coordenadas de pantalla
     
     
@@ -521,6 +584,12 @@ void Scene::resetLevel()
     for (auto* p : plataformas2) delete p;
     plataformas2.clear();
 
+	for (auto* f : llamas) delete f;
+	llamas.clear();
+
+	for (auto* c : collectibles) delete c;
+	collectibles.clear();
+
     delete cor1;
     delete cor2;
     delete calabaza1;
@@ -533,8 +602,47 @@ void Scene::resetLevel()
     // 🌀 Reiniciar tiempo y estado
     currentTime = 0.0f;
     jocComencat = false;
+	showControls = false;
 
     // 🔄 Volver a iniciar todo
     init();
 }
 
+void Scene::spawnRandomCollectible(const glm::vec2& position) {
+    // Número aleatorio entre 0 y 3 (por ejemplo, 4 tipos de coleccionables)
+    int r = rand() % 4;
+    Collectible* item = nullptr;
+
+    switch (r) {
+    case 0: {
+        LittleHeart* heart = new LittleHeart();
+        heart->init(position, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/heart1.png");
+        item = heart;
+        break;
+    }
+    case 1: {
+        BigHeart* bigHeart = new BigHeart();
+        bigHeart->init(position, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/heart2.png");
+        item = bigHeart;
+        break;
+    }
+    case 2: {
+        Calabaza* pumpkin = new Calabaza();
+        pumpkin->init(position, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/calabaza1.png");
+        item = pumpkin;
+        break;
+    }
+    case 3: {
+        Lampara* lamp = new Lampara();
+        lamp->init(position, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/lamp.png");
+        item = lamp;
+        break;
+    }
+    default:
+        break;
+    }
+
+    if (item != nullptr) {
+        collectibles.push_back(item);
+    }
+}

@@ -17,6 +17,8 @@ public:
     void getPosPlayer(glm::vec2 pos);
     glm::vec2 getPosFoc() const;
 	void spawn(int x, int y);
+	bool spawnItem();
+    glm::vec2 getPositionSpawn() const;
 
 private:
     bool bJumping;
@@ -37,6 +39,8 @@ private:
     bool habaixat;
     bool focActiu;
 	bool spawnB;
+    glm::ivec2 posSpawnItem;
+    bool defeated = false;
 };
 
 
