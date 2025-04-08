@@ -763,6 +763,10 @@ bool Player::checkCollisionLanza(const glm::vec2& pos, const glm::ivec2& size) c
 }
 
 void Player::takeDamage(float damage) {
+    if (lives <= 0) {
+        lives = 0;
+        return;
+    }
     lives -= damage;
 }
 
