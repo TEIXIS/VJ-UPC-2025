@@ -323,82 +323,92 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
         // Normal gameplay when not hurt
 
         // Handle horizontal movement
-        handleHorizontalMovement();
-
-        if (Game::instance().getKey(GLFW_KEY_W)) {
-			posPlayer.y -= MOVE_SPEED;
-        }
-		else if (Game::instance().getKey(GLFW_KEY_S)) {
-			posPlayer.y += MOVE_SPEED;
-		}
-
-		cout << "PosPlayer: " << posPlayer.x << ", " << posPlayer.y << endl;
-
-        // Handle jumping and falling
         
-
-        // Handle weapon state
-        if (!Game::instance().getKey(GLFW_KEY_X)) {
-            isAttacking = false;
+        if (map->isOnLadder(posPlayer, glm::ivec2(32,32))) {
+            handleLadderMovement();
         }
         else {
-            isAttacking = true;
-            if (isRightFacing()) {
-                if (totemFocActiu) {
-					lanza->changeAnimation(0);
-					if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
-                    offsetTotem = 8;
-                }
-                else {
-                    if (lanza->animation() != 0) lanza->changeAnimation(0);
-                }
-                
-                posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+            if (Game::instance().getKey(GLFW_KEY_W)) {
+                posPlayer.y -= MOVE_SPEED;
             }
-            else if (isLeftFacing()) {
-                if (totemFocActiu) {
-                    lanza->changeAnimation(1);
-					if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
-                    
-					offsetTotem = 8;
-                }
-				else {
-					if (lanza->animation() != 1) lanza->changeAnimation(1);
-				}
+            else if (Game::instance().getKey(GLFW_KEY_S)) {
+                posPlayer.y += MOVE_SPEED;
+            }
 
-                posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+            //cout << "PosPlayer: " << posPlayer.x << ", " << posPlayer.y << endl;
+
+            // Handle jumping and falling
+
+
+
+
+            // Handle weapon state
+            if (!Game::instance().getKey(GLFW_KEY_X)) {
+                isAttacking = false;
+            }
+            else {
+                isAttacking = true;
+                if (isRightFacing()) {
+                    if (totemFocActiu) {
+                        lanza->changeAnimation(0);
+                        if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
+                        offsetTotem = 8;
+                    }
+                    else {
+                        if (lanza->animation() != 0) lanza->changeAnimation(0);
+                    }
+
+                    posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+                }
+                else if (isLeftFacing()) {
+                    if (totemFocActiu) {
+                        lanza->changeAnimation(1);
+                        if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
+
+                        offsetTotem = 8;
+                    }
+                    else {
+                        if (lanza->animation() != 1) lanza->changeAnimation(1);
+                    }
+
+                    posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+                }
+            }
+
+            handleHorizontalMovement();
+
+            // Handle vertical keys
+            handleVerticalKeys();
+
+            handleJumpingAndFalling();
+
+            // Handle special attack positions
+            if (sprite->animation() == ATK_JUMPING_UP_R) {
+                atacantAdalt = true;
+                posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
+            }
+            else if (sprite->animation() == ATK_JUMPING_UP_L) {
+                atacantAdalt = true;
+                posLanza = glm::vec2(posPlayer.x, posPlayer.y - 32);
+            }
+            else {
+                atacantAdalt = false;
+            }
+
+            if (sprite->animation() == ATK_JUMPING_DOWN_R) {
+                atacantAbaix = true;
+                posLanza = glm::vec2(posPlayer.x + 7, posPlayer.y + 25);
+            }
+            else if (sprite->animation() == ATK_JUMPING_DOWN_L) {
+                atacantAbaix = true;
+                posLanza = glm::vec2(posPlayer.x, posPlayer.y + 25);
+            }
+            else {
+                atacantAbaix = false;
             }
         }
 
-        // Handle vertical keys
-        handleVerticalKeys();
-
-        handleJumpingAndFalling();
-
-        // Handle special attack positions
-        if (sprite->animation() == ATK_JUMPING_UP_R) {
-            atacantAdalt = true;
-            posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
-        }
-        else if (sprite->animation() == ATK_JUMPING_UP_L) {
-            atacantAdalt = true;
-            posLanza = glm::vec2(posPlayer.x, posPlayer.y - 32);
-        }
-        else {
-            atacantAdalt = false;
-        }
-
-        if (sprite->animation() == ATK_JUMPING_DOWN_R) {
-            atacantAbaix = true;
-            posLanza = glm::vec2(posPlayer.x + 7, posPlayer.y + 25);
-        }
-        else if (sprite->animation() == ATK_JUMPING_DOWN_L) {
-            atacantAbaix = true;
-            posLanza = glm::vec2(posPlayer.x, posPlayer.y + 25);
-        }
-        else {
-            atacantAbaix = false;
-        }
+        
 
         // Check collisions with enemy
         for (int i = 0; i < setas.size();i++) {
@@ -985,4 +995,68 @@ void Player::setPlorantTimer() {
 bool Player::playerIsPlorant() {
 	if (plorantTimer > 0) return true;
 	return false;
+}
+
+void Player::handleLadderMovement()
+{
+    // When on ladder, player can only move up and down
+    if (Game::instance().getKey(GLFW_KEY_UP)) {
+        // Move up on ladder
+        posPlayer.y -= MOVE_SPEED;
+
+        // Set appropriate animation
+        if (isRightFacing()) {
+            sprite->changeAnimation(LOOK_UP_R);
+        }
+        else {
+            sprite->changeAnimation(LOOK_UP_L);
+        }
+    }
+    else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
+        // Move down on ladder
+        posPlayer.y += MOVE_SPEED;
+
+        // Set appropriate animation
+        if (isRightFacing()) {
+            sprite->changeAnimation(LOOK_DOWN_R);
+        }
+        else {
+            sprite->changeAnimation(LOOK_DOWN_L);
+        }
+    }
+    else {
+        // If not moving, use idle animation
+        if (isRightFacing()) {
+            sprite->changeAnimation(STAND_RIGHT);
+        }
+        else {
+            sprite->changeAnimation(STAND_LEFT);
+        }
+    }
+
+    // Allow attacking to the sides while on ladder
+    if (Game::instance().getKey(GLFW_KEY_X)) {
+        isAttacking = true;
+        if (isRightFacing()) {
+            sprite->changeAnimation(ATK_RIGHT_STANDING);
+            posLanza = glm::vec2(posPlayer.x + 26, posPlayer.y);
+        }
+        else {
+            sprite->changeAnimation(ATK_LEFT_STANDING);
+            posLanza = glm::vec2(posPlayer.x - 27, posPlayer.y);
+        }
+    }
+    else {
+        isAttacking = false;
+    }
+
+    // Allow left/right movement to get off the ladder
+    if (Game::instance().getKey(GLFW_KEY_LEFT)) {
+        posPlayer.x -= MOVE_SPEED;
+        sprite->changeAnimation(STAND_LEFT);
+    }
+    else if (Game::instance().getKey(GLFW_KEY_RIGHT)) {
+        posPlayer.x += MOVE_SPEED;
+        sprite->changeAnimation(STAND_RIGHT);
+    }
 }

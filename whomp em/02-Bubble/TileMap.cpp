@@ -387,7 +387,34 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int
 
 	return false;
 }
+bool TileMap::isOnLadder(const glm::ivec2& pos, const glm::ivec2& size) const
+{
+	// Calculate the tile coordinates that the character occupies
+	int x0 = pos.x / tileSize;
+	int x1 = (pos.x + size.x - 1) / tileSize;
+	int y0 = pos.y / tileSize;
+	int y1 = (pos.y + size.y - 1) / tileSize;
 
+	// Check if the character's center is aligned with a ladder tile
+	int centerX = pos.x + (size.x / 2);
+	int centerTileX = centerX / tileSize;
+
+	// Check all tiles that the character overlaps
+	for (int y = y0; y <= y1; y++)
+	{
+		for (int x = x0; x <= x1; x++)
+		{
+			// For exact ladder alignment, we can check if the character's center
+			// is within the ladder tile
+			if (x == centerTileX && ladder.find(map[y * mapSize.x + x]) != ladder.end())
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
 
 
 
