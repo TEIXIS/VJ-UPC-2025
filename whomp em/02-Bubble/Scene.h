@@ -12,7 +12,10 @@
 #include "Mag.h"
 #include "Platform1.h"
 #include "Platform2.h"
-
+#include "Collectible.h"
+#include "LittleHeart.h"
+#include "BigHeart.h"
+#include "Calabaza.h"
 
 
 // Scene contains all the entities of our game.
@@ -39,8 +42,9 @@ private:
 	Seta* seta;
 	Fenix* fenix;
 	Mag* mag;
-	Platform1* plataforma;
-	Platform2* plataforma2;
+	LittleHeart* cor1;
+	BigHeart* cor2;
+	Calabaza* calabaza1;
 	vector<Platform1*> plataformas1;
 	vector<Platform2*> plataformas2;
 	HUD* hud;

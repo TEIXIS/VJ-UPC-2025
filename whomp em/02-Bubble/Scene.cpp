@@ -38,7 +38,7 @@ void Scene::init()
 // Crear varias plataformas del tipo Platform1
     for (int i = 0; i < 5; ++i) {
         Platform1* plataforma = new Platform1();
-        glm::vec2 plataformaPos = glm::vec2((INIT_PLAYER_X_TILES + 85 + i * 4) * 16, (INIT_PLAYER_Y_TILES) * 16+i*2);
+        glm::vec2 plataformaPos = glm::vec2((1 + 100 + i * 4) * 16, (98) * 16+i*2);
         plataforma->init(plataformaPos, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y));
         plataformas1.push_back(plataforma);
     }
@@ -46,12 +46,19 @@ void Scene::init()
     // Crear varias plataformas del tipo Platform2
     for (int i = 0; i < 2; ++i) {
         Platform2* plataforma2 = new Platform2();
-        glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 100 + i * 6) * 16, (INIT_PLAYER_Y_TILES - 80) * 16);
+        glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 150 + i * 6) * 16, (INIT_PLAYER_Y_TILES - 80) * 16);
         plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 40.f);
         plataformas2.push_back(plataforma2);
     }
 
+    cor1 = new LittleHeart();
+    cor1->init(glm::vec2((INIT_PLAYER_X_TILES + 10) * 16, (INIT_PLAYER_Y_TILES-5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/heart1.png");
 
+    cor2 = new BigHeart();
+    cor2->init(glm::vec2((INIT_PLAYER_X_TILES + 20) * 16, (INIT_PLAYER_Y_TILES-5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/heart2.png");
+
+    calabaza1 = new Calabaza();
+    calabaza1->init(glm::vec2((INIT_PLAYER_X_TILES + 25) * 16, (INIT_PLAYER_Y_TILES - 5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/calabaza1.png");
 
     player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
     player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
@@ -86,7 +93,6 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
-    player->update(deltaTime, *seta, *fenix, *mag);
     seta->update(deltaTime);
 	fenix->update(deltaTime);
 	mag->update(deltaTime);
@@ -190,8 +196,22 @@ void Scene::update(int deltaTime)
         player->setPlatform(false);
         for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
     }
-
-    
+    player->update(deltaTime, *seta, *fenix, *mag);
+    cor1->applyGravity(deltaTime, map);
+    if (!cor1->isCollected() && cor1->collidesWith(*player)) {
+        cor1->onCollect(*player);
+    }
+    cor1->update(deltaTime);
+    cor2->applyGravity(deltaTime, map);
+    if (!cor2->isCollected() && cor2->collidesWith(*player)) {
+        cor2->onCollect(*player);
+    }
+    cor2->update(deltaTime);
+    calabaza1->applyGravity(deltaTime, map);
+    if (!calabaza1->isCollected() && calabaza1->collidesWith(*player)) {
+        calabaza1->onCollect(*player);
+    }
+    calabaza1->update(deltaTime);
 
     if (playerPos.x == 8*16) {
         mag->spawn();
@@ -237,6 +257,9 @@ void Scene::render()
     texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
     map->render();
     texProgram.use();
+    cor1->render();
+    cor2->render();
+    calabaza1->render();
     // HUD usa coordenadas de pantalla
     
     

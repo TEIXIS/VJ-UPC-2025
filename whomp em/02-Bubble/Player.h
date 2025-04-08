@@ -29,7 +29,9 @@ public:
     bool isJumping();
     bool isJumpingPlat();
     void heal1Live();
-
+    void healallLives();
+    int getHmax();
+    void actCalabaza();
 
 private:
     // Helper methods for cleaner code organization
@@ -65,6 +67,7 @@ private:
     bool saltarPlata = false;
 	bool totemFocActiu = false;
 	int offsetTotem = 0;
+    int calabazas = 1;
 	
 };
 
