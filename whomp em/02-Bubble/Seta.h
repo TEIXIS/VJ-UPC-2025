@@ -15,6 +15,8 @@ public:
     void setPosition(const glm::vec2& pos);
     glm::vec2 getPosition() const;
     void restarVida();
+    void spawn(int x, int y);
+    void getPosPlayer(glm::vec2 pos);
 
 private:
     glm::ivec2 tileMapDispl, posEnemy;
@@ -26,7 +28,8 @@ private:
     Texture spritesheet;
     Sprite* sprite;
     TileMap* map;
-    int vida = 1;
+    int vida = -1;
+    glm::vec2 posPlayer;
 };
 
 #endif // SETA_H

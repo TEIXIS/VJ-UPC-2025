@@ -226,10 +226,10 @@ glm::vec2 Mag::getPosProjectile()
 	return posProjectile;
 }
 
-void Mag::spawn()
+void Mag::spawn(int x, int y)
 {
 	if (vida <= 0) {
-        setPosition(glm::vec2((20) * 16, (99) * 16));
+        setPosition(glm::vec2((x) * 16, (y) * 16));
         cout << "Mag spawned" << endl;
 		//posEnemy = glm::vec2(16, 16);
 		vida = 3;

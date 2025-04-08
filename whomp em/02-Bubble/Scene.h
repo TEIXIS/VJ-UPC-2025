@@ -39,9 +39,12 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	Seta* seta;
-	Fenix* fenix;
+	//Seta* seta;
+	vector<Seta*> setas;
+	//Fenix* fenix;
+	vector<Fenix*> fenixes;
 	Mag* mag;
+	Mag* mag2;
 	LittleHeart* cor1;
 	BigHeart* cor2;
 	Calabaza* calabaza1;

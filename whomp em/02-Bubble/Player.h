@@ -11,7 +11,7 @@ class Player
 {
 public:
     void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-    void update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag);
+    void update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes, Mag& mag, Mag& mag2);
     void render();
 
     void setTileMap(TileMap* tileMap);
