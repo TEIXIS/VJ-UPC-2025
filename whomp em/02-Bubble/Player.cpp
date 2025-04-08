@@ -185,6 +185,20 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
     
 
 
+    static bool healKey = false;
+
+    if (Game::instance().getKey(GLFW_KEY_H)) {
+        if (!healKey) {
+			lives = 4;
+            //falta les llanternes
+            healKey = true;
+        }
+    }
+    else {
+        healKey = false;
+    }
+
+
     static bool totemKey = false;
 
     if (Game::instance().getKey(GLFW_KEY_T)) {
