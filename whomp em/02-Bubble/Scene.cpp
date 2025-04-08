@@ -10,11 +10,11 @@
 #define SCREEN_X 32
 #define SCREEN_Y 16
 
-//#define INIT_PLAYER_X_TILES 1
+#define INIT_PLAYER_X_TILES 1
+#define INIT_PLAYER_Y_TILES 97
 //#define INIT_PLAYER_X_TILES 70
-//#define INIT_PLAYER_Y_TILES 97
-#define INIT_PLAYER_X_TILES 2128/16
-#define INIT_PLAYER_Y_TILES 154/16
+//#define INIT_PLAYER_X_TILES 2128/16
+//#define INIT_PLAYER_Y_TILES 154/16
 
 Scene::Scene()
 {
@@ -299,9 +299,7 @@ void Scene::update(int deltaTime)
         mag2->spawn(200, 8);
     }
 
-    if (playerPos.x == 2 * 16) {
-        setas[0]->spawn(2,97);
-    }
+    
     if (playerPos.y == 740) {
         setas[1]->spawn(133, 36);
     }
@@ -318,8 +316,8 @@ void Scene::update(int deltaTime)
         setas[5]->spawn(135, 13);
         setas[6]->spawn(140, 13);
     }
-    if (playerPos.y == 94) {
-        fenixes[4]->spawn(143, 2);
+    if (playerPos.y == 104) {
+        fenixes[4]->spawn(141, 2);
     }
     if (playerPos.x == 2810) {
         fenixes[5]->spawn(185, 1);
