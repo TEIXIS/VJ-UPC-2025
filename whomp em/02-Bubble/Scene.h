@@ -65,7 +65,7 @@ private:
 	Sprite* pantallaTitol;
 	bool jocComencat;
 	Texture spritesheet;
-
+	bool s = false;
 };
 
 

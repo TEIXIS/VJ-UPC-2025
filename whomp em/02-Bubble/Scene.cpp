@@ -38,13 +38,19 @@ void Scene::init()
 
     jocComencat = false;
 
+    
     spritesheet.loadFromFile("images/titol.png", TEXTURE_PIXEL_FORMAT_RGBA);
-    pantallaTitol = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH/2, SCREEN_HEIGHT/2), glm::vec2(1.f, 1.f), &spritesheet, &texProgram);
+    pantallaTitol = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), glm::vec2(1.f, 1.f), &spritesheet, &texProgram);
 	pantallaTitol->setNumberAnimations(1);
 	pantallaTitol->setAnimationSpeed(0, 1);
 	pantallaTitol->addKeyframe(0, glm::vec2(0.f, 0.f));
     pantallaTitol->setPosition(glm::vec2(0.f, 0.f));
 
+    // ⚡ Cámara inicial para primer render
+    glm::vec2 playerPos = player->getPosition();
+    float centerX = SCREEN_WIDTH / 8.0f;
+    glm::vec3 cameraPos = glm::vec3(playerPos.x - centerX, 1460, 0.0f); // O usa una altura inicial adaptada
+    view = glm::translate(glm::mat4(1.0f), -cameraPos);
 
 
     // Suponiendo que texProgram, SCREEN_X, SCREEN_Y están definidos y accesibles aquí
@@ -134,222 +140,234 @@ void Scene::init()
 
 void Scene::update(int deltaTime)
 {
+    glm::vec2 playerPos = player->getPosition();
 	if (!jocComencat) {
 		if (Game::instance().getKey(GLFW_KEY_SPACE)) {
 			jocComencat = true;
+            
 		}
-		return;
+        if (pantallaTitol == nullptr)
+            std::cout << "[ERROR] pantallaTitol no se ha creado correctamente\n";
+        else
+            std::cout << "[OK] pantallaTitol creada\n";
+        std::cout << "[DEBUG] Renderizando pantalla de título\n";
 	}
-    if (Game::instance().getKey(GLFW_KEY_R)) {
-        resetLevel();  // Al pulsar R reinicia todo
-    }
-    currentTime += deltaTime;
-    /*seta->update(deltaTime);
-	fenix->update(deltaTime);*/
-	mag->update(deltaTime);
-	mag2->update(deltaTime);
-    map->update(deltaTime / 1000.f);  
-    flam->update(deltaTime);
-	hud->update(deltaTime);
-
-    for (auto& fenn : fenixes) {
-		fenn->update(deltaTime);
-    }
-	for (auto& seta : setas) {
-		seta->update(deltaTime);
-	}
-    
-    glm::vec2 playerPos = player->getPosition();
-    int posNy = int(playerPos.y);
-    int* ptr = &posNy;  
-    float deltaY = 0.f;
-    bool collisionDetected = false;
-
-    // Revisar colisiones desde arriba con plataformas1
-    for (auto& plataforma : plataformas1) {
-        if (plataforma->checkCollisionFromAbove(*player)) {
-            if (!map->collisionMoveDown(playerPos, glm::ivec2(32, 32), ptr)) {
-                plataforma->moveWithCharacter(1.0f, *player);
-            }
-            else {
-                player->setPosition(glm::ivec2(playerPos.x, playerPos.y - 1.0f));
-            }
-
-            if (!player->isJumpingPlat()) {
-                cout << "Me poso\n";
-                player->stopJump();
-            }
-
-            player->setPlatform(true);
-            collisionDetected = true;
+    else {
+        if (Game::instance().getKey(GLFW_KEY_R)) {
+            resetLevel();  // Al pulsar R reinicia todo
         }
-    }
+        currentTime += deltaTime;
+        /*seta->update(deltaTime);
+        fenix->update(deltaTime);*/
+        mag->update(deltaTime);
+        mag2->update(deltaTime);
+        map->update(deltaTime / 1000.f);
+        flam->update(deltaTime);
+        hud->update(deltaTime);
 
-    // Revisar colisiones desde abajo con plataformas1
-    if (!collisionDetected) {
-        for (auto& plataforma : plataformas1) {
-            if (plataforma->checkCollisionFromBelow(*player)) {
-                plataforma->returnToOriginalPosition(deltaTime);
-                player->stopJump();
-                cout << "DJG\n";
-                collisionDetected = true;
-                break;
-            }
+        for (auto& fenn : fenixes) {
+            fenn->update(deltaTime);
         }
-    }
-
-    // Si no hay colisión con ninguna plataforma1 ni plataforma2
-    if (!collisionDetected) {
-        bool anyCollision = false;
-        for (auto& plataforma : plataformas1) {
-            if (plataforma->checkCollisionFromAbove(*player) || plataforma->checkCollisionFromBelow(*player)) {
-                anyCollision = true;
-                break;
-            }
-        }
-        for (auto& plataforma : plataformas2) {
-            if (plataforma->checkCollisionFromAbove(*player) || plataforma->checkCollisionFromBelow(*player)) {
-                anyCollision = true;
-                break;
-            }
+        for (auto& seta : setas) {
+            seta->update(deltaTime);
         }
 
-        if (!anyCollision) {
-            for (auto& plataforma : plataformas1) plataforma->returnToOriginalPosition(deltaTime);
-            for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
-
-            if (!plataformas2.empty())
-                deltaY = plataformas2[0]->getLastDeltaY(); // Podrías sumar todos los deltaY si hay más
-            player->setPlatform(false);
-        }
-    }
-
-    // Revisar colisiones desde arriba con plataformas2
-    for (auto& plataforma : plataformas2) {
-        if (plataforma->checkCollisionFromAbove(*player)) {
-            if (!player->isJumpingPlat()) {
-                player->stopJump();
-            }
-            player->setPlatform(true);
-            glm::vec2 currentPos = player->getPosition();
-            plataforma->update(deltaTime);
-            deltaY = plataforma->getLastDeltaY();
-            player->setPosition(currentPos + glm::vec2(0.f, deltaY));
-            collisionDetected = true;
-        }
-    }
-
-    // Revisar colisiones desde abajo con plataformas2
-    if (!collisionDetected) {
-        for (auto& plataforma : plataformas2) {
-            if (plataforma->checkCollisionFromBelow(*player)) {
-                player->stopJump();
-                for (auto& plataformaaux : plataformas2) plataformaaux->update(deltaTime);
-                collisionDetected = true;
-                break;
-            }
-        }
-    }
-
-    // Si no pasó nada con plataformas2, igual se actualizan
-    if (!collisionDetected) {
-        player->setPlatform(false);
-        for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
-    }
-
-
-    player->update(deltaTime, setas, fenixes, *mag, *mag2);
-
-    if (player->getLives() <= 0) {
-        resetLevel();
-    }
-
-
-
-    if (flam->collidesWithPlayer(*player) && !player->getCapaActiva() && !player->playerIsPlorant()) {
-        player->setPlorantTimer();
-        player->takeDamage(0.66f); // o el método que uses
-    }
-    cor1->applyGravity(deltaTime, map);
-    if (!cor1->isCollected() && cor1->collidesWith(*player)) {
-        cor1->onCollect(*player);
-    }
-    cor1->update(deltaTime);
-    cor2->applyGravity(deltaTime, map);
-    if (!cor2->isCollected() && cor2->collidesWith(*player)) {
-        cor2->onCollect(*player);
-    }
-    cor2->update(deltaTime);
-    calabaza1->applyGravity(deltaTime, map);
-    if (!calabaza1->isCollected() && calabaza1->collidesWith(*player)) {
-        calabaza1->onCollect(*player);
-    }
-    calabaza1->update(deltaTime);
-
-    lamp->applyGravity(deltaTime, map);
-    if (!lamp->isCollected() && lamp->collidesWith(*player)) {
-        lamp->onCollect(*player);
-    }
-    lamp->update(deltaTime);
-
-	capa->applyGravity(deltaTime, map);
-	if (!capa->isCollected() && capa->collidesWith(*player)) {
-		capa->onCollect(*player);
-	}
-	capa->update(deltaTime);
-
-    if (playerPos.x == 8*16) {
-        mag->spawn(20,99);
         
-    }
-	if (playerPos.x == 82*16) {
-		fenixes[0]->spawn(94,93);
-		
-	}
-    if (playerPos.x == 86 * 16) {
-        fenixes[1]->spawn(98, 93);
-    }
-	if (playerPos.x == 90 * 16) {
-		fenixes[2]->spawn(100, 93);
-	}
-	if (playerPos.x == 94 * 16) {
-		fenixes[3]->spawn(104, 93);
-	}
-    
-    if (playerPos.x == 3040) {
-        mag2->spawn(200, 8);
-    }
+        int posNy = int(playerPos.y);
+        int* ptr = &posNy;
+        float deltaY = 0.f;
+        bool collisionDetected = false;
 
+        // Revisar colisiones desde arriba con plataformas1
+        for (auto& plataforma : plataformas1) {
+            if (plataforma->checkCollisionFromAbove(*player)) {
+                if (!map->collisionMoveDown(playerPos, glm::ivec2(32, 32), ptr)) {
+                    plataforma->moveWithCharacter(1.0f, *player);
+                }
+                else {
+                    player->setPosition(glm::ivec2(playerPos.x, playerPos.y - 1.0f));
+                }
+
+                if (!player->isJumpingPlat()) {
+                    cout << "Me poso\n";
+                    player->stopJump();
+                }
+
+                player->setPlatform(true);
+                collisionDetected = true;
+            }
+        }
+
+        // Revisar colisiones desde abajo con plataformas1
+        if (!collisionDetected) {
+            for (auto& plataforma : plataformas1) {
+                if (plataforma->checkCollisionFromBelow(*player)) {
+                    plataforma->returnToOriginalPosition(deltaTime);
+                    player->stopJump();
+                    cout << "DJG\n";
+                    collisionDetected = true;
+                    break;
+                }
+            }
+        }
+
+        // Si no hay colisión con ninguna plataforma1 ni plataforma2
+        if (!collisionDetected) {
+            bool anyCollision = false;
+            for (auto& plataforma : plataformas1) {
+                if (plataforma->checkCollisionFromAbove(*player) || plataforma->checkCollisionFromBelow(*player)) {
+                    anyCollision = true;
+                    break;
+                }
+            }
+            for (auto& plataforma : plataformas2) {
+                if (plataforma->checkCollisionFromAbove(*player) || plataforma->checkCollisionFromBelow(*player)) {
+                    anyCollision = true;
+                    break;
+                }
+            }
+
+            if (!anyCollision) {
+                for (auto& plataforma : plataformas1) plataforma->returnToOriginalPosition(deltaTime);
+                for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
+
+                if (!plataformas2.empty())
+                    deltaY = plataformas2[0]->getLastDeltaY(); // Podrías sumar todos los deltaY si hay más
+                player->setPlatform(false);
+            }
+        }
+
+        // Revisar colisiones desde arriba con plataformas2
+        for (auto& plataforma : plataformas2) {
+            if (plataforma->checkCollisionFromAbove(*player)) {
+                if (!player->isJumpingPlat()) {
+                    player->stopJump();
+                }
+                player->setPlatform(true);
+                glm::vec2 currentPos = player->getPosition();
+                plataforma->update(deltaTime);
+                deltaY = plataforma->getLastDeltaY();
+                player->setPosition(currentPos + glm::vec2(0.f, deltaY));
+                collisionDetected = true;
+            }
+        }
+
+        // Revisar colisiones desde abajo con plataformas2
+        if (!collisionDetected) {
+            for (auto& plataforma : plataformas2) {
+                if (plataforma->checkCollisionFromBelow(*player)) {
+                    player->stopJump();
+                    for (auto& plataformaaux : plataformas2) plataformaaux->update(deltaTime);
+                    collisionDetected = true;
+                    break;
+                }
+            }
+        }
+
+        // Si no pasó nada con plataformas2, igual se actualizan
+        if (!collisionDetected) {
+            player->setPlatform(false);
+            for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
+        }
+
+
+        player->update(deltaTime, setas, fenixes, *mag, *mag2);
+
+        if (player->getLives() <= 0) {
+            if (player->getLamps() == 0) resetLevel();
+            else {
+                player->healallLives();
+                player->restaLamp();
+            }
+        }
+
+
+        if (flam->collidesWithPlayer(*player) && !player->getCapaActiva() && !player->playerIsPlorant() && !player->isGod()) {
+            player->setPlorantTimer();
+            player->takeDamage(0.66f); // o el método que uses
+        }
+        cor1->applyGravity(deltaTime, map);
+        if (!cor1->isCollected() && cor1->collidesWith(*player)) {
+            cor1->onCollect(*player);
+        }
+        cor1->update(deltaTime);
+        cor2->applyGravity(deltaTime, map);
+        if (!cor2->isCollected() && cor2->collidesWith(*player)) {
+            cor2->onCollect(*player);
+        }
+        cor2->update(deltaTime);
+        calabaza1->applyGravity(deltaTime, map);
+        if (!calabaza1->isCollected() && calabaza1->collidesWith(*player)) {
+            calabaza1->onCollect(*player);
+        }
+        calabaza1->update(deltaTime);
+
+        lamp->applyGravity(deltaTime, map);
+        if (!lamp->isCollected() && lamp->collidesWith(*player)) {
+            lamp->onCollect(*player);
+        }
+        lamp->update(deltaTime);
+
+        capa->applyGravity(deltaTime, map);
+        if (!capa->isCollected() && capa->collidesWith(*player)) {
+            capa->onCollect(*player);
+        }
+        capa->update(deltaTime);
+
+        if (playerPos.x == 8 * 16) {
+            mag->spawn(20, 99);
+
+        }
+        if (playerPos.x == 82 * 16) {
+            fenixes[0]->spawn(94, 93);
+
+        }
+        if (playerPos.x == 86 * 16) {
+            fenixes[1]->spawn(98, 93);
+        }
+        if (playerPos.x == 90 * 16) {
+            fenixes[2]->spawn(100, 93);
+        }
+        if (playerPos.x == 94 * 16) {
+            fenixes[3]->spawn(104, 93);
+        }
+
+        if (playerPos.x == 3040) {
+            mag2->spawn(200, 8);
+        }
+
+
+        if (playerPos.y == 740) {
+            setas[1]->spawn(133, 36);
+        }
+        if (playerPos.y == 574) {
+            setas[2]->spawn(133, 30);
+        }
+        if (playerPos.y == 546) {
+            setas[3]->spawn(136, 24);
+        }
+        if (playerPos.y == 442) {
+            setas[4]->spawn(135, 17);
+        }
+        if (playerPos.y == 368) {
+            setas[5]->spawn(135, 13);
+            setas[6]->spawn(140, 13);
+        }
+        if (playerPos.y == 104) {
+            fenixes[4]->spawn(141, 2);
+        }
+        if (playerPos.x == 2810) {
+            fenixes[5]->spawn(185, 1);
+            fenixes[6]->spawn(187, 3);
+        }
+        if (playerPos.x == 3214) {
+            fenixes[7]->spawn(210, 1);
+        }
+        if (playerPos.x == 3278) {
+            setas[7]->spawn(213, 2);
+        }
+    }
     
-    if (playerPos.y == 740) {
-        setas[1]->spawn(133, 36);
-    }
-	if (playerPos.y == 574) {
-		setas[2]->spawn(133, 30);
-	}
-    if (playerPos.y == 546) {
-        setas[3]->spawn(136, 24);
-    }
-    if (playerPos.y == 442) {
-        setas[4]->spawn(135, 17);
-    }
-    if (playerPos.y == 368) {
-        setas[5]->spawn(135, 13);
-        setas[6]->spawn(140, 13);
-    }
-    if (playerPos.y == 104) {
-        fenixes[4]->spawn(141, 2);
-    }
-    if (playerPos.x == 2810) {
-        fenixes[5]->spawn(185, 1);
-        fenixes[6]->spawn(187, 3);
-    }
-    if (playerPos.x == 3214) {
-        fenixes[7]->spawn(210, 1);
-    }
-    if (playerPos.x == 3278) {
-        setas[7]->spawn(213, 2);
-    }
 
 
 
@@ -392,6 +410,13 @@ void Scene::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (!jocComencat) {
+        glm::mat4 titleProjection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
+        texProgram.use();
+        texProgram.setUniformMatrix4f("projection", titleProjection);
+        texProgram.setUniformMatrix4f("view", glm::mat4(1.0f));
+        texProgram.setUniformMatrix4f("modelview", glm::mat4(1.0f));
+        texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+        texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);  // Asegurarse de que no se aplica ningún desplazamiento
 		pantallaTitol->render();
 		return;
 	}

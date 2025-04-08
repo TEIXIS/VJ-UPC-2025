@@ -203,7 +203,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
     if (Game::instance().getKey(GLFW_KEY_H)) {
         if (!healKey) {
 			lives = hMax;
-            //falta les llanternes
+            lamps = 2;
             healKey = true;
         }
     }
@@ -953,6 +953,10 @@ void Player::actLamp() {
     lamps += 1;
 }
 
+void Player::restaLamp() {
+	lamps -= 1;
+}
+
 void Player::setImmortalTimer(float t) {
     inmortalTimer = t;
 }
@@ -985,4 +989,8 @@ void Player::setPlorantTimer() {
 bool Player::playerIsPlorant() {
 	if (plorantTimer > 0) return true;
 	return false;
+}
+
+bool Player::isGod() {
+	return godMode;
 }
