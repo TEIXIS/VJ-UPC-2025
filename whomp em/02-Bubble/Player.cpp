@@ -215,7 +215,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
     if (Game::instance().getKey(GLFW_KEY_H)) {
         if (!healKey) {
 			lives = hMax;
-            //falta les llanternes
+            lamps = 2;
             healKey = true;
         }
     }
@@ -1026,6 +1026,10 @@ void Player::actLamp() {
     lamps += 1;
 }
 
+void Player::restaLamp() {
+	lamps -= 1;
+}
+
 void Player::setImmortalTimer(float t) {
     inmortalTimer = t;
 }
@@ -1066,10 +1070,10 @@ void Player::handleLadderMovement()
     if (Game::instance().getKey(GLFW_KEY_UP)) {
         // Move up on ladder
         posPlayer.y -= MOVE_SPEED;
-		if (sprite->animation() != ESCALANT)
-			sprite->changeAnimation(ESCALANT);
+        if (sprite->animation() != ESCALANT)
+            sprite->changeAnimation(ESCALANT);
         // Set appropriate animation
-       
+
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
         // Move down on ladder
@@ -1077,20 +1081,20 @@ void Player::handleLadderMovement()
         if (sprite->animation() != ESCALANT)
             sprite->changeAnimation(ESCALANT);
         // Set appropriate animation
-        
+
     }
     else {
         // If not moving, use idle animation
-		sprite->changeAnimation(ESCALANT);
+        sprite->changeAnimation(ESCALANT);
     }
 
     // Allow attacking to the sides while on ladder
     if (Game::instance().getKey(GLFW_KEY_X)) {
         isAttacking = true;
-        
+
         sprite->changeAnimation(ATK_ESCALANT_R);
         posLanza = glm::vec2(posPlayer.x + 26, posPlayer.y);
-        
+
         if (totemFocActiu) {
             lanza->changeAnimation(0);
             if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
@@ -1101,16 +1105,16 @@ void Player::handleLadderMovement()
         }
 
         posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
-       
-        
-        
-        
+
+
+
+
     }
     else {
         isAttacking = false;
     }
 
- 
+
     if (Game::instance().getKey(GLFW_KEY_LEFT)) {
         if (Game::instance().getKey(GLFW_KEY_X)) {
             /*isAttacking = true;
@@ -1138,10 +1142,10 @@ void Player::handleLadderMovement()
             }
             else {
                 if (lanza->animation() != 1) lanza->changeAnimation(1);
-				
+
             }
 
-            posLanza = glm::vec2(posPlayer.x -27, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+            posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
 
 
 
@@ -1149,7 +1153,9 @@ void Player::handleLadderMovement()
         else {
             isAttacking = false;
         }
-		
+
     }
-    
+}
+bool Player::isGod() {
+	return godMode;
 }
