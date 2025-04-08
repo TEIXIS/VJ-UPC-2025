@@ -183,7 +183,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
     lanzaAdalt->update(deltaTime);
 	totemFoc->update(deltaTime);
     
-
+    this->checkImmortalTimer(deltaTime);
 
     static bool healKey = false;
 
@@ -249,6 +249,9 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 
         // Handle jumping/falling when hurt
         if (bJumping) {
+            saltarPlata = false;
+            handleJumpingAnimations();
+
             jumpAngle += JUMP_ANGLE_STEP;
             if (jumpAngle == 180) {
                 bJumping = false;
@@ -268,15 +271,28 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                 }
             }
         }
+        else if (platform) {
+            // 🔹 Si está sobre una plataforma, no aplicar gravedad
+            if (Game::instance().getKey(GLFW_KEY_Z)) {
+                platform = false;
+                cout << "Salto\n";
+                bJumping = true;
+                jumpAngle = 0;
+                startY = posPlayer.y;
+                saltarPlata = true;
+            }
+        }
         else {
-            // Apply gravity
+            // 🔹 Aplica gravedad normalmente
             posPlayer.y += FALL_STEP;
-            if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y) || platform) {
+            if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
                 if (Game::instance().getKey(GLFW_KEY_Z)) {
                     bJumping = true;
                     jumpAngle = 0;
                     startY = posPlayer.y;
+                    saltarPlata = false;
                 }
+                saltarPlata = false;
             }
         }
     }
@@ -357,7 +373,8 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
         // Check collisions with enemy
         for (int i = 0; i < setas.size();i++) {
             Seta& seta = *setas[i];
-            if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode) {
+			//cout << inmortalTimer << endl;
+            if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode && inmortalTimer <= 0) {
                 cout << "Collision with seta" << endl;
                 if (isRightFacing()) {
                     sprite->changeAnimation(PLORANT_DRETA);
@@ -365,8 +382,11 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                 else if (isLeftFacing()) {
                     sprite->changeAnimation(PLORANT_ESQUERRA);
                 }
-                plorantTimer = 500;
-                this->takeDamage(0.66f);
+				if (plorantTimer <= 0) {
+					plorantTimer = 1000;
+					this->takeDamage(0.66f);
+				}
+                
             }
         }
 
@@ -374,7 +394,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 
         for (int i = 0; i < fenixes.size(); i++) {
 			Fenix& fenix = *fenixes[i];
-            if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode) {
+            if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode && inmortalTimer <= 0) {
                 cout << "Collision with fenix" << endl;
                 if (isRightFacing()) {
                     sprite->changeAnimation(PLORANT_DRETA);
@@ -382,11 +402,13 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                 else if (isLeftFacing()) {
                     sprite->changeAnimation(PLORANT_ESQUERRA);
                 }
-                plorantTimer = 500;
-                this->takeDamage(0.66f);
+                if (plorantTimer <= 0) {
+                    plorantTimer = 1000;
+                    this->takeDamage(0.66f);
+                }
             }
 
-            if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode) {
+            if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode && inmortalTimer <= 0) {
                 cout << "Collision with fenix fire" << endl;
                 if (isRightFacing()) {
                     sprite->changeAnimation(PLORANT_DRETA);
@@ -394,13 +416,15 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                 else if (isLeftFacing()) {
                     sprite->changeAnimation(PLORANT_ESQUERRA);
                 }
-                plorantTimer = 500;
-                this->takeDamage(0.33f);
+                if (plorantTimer <= 0) {
+                    plorantTimer = 1000;
+                    this->takeDamage(0.33f);
+                }
             }
         }
         
 
-		if (checkCollision(mag.getPosition(), glm::ivec2(32, 32)) && !godMode) {
+		if (checkCollision(mag.getPosition(), glm::ivec2(32, 32)) && !godMode && inmortalTimer <= 0) {
 			cout << "Collision with mag" << endl;
 			if (isRightFacing()) {
 				sprite->changeAnimation(PLORANT_DRETA);
@@ -408,11 +432,13 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 			else if (isLeftFacing()) {
 				sprite->changeAnimation(PLORANT_ESQUERRA);
 			}
-			plorantTimer = 500;
-            this->takeDamage(0.66f);
+            if (plorantTimer <= 0) {
+                plorantTimer = 1000;
+                this->takeDamage(0.66f);
+            }
 		}
 
-		if (checkCollision(mag2.getPosition(), glm::ivec2(32, 32)) && !godMode) {
+		if (checkCollision(mag2.getPosition(), glm::ivec2(32, 32)) && !godMode && inmortalTimer <= 0) {
 			cout << "Collision with mag2" << endl;
 			if (isRightFacing()) {
 				sprite->changeAnimation(PLORANT_DRETA);
@@ -420,11 +446,13 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 			else if (isLeftFacing()) {
 				sprite->changeAnimation(PLORANT_ESQUERRA);
 			}
-			plorantTimer = 500;
-			this->takeDamage(0.66f);
+            if (plorantTimer <= 0) {
+                plorantTimer = 1000;
+                this->takeDamage(0.66f);
+            }
 		}
 
-		if (checkCollision(mag.getPosProjectile(), glm::ivec2(8, 8)) && !godMode) {
+		if (checkCollision(mag.getPosProjectile(), glm::ivec2(8, 8)) && !godMode && inmortalTimer <= 0) {
 			cout << "Collision with mag projectile" << endl;
 			if (isRightFacing()) {
 				sprite->changeAnimation(PLORANT_DRETA);
@@ -432,11 +460,13 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 			else if (isLeftFacing()) {
 				sprite->changeAnimation(PLORANT_ESQUERRA);
 			}
-			plorantTimer = 500;
-            this->takeDamage(0.33f);
+            if (plorantTimer <= 0) {
+                plorantTimer = 1000;
+                this->takeDamage(0.33f);
+            }
 		}
 
-		if (checkCollision(mag2.getPosProjectile(), glm::ivec2(8, 8)) && !godMode) {
+		if (checkCollision(mag2.getPosProjectile(), glm::ivec2(8, 8)) && !godMode && inmortalTimer <= 0) {
 			cout << "Collision with mag2 projectile" << endl;
 			if (isRightFacing()) {
 				sprite->changeAnimation(PLORANT_DRETA);
@@ -444,8 +474,10 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
             else if (isLeftFacing()) {
                 sprite->changeAnimation(PLORANT_ESQUERRA);
             }
-            plorantTimer = 500;
-            this->takeDamage(0.33f);
+            if (plorantTimer <= 0) {
+                plorantTimer = 1000;
+                this->takeDamage(0.33f);
+            }
         }
 
 
@@ -725,7 +757,7 @@ void Player::render()
     renderHitbox(posLanza, glm::ivec2(32, 32));
 	frameCount++;
     // Render the player sprite
-    if (plorantTimer <= 0 || (frameCount % 2 == 1)) {
+    if (plorantTimer <= 0 || (frameCount % 2 == 1) || (inmortalTimer<=0 && plorantTimer<=0)) {
         renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
         sprite->render();
     }
@@ -824,6 +856,7 @@ void Player::takeDamage(float damage) {
         return;
     }
     lives -= damage;
+    if (lives < 0) lives = 0;
 }
 
 void Player::stopJump() {
@@ -860,11 +893,46 @@ void Player::actCalabaza() {
     calabazas += 1;
     if (calabazas == 2) {
         hMax++;
+        this->heal1Live();
     }
     else if (calabazas == 4) {
         hMax++;
+        this->heal1Live();
     }
     else if (calabazas == 6) {
         hMax++;
+        this->heal1Live();
     }
+}
+
+int Player::getLamps() {
+    return lamps;
+}
+
+void Player::actLamp() {
+    lamps += 1;
+}
+
+void Player::setImmortalTimer(float t) {
+    inmortalTimer = t;
+}
+
+void Player::checkImmortalTimer(int deltaTime) {
+    if (inmortalTimer > 0) {
+        inmortalTimer -= deltaTime;
+    }
+    else {
+        inmortalTimer = 0;
+		this->setCapaActiva(false);
+    }
+}
+
+void Player::setCapaActiva(bool capa) {
+	capaActiva = capa;
+    if(capaActiva) inmortalTimer = 5000;
+	else inmortalTimer = 0;
+}
+
+bool Player::getCapaActiva() const {
+	return capaActiva;
 }

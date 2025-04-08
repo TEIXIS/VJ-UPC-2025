@@ -21,7 +21,8 @@ void HUD::init(ShaderProgram& shaderProgram, Player* p)
 
     heartTexture.loadFromFile("images/HUD.png", TEXTURE_PIXEL_FORMAT_RGBA);
     weaponTexture.loadFromFile("images/HUD.png", TEXTURE_PIXEL_FORMAT_RGBA); // arma actual
-
+    lampTexture.loadFromFile("images/lamp.png", TEXTURE_PIXEL_FORMAT_RGBA);
+    capaTexture.loadFromFile("images/capa.png", TEXTURE_PIXEL_FORMAT_RGBA);
     heartSprite = Sprite::createSprite(glm::ivec2(8, 8), glm::vec2(0.25f, 0.25f), &heartTexture, shader);
     weaponSprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.5f, 0.5f), &weaponTexture, shader);
     heartSprite->setNumberAnimations(4);
@@ -42,6 +43,9 @@ void HUD::init(ShaderProgram& shaderProgram, Player* p)
 	weaponSprite->addKeyframe(1, glm::vec2(0.5f, 0.25f));
 
     weaponSprite->changeAnimation(0);
+
+    lampSprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(1.f, 1.f), &lampTexture, shader);
+	capaSprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(1.f, 1.f), &capaTexture, shader);
 }
 
 void HUD::update(int deltaTime)
@@ -100,6 +104,18 @@ void HUD::render()
 
     // arma al lado de los corazones (alineada al primero)
     weaponSprite->setPosition(glm::vec2(10.f, 10.f));
- 
+    lampSprite->setPosition(glm::vec2(28, 10.f));
+     
     weaponSprite->render();
+    
+    int nLamps = player->getLamps();
+    int i;
+    for (i = 0; i < nLamps; ++i) {
+        lampSprite->setPosition(glm::vec2(28+i*16, 10.f));
+        lampSprite->render();
+    }
+	if (player->getCapaActiva()) {
+		capaSprite->setPosition(glm::vec2(28 + i * 16, 10.f));
+		capaSprite->render();
+	}
 }

@@ -95,7 +95,8 @@ void Mag::update(int deltaTime)
 
     if (abs(posEnemy.x - posPlayer.x) > 200) {
         vida = 0;
-
+		posEnemy = glm::vec2(-100, -100);
+		posProjectile = glm::vec2(-100, -100);
     }
     
     sprite->update(deltaTime);

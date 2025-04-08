@@ -71,6 +71,12 @@ void Scene::init()
     calabaza1 = new Calabaza();
     calabaza1->init(glm::vec2((INIT_PLAYER_X_TILES + 25) * 16, (INIT_PLAYER_Y_TILES - 5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/calabaza1.png");
 
+    lamp = new Lampara();
+    lamp->init(glm::vec2((INIT_PLAYER_X_TILES + 30) * 16, (INIT_PLAYER_Y_TILES - 5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/lamp.png");
+
+	capa = new Capa();
+	capa->init(glm::vec2((INIT_PLAYER_X_TILES + 35) * 16, (INIT_PLAYER_Y_TILES - 5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/capa.png");
+
     player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
     player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
     player->setTileMap(map);
@@ -257,6 +263,18 @@ void Scene::update(int deltaTime)
     }
     calabaza1->update(deltaTime);
 
+    lamp->applyGravity(deltaTime, map);
+    if (!lamp->isCollected() && lamp->collidesWith(*player)) {
+        lamp->onCollect(*player);
+    }
+    lamp->update(deltaTime);
+
+	capa->applyGravity(deltaTime, map);
+	if (!capa->isCollected() && capa->collidesWith(*player)) {
+		capa->onCollect(*player);
+	}
+	capa->update(deltaTime);
+
     if (playerPos.x == 8*16) {
         mag->spawn(20,99);
         
@@ -323,6 +341,8 @@ void Scene::render()
     cor1->render();
     cor2->render();
     calabaza1->render();
+    lamp->render();
+	capa->render();
     // HUD usa coordenadas de pantalla
     
     

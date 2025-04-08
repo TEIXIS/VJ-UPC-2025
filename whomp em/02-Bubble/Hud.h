@@ -26,6 +26,12 @@ private:
 
     Texture weaponTexture;
     Sprite* weaponSprite;
+
+    Texture lampTexture;
+    Sprite* lampSprite;
+
+    Texture capaTexture;
+	Sprite* capaSprite;
 };
 
 
