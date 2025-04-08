@@ -18,7 +18,8 @@ enum PlayerAnims {
     ATK_LEFT_STANDING, ATK_RIGHT_STANDING,
     ATK_LEFT_MOVING, ATK_RIGHT_MOVING,
     ATK_LEFT_DOWN, ATK_RIGHT_DOWN,
-    ATK_JUMPING_UP_R, ATK_JUMPING_DOWN_R, ATK_JUMPING_UP_L, ATK_JUMPING_DOWN_L, PLORANT_DRETA, PLORANT_ESQUERRA, COUNT
+    ATK_JUMPING_UP_R, ATK_JUMPING_DOWN_R, ATK_JUMPING_UP_L, ATK_JUMPING_DOWN_L, PLORANT_DRETA, PLORANT_ESQUERRA, 
+    ESCALANT, ATK_ESCALANT_R, ATK_ESCALANT_L, COUNT
 };
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
@@ -150,6 +151,17 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
     sprite->setAnimationSpeed(PLORANT_ESQUERRA, 8);
     sprite->addKeyframe(PLORANT_ESQUERRA, glm::vec2(0.75f, 0.0f));
+
+
+	sprite->setAnimationSpeed(ESCALANT, 8);
+	sprite->addKeyframe(ESCALANT, glm::vec2(0.f, 0.75f));
+	sprite->addKeyframe(ESCALANT, glm::vec2(0.125f, 0.75f));
+
+	sprite->setAnimationSpeed(ATK_ESCALANT_R, 8);
+	sprite->addKeyframe(ATK_ESCALANT_R, glm::vec2(0.25f, 0.75f));
+
+	sprite->setAnimationSpeed(ATK_ESCALANT_L, 8);
+	sprite->addKeyframe(ATK_ESCALANT_L, glm::vec2(0.375f, 0.75f));
 
     // Set initial states
     sprite->changeAnimation(0);
@@ -832,7 +844,7 @@ bool Player::isRightFacing() const
     int anim = sprite->animation();
     return anim == STAND_RIGHT || anim == MOVE_RIGHT || anim == LOOK_UP_R ||
         anim == LOOK_DOWN_R || anim == ATK_RIGHT_STANDING || anim == ATK_RIGHT_MOVING ||
-        anim == ATK_RIGHT_DOWN || anim == ATK_JUMPING_UP_R || anim == ATK_JUMPING_DOWN_R || anim == PLORANT_DRETA;
+		anim == ATK_RIGHT_DOWN || anim == ATK_JUMPING_UP_R || anim == ATK_JUMPING_DOWN_R || anim == PLORANT_DRETA || anim == ATK_ESCALANT_R;
 }
 
 bool Player::isLeftFacing() const
@@ -840,7 +852,7 @@ bool Player::isLeftFacing() const
     int anim = sprite->animation();
     return anim == STAND_LEFT || anim == MOVE_LEFT || anim == LOOK_UP_L ||
         anim == LOOK_DOWN_L || anim == ATK_LEFT_STANDING || anim == ATK_LEFT_MOVING ||
-        anim == ATK_LEFT_DOWN || anim == ATK_JUMPING_UP_L || anim == ATK_JUMPING_DOWN_L || anim == PLORANT_ESQUERRA;
+		anim == ATK_LEFT_DOWN || anim == ATK_JUMPING_UP_L || anim == ATK_JUMPING_DOWN_L || anim == PLORANT_ESQUERRA || anim == ATK_ESCALANT_L;
 }
 
 void Player::setIdleAnimation()
@@ -1054,30 +1066,44 @@ void Player::handleLadderMovement()
     if (Game::instance().getKey(GLFW_KEY_UP)) {
         // Move up on ladder
         posPlayer.y -= MOVE_SPEED;
-
+		if (sprite->animation() != ESCALANT)
+			sprite->changeAnimation(ESCALANT);
         // Set appropriate animation
        
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
         // Move down on ladder
         posPlayer.y += MOVE_SPEED;
-
+        if (sprite->animation() != ESCALANT)
+            sprite->changeAnimation(ESCALANT);
         // Set appropriate animation
         
     }
     else {
         // If not moving, use idle animation
-       
+		sprite->changeAnimation(ESCALANT);
     }
 
     // Allow attacking to the sides while on ladder
     if (Game::instance().getKey(GLFW_KEY_X)) {
         isAttacking = true;
         
-        sprite->changeAnimation(ATK_RIGHT_STANDING);
+        sprite->changeAnimation(ATK_ESCALANT_R);
         posLanza = glm::vec2(posPlayer.x + 26, posPlayer.y);
         
+        if (totemFocActiu) {
+            lanza->changeAnimation(0);
+            if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
+            offsetTotem = 8;
+        }
+        else {
+            if (lanza->animation() != 0) lanza->changeAnimation(0);
+        }
 
+        posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+       
+        
+        
         
     }
     else {
@@ -1087,10 +1113,35 @@ void Player::handleLadderMovement()
  
     if (Game::instance().getKey(GLFW_KEY_LEFT)) {
         if (Game::instance().getKey(GLFW_KEY_X)) {
+            /*isAttacking = true;
+
+            sprite->changeAnimation(ATK_ESCALANT_L);
+            if (totemFocActiu) {
+                lanza->changeAnimation(1);
+                if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
+
+                offsetTotem = 8;
+            }
+            else {
+                if (lanza->animation() != 1) lanza->changeAnimation(1);
+            }
+
+            posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);*/
+
             isAttacking = true;
 
-            sprite->changeAnimation(ATK_RIGHT_STANDING);
-            posLanza = glm::vec2(posPlayer.x -27, posPlayer.y);
+            sprite->changeAnimation(ATK_ESCALANT_L);
+            if (totemFocActiu) {
+                lanza->changeAnimation(0);
+                if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
+                offsetTotem = 8;
+            }
+            else {
+                if (lanza->animation() != 1) lanza->changeAnimation(1);
+				
+            }
+
+            posLanza = glm::vec2(posPlayer.x -27, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
 
 
 
