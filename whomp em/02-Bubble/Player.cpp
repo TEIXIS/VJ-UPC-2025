@@ -189,7 +189,7 @@ void Player::update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag)
 
     if (Game::instance().getKey(GLFW_KEY_H)) {
         if (!healKey) {
-			lives = 4;
+			lives = hMax;
             //falta les llanternes
             healKey = true;
         }
@@ -670,6 +670,7 @@ void Player::render()
 	frameCount++;
     // Render the player sprite
     if (plorantTimer <= 0 || (frameCount % 2 == 1)) {
+        renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
         sprite->render();
     }
 
@@ -702,10 +703,10 @@ void Player::renderHitbox(const glm::vec2& position, const glm::ivec2& size)
     glColor3f(0.0f, 0.0f, 1.0f);
 
     glBegin(GL_LINE_LOOP);
-    glVertex2f(position.x, position.y);
-    glVertex2f(position.x + size.x, position.y);
-    glVertex2f(position.x + size.x, position.y + size.y);
-    glVertex2f(position.x, position.y + size.y);
+    glVertex2f(tileMapDispl.x+position.x, tileMapDispl.y+position.y);
+    glVertex2f(tileMapDispl.x+position.x + size.x, tileMapDispl.y+position.y);
+    glVertex2f(tileMapDispl.x+position.x + size.x, tileMapDispl.y+position.y + size.y);
+    glVertex2f(tileMapDispl.x+position.x, tileMapDispl.y+position.y + size.y);
     glEnd();
 
     glEnable(GL_TEXTURE_2D);
@@ -762,6 +763,10 @@ bool Player::checkCollisionLanza(const glm::vec2& pos, const glm::ivec2& size) c
 }
 
 void Player::takeDamage(float damage) {
+    if (lives <= 0) {
+        lives = 0;
+        return;
+    }
     lives -= damage;
 }
 
@@ -785,4 +790,25 @@ bool Player::isJumpingPlat() {
 void Player::heal1Live() {
     lives += 1;
     lives = min(lives, hMax);
+}
+
+void Player::healallLives() {
+    lives = hMax;
+}
+
+int Player::getHmax() {
+    return hMax;
+}
+
+void Player::actCalabaza() {
+    calabazas += 1;
+    if (calabazas == 2) {
+        hMax++;
+    }
+    else if (calabazas == 4) {
+        hMax++;
+    }
+    else if (calabazas == 6) {
+        hMax++;
+    }
 }

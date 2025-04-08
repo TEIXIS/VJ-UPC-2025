@@ -1,9 +1,7 @@
-#include "Collectible.h"
+#include "LittleHeart.h"
+#include <iostream>
 
-class LifeUp : public Collectible {
-public:
-    void onCollect(Player& player) override {
-        player.heal1Live();
-        destroy();
-    }
-};
+void LittleHeart::onCollect(Player& player) {
+    player.heal1Live(); // reemplazá por tu método real de sumar vidas
+    destroy();
+}
