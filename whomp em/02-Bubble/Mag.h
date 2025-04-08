@@ -1,11 +1,11 @@
-#ifndef FENIX_H
-#define FENIX_H
+#ifndef MAG_H
+#define MAG_H
 
 #include <glm/glm.hpp>
 #include "Sprite.h"
 #include "TileMap.h"
 
-class Fenix {
+class Mag {
 public:
     void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
     void update(int deltaTime);
@@ -15,29 +15,30 @@ public:
     glm::vec2 getPosition() const;
     void restarVida();
     void getPosPlayer(glm::vec2 pos);
-    glm::vec2 getPosFoc() const;
-	void spawn();
+    glm::vec2 getPosProjectile();
+    void spawn();
+    
 
 private:
     bool bJumping;
     bool movingRight;
+    bool projectilDreta;
     bool attacking;
     int vida;
-    int groundTimer;
+    int atacTimer;
     glm::ivec2 tileMapDispl, posEnemy;
-    glm::vec2 originalHeight;
+    glm::vec2 posPlayer;
+	glm::ivec2 posProjectile;
     Sprite* sprite;
-    Sprite* foc;
-    Sprite* foc2;
+	Sprite* projectile;
+    bool invulnerable;
+    int invulnerableTimer;
     TileMap* map;
     Texture spritesheet;
-	glm::vec2 posPlayer;
-    glm::ivec2 posFoc;
-    glm::ivec2 posFoc2;
-    bool habaixat;
-    bool focActiu;
-	bool spawnB;
+    bool spawnB;
+    
 };
 
 
-#endif // FENIX_H
+#endif // MAG_H
+

@@ -5,12 +5,13 @@
 #include "TileMap.h"
 #include "Seta.h"
 #include "Fenix.h"
+#include "Mag.h"
 
 class Player
 {
 public:
     void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-    void update(int deltaTime, Seta& seta, Fenix& fenix);
+    void update(int deltaTime, Seta& seta, Fenix& fenix, Mag& mag);
     void render();
 
     void setTileMap(TileMap* tileMap);
@@ -49,7 +50,8 @@ private:
     Sprite* lanzaAbaix;
     int plorantTimer;
     bool godMode;
-	
+    bool attackKeyPressed = false;
+    int frameCount;
 };
 
 #endif // _PLAYER_INCLUDE

@@ -9,7 +9,7 @@
 #define SCREEN_Y 16
 
 //#define INIT_PLAYER_X_TILES 2
-#define INIT_PLAYER_X_TILES 16
+#define INIT_PLAYER_X_TILES 1
 #define INIT_PLAYER_Y_TILES 97
 
 Scene::Scene()
@@ -44,13 +44,20 @@ void Scene::init()
 
 	fenix = new Fenix();
 	fenix->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+
+	mag = new Mag();
+	mag->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
     
 	//enemy->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), 26 * map->getTileSize()));
     seta->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
     seta->setTileMap(map);
 
-    fenix->setPosition(glm::vec2((INIT_PLAYER_X_TILES + 8) * 16, (INIT_PLAYER_Y_TILES) * 16));
+    //fenix->setPosition(glm::vec2((INIT_PLAYER_X_TILES + 8) * 16, (INIT_PLAYER_Y_TILES) * 16));
     fenix->setTileMap(map);
+
+	//mag->setPosition(glm::vec2((INIT_PLAYER_X_TILES) * 16, (INIT_PLAYER_Y_TILES + 2) * 16));
+	mag->setTileMap(map);
+    
 
     projection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
     currentTime = 0.0f;
@@ -59,12 +66,24 @@ void Scene::init()
 void Scene::update(int deltaTime)
 {
     currentTime += deltaTime;
-    player->update(deltaTime, *seta, *fenix);
+    player->update(deltaTime, *seta, *fenix, *mag);
     seta->update(deltaTime);
 	fenix->update(deltaTime);
+	mag->update(deltaTime);
 
     glm::vec2 playerPos = player->getPosition();
 
+    if (playerPos.x == 8*16) {
+        mag->spawn();
+        
+    }
+	if (playerPos.x == 78*16) {
+		fenix->spawn();
+		
+	}
+    if (playerPos.x == 0 * 16) {
+        //seta->spawn();
+    }
 
     float centerX = SCREEN_WIDTH / 8.0f;
     float centerY = SCREEN_HEIGHT / 8.0f;
@@ -101,10 +120,11 @@ void Scene::render()
     // HUD usa coordenadas de pantalla
     
     
-    
+	mag->render();
     seta->render();
 	fenix->render();
     player->render();
+
 
     glm::mat4 hudProjection = glm::ortho(0.f, float(SCREEN_WIDTH)/2, float(SCREEN_HEIGHT)/2, 0.f);
     texProgram.setUniformMatrix4f("projection", hudProjection);
