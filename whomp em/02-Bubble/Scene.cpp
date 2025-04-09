@@ -214,7 +214,12 @@ void Scene::update(int deltaTime)
             if (showControls) {
                 jocComencat = true;  // Si ya se muestran controles, inicia el juego
                 std::cout << "[DEBUG] Iniciando el nivel\n";
-                if (soundEngine) soundEngine->play2D("media/sonidoCorrecto.wav", false); // Cambia ruta si está en otro lado
+                if (soundEngine) soundEngine->play2D("media/sonidoCorrecto.wav", false);
+                if (soundEngine) {
+                    soundEngine->play2D("media/musica.wav", true);
+                    soundEngine->play2D("media/volcan.wav", true); // true = bucle
+                }
+                // Cambia ruta si está en otro lado
             }
             else {
                 showControls = true;  // De lo contrario, se muestra la pantalla de controles
@@ -449,6 +454,8 @@ void Scene::update(int deltaTime)
         }
         else if (counterW == -1) {
             counterW = 2000;
+            soundEngine->stopAllSounds();
+			if (soundEngine) soundEngine->play2D("media/win.wav", false);
             std::cout << "[DEBUG] counterW initialized to 2000" << std::endl;
         }
 		else if (counterW <= 0) {

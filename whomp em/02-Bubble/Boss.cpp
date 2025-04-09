@@ -3,6 +3,7 @@
 #include <iostream>
 #include <GL/glew.h>
 #include "Player.h"
+#include <irrKlang.h>
 
 #define PI 3.14159f
 
@@ -14,7 +15,7 @@ void Boss::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
     sprite->addKeyframe(0, glm::vec2(0.f, 0.f));
 	sprite->addKeyframe(0, glm::vec2(0.25f, 0.f));
     sprite->changeAnimation(0);
-
+    soundEngine = irrklang::createIrrKlangDevice();
 	sprite->setAnimationSpeed(1, 8);
 	sprite->addKeyframe(1, glm::vec2(0.5f, 0.f));
 
@@ -61,6 +62,7 @@ void Boss::update(int deltaTime, Player& player) {
             else {
                 sprite->changeAnimation(0);
             }
+			soundEngine->play2D("media/fire.wav", false);
         }
     }
 
