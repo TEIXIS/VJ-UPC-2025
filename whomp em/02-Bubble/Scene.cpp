@@ -359,6 +359,7 @@ void Scene::update(int deltaTime)
 			collectible->applyGravity(deltaTime,map);
 			if (!collectible->isCollected() && collectible->collidesWith(*player)) {
 				collectible->onCollect(*player);
+                if (soundEngine) soundEngine->play2D("media/coin.wav", false);
 			}
             collectible->update(deltaTime);
 		}
@@ -668,6 +669,8 @@ void Scene::spawnRandomCollectible(const glm::vec2& position) {
     // Número aleatorio entre 0 y 3 (por ejemplo, 4 tipos de coleccionables)
     int r = rand() % 4;
     Collectible* item = nullptr;
+
+    
 
     switch (r) {
     case 0: {

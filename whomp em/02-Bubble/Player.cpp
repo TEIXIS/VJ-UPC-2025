@@ -647,7 +647,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                     Seta& seta = *setas[i];
                     if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
                         seta.restarVida();
-                        if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
+                        if (soundEngine) soundEngine->play2D("media/hit.wav", false);
                     }
                 }
 
@@ -656,21 +656,21 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                     Fenix& fenix = *fenixes[i];
                     if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(16, 16))) {
                         fenix.restarVida();
-                        if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
+                        if (soundEngine) soundEngine->play2D("media/hit.wav", false);
                     }
                 }
                 if (checkCollisionLanza(mag.getPosition(), glm::ivec2(32, 32))) {
                     mag.restarVida();
-                    if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
+                    if (soundEngine) soundEngine->play2D("media/hit.wav", false);
                 }
                 if (checkCollisionLanza(mag2.getPosition(), glm::ivec2(32, 32))) {
                     mag2.restarVida();
-                    if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
+                    if (soundEngine) soundEngine->play2D("media/hit.wav", false);
                 }
                 if (checkCollisionLanza(boss.getPosition(), glm::ivec2(64, 64))) {
                     if (boss.getCooldown() <= 0) {
                         boss.takeDamage(0.66f);
-                        if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
+                        if (soundEngine) soundEngine->play2D("media/hit.wav", false);
                     }
                     // o 1.0f, lo que quieras
                 }
@@ -711,6 +711,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 
     if (!boss.isAlive()) {
         sprite->changeAnimation(WIN);
+        atacantAbaix = atacantAdalt = isAttacking = false;
         totSprite->changeAnimation(0);
         drawTotem();
         win = true;
@@ -1102,6 +1103,7 @@ bool Player::checkCollisionLanza(const glm::vec2& pos, const glm::ivec2& size) c
 }
 
 void Player::takeDamage(float damage) {
+    if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
     if (lives <= 0) {
         lives = 0;
         return;
@@ -1166,6 +1168,7 @@ void Player::actLamp() {
 
 void Player::restaLamp() {
     lamps -= 1;
+    if (lamps==0) if (soundEngine) soundEngine->play2D("media/nearly_dead.wav", false);
 }
 
 void Player::setImmortalTimer(float t) {
