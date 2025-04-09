@@ -7,6 +7,9 @@
 #include "Fenix.h"
 #include "Mag.h"
 #include "Boss.h"
+#include <irrKlang.h>
+using namespace irrklang;
+
 
 class Player
 {
@@ -94,6 +97,8 @@ private:
 	Texture texTotem;
     bool totemD = false;
     bool win = false;
+    irrklang::ISoundEngine* soundEngine;
+    int delayAudioSpear = 500;
 };
 
 #endif // _PLAYER_INCLUDE

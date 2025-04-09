@@ -25,6 +25,7 @@ enum PlayerAnims {
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 {
+    soundEngine = irrklang::createIrrKlangDevice();
     bJumping = false;
     isAttacking = false;
     atacantAdalt = false;
@@ -646,6 +647,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                     Seta& seta = *setas[i];
                     if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
                         seta.restarVida();
+                        if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
                     }
                 }
 
@@ -654,17 +656,21 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                     Fenix& fenix = *fenixes[i];
                     if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(16, 16))) {
                         fenix.restarVida();
+                        if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
                     }
                 }
                 if (checkCollisionLanza(mag.getPosition(), glm::ivec2(32, 32))) {
                     mag.restarVida();
+                    if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
                 }
                 if (checkCollisionLanza(mag2.getPosition(), glm::ivec2(32, 32))) {
                     mag2.restarVida();
+                    if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
                 }
                 if (checkCollisionLanza(boss.getPosition(), glm::ivec2(64, 64))) {
                     if (boss.getCooldown() <= 0) {
                         boss.takeDamage(0.66f);
+                        if (soundEngine) soundEngine->play2D("media/hurt.wav", false);
                     }
                     // o 1.0f, lo que quieras
                 }
@@ -684,6 +690,16 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
             Seta& seta = *setas[i];
             seta.getPosPlayer(posPlayer);
         }
+
+
+        if (delayAudioSpear <= 0) {
+            if (isAttacking /*|| atacantAbaix || atacantAdalt*/) {
+                if (soundEngine) soundEngine->play2D("media/spearBo.wav", false);
+                delayAudioSpear = 500;
+            }
+        }
+        else delayAudioSpear -= deltaTime;
+        
 
         // Update sprite positions
         sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -985,6 +1001,9 @@ void Player::render()
     renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
     renderHitbox(posLanza, glm::ivec2(32, 32));
     frameCount++;
+
+    
+
     // Render the player sprite
     if (plorantTimer <= 0 || (frameCount % 2 == 1) || (inmortalTimer <= 0 && plorantTimer <= 0)) {
         renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox

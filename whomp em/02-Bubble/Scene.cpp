@@ -416,6 +416,7 @@ void Scene::update(int deltaTime)
         }
 
 
+
         if (playerPos.y == 740) {
             setas[1]->spawn(133, 36);
         }
