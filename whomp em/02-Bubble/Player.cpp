@@ -7,7 +7,7 @@
 
 // Constants
 #define JUMP_ANGLE_STEP 4
-#define JUMP_HEIGHT 70
+#define JUMP_HEIGHT 50
 #define FALL_STEP 5
 #define MOVE_SPEED 2
 

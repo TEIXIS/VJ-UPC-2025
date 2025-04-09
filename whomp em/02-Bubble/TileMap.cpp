@@ -270,7 +270,7 @@ bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) c
 	{
 		if (collisions.find(map[y * mapSize.x + x]) != collisions.end()) {
 			cout << map[y * mapSize.x + x] << '\n';
-			if (map[y * mapSize.x + x] != 74 && map[y * mapSize.x + x] != 75 && map[y * mapSize.x + x] != 68 && map[y * mapSize.x + x] != 59 && map[y * mapSize.x + x] != 60)return true;
+			if (map[y * mapSize.x + x] != 74 && map[y * mapSize.x + x] != 75 && map[y * mapSize.x + x] != 68 && map[y * mapSize.x + x] != 59 && map[y * mapSize.x + x] != 60 && map[y * mapSize.x + x] != 90 && map[y * mapSize.x + x] != 85 && map[y * mapSize.x + x] != 84 && map[y * mapSize.x + x] != 82 && map[y * mapSize.x + x] != 81 && map[y * mapSize.x + x] != 17 && map[y * mapSize.x + x] != 15 && map[y * mapSize.x + x] != 14 && map[y * mapSize.x + x] != 13)return true;
 		}
 			
 	}
@@ -288,7 +288,7 @@ bool TileMap::collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) 
 	for(int y=y0; y<=y1; y++)
 	{
 		if(collisions.find(map[y*mapSize.x + x]) != collisions.end())
-			if (map[y * mapSize.x + x] != 74 && map[y * mapSize.x + x] != 75 && map[y * mapSize.x + x] != 68 && map[y * mapSize.x + x] != 59 && map[y * mapSize.x + x] != 60)return true;
+			if (map[y * mapSize.x + x] != 74 && map[y * mapSize.x + x] != 75 && map[y * mapSize.x + x] != 68 && map[y * mapSize.x + x] != 59 && map[y * mapSize.x + x] != 60 && map[y * mapSize.x + x] != 90 && map[y * mapSize.x + x] != 85 && map[y * mapSize.x + x] != 84 && map[y * mapSize.x + x] != 82 && map[y * mapSize.x + x] != 81 && map[y * mapSize.x + x] != 17 && map[y * mapSize.x + x] != 15 && map[y * mapSize.x + x] != 14 && map[y * mapSize.x + x] != 13)return true;
 	}
 	
 	return false;
@@ -379,7 +379,7 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int
 		{
 			if (tileSize * (y + 1) - *posY <= 16) // margen de 16 px, opcional
 			{
-				if (map[y * mapSize.x + x] != 74 && map[y * mapSize.x + x] != 75 && map[y * mapSize.x + x] != 68 && map[y * mapSize.x + x] != 59 && map[y * mapSize.x + x] != 60) { 
+				if (map[y * mapSize.x + x] != 74 && map[y * mapSize.x + x] != 75 && map[y * mapSize.x + x] != 68 && map[y * mapSize.x + x] != 59 && map[y * mapSize.x + x] != 60 && map[y * mapSize.x + x] != 90 && map[y * mapSize.x + x] != 85 && map[y * mapSize.x + x] != 84 && map[y * mapSize.x + x] != 82 && map[y * mapSize.x + x] != 81 && map[y * mapSize.x + x] != 17 && map[y * mapSize.x + x] != 15 && map[y * mapSize.x + x] != 14 && map[y * mapSize.x + x] != 13) {
 					*posY = tileSize * (y + 1);
 					return true;
 				}

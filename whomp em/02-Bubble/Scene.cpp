@@ -104,7 +104,14 @@ void Scene::init()
     for (int i = 0; i < 2; ++i) {
         Platform2* plataforma2 = new Platform2();
         glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 158 + i * 9) * 16, (INIT_PLAYER_Y_TILES - 86) * 16);
-        plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 40.f);
+        plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 60.f);
+        plataformas2.push_back(plataforma2);
+    }
+
+    for (int i = 0; i < 2; ++i) {
+        Platform2* plataforma2 = new Platform2();
+        glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 180 + i * 7) * 16, (INIT_PLAYER_Y_TILES - 86) * 16);
+        plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 60.f);
         plataformas2.push_back(plataforma2);
     }
 
@@ -266,32 +273,22 @@ void Scene::update(int deltaTime)
                 player->setPlatform(true);
                 collisionDetected = true;
             }
+			else plataforma->returnToOriginalPosition(deltaTime); // Actualiza la posición de la plataforma si no hay colisión
         }
 
-        // Revisar colisiones desde abajo con plataformas1
-        if (!collisionDetected) {
-            for (auto& plataforma : plataformas1) {
-                if (plataforma->checkCollisionFromBelow(*player)) {
-                    plataforma->returnToOriginalPosition(deltaTime);
-                    player->stopJump();
-                    cout << "DJG\n";
-                    collisionDetected = true;
-                    break;
-                }
-            }
-        }
+
 
         // Si no hay colisión con ninguna plataforma1 ni plataforma2
         if (!collisionDetected) {
             bool anyCollision = false;
             for (auto& plataforma : plataformas1) {
-                if (plataforma->checkCollisionFromAbove(*player) || plataforma->checkCollisionFromBelow(*player)) {
+                if (plataforma->checkCollisionFromAbove(*player)) {
                     anyCollision = true;
                     break;
                 }
             }
             for (auto& plataforma : plataformas2) {
-                if (plataforma->checkCollisionFromAbove(*player) || plataforma->checkCollisionFromBelow(*player)) {
+                if (plataforma->checkCollisionFromAbove(*player)) {
                     anyCollision = true;
                     break;
                 }
@@ -328,17 +325,7 @@ void Scene::update(int deltaTime)
         }
 
         // Revisar colisiones desde abajo con plataformas2
-        if (!collisionDetected) {
-            for (auto& plataforma : plataformas2) {
-                if (plataforma->checkCollisionFromBelow(*player)) {
-                    player->stopJump();
-                    for (auto& plataformaaux : plataformas2) plataformaaux->update(deltaTime);
-                    collisionDetected = true;
-                    break;
-                }
-				//else plataforma->update(deltaTime);
-            }
-        }
+
 
         // Si no pasó nada con plataformas2, igual se actualizan
         if (!collisionDetected) {
