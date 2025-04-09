@@ -87,7 +87,7 @@ void Boss::update(int deltaTime, Player& player) {
 
     // Colisión con el jugador
     glm::vec2 playerPos = player.getPosition();
-    glm::vec2 size = glm::vec2(64, 64);
+    glm::vec2 size = glm::vec2(32, 32);
     glm::vec2 playerSize = glm::vec2(32, 32);
     bool colX = position.x + size.x > playerPos.x && position.x < playerPos.x + playerSize.x;
     bool colY = position.y + size.y > playerPos.y && position.y < playerPos.y + playerSize.y;
