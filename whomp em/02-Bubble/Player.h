@@ -88,7 +88,7 @@ private:
     bool lava = false;
     bool isClimbingLadder = false; 
     bool estaboss = false;// New variable to track ladder climbing state
-
+    int ancho;
 };
 
 #endif // _PLAYER_INCLUDE
