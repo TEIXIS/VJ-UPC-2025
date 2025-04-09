@@ -350,6 +350,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                 else if (Game::instance().getKey(GLFW_KEY_UP)) {
                     posPlayer.y -= 5;
                 }
+				else sprite->changeAnimation(STAND_RIGHT);
 			}
             
 
@@ -647,7 +648,7 @@ void Player::handleVerticalKeys()
 {
     if (Game::instance().getKey(GLFW_KEY_UP)) {
 		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
-			posPlayer.y -= MOVE_SPEED;
+			//posPlayer.y -= MOVE_SPEED;
 			//animacio
 		}
 		else {
@@ -674,7 +675,7 @@ void Player::handleVerticalKeys()
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
         if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
-			posPlayer.y += MOVE_SPEED;
+			//posPlayer.y += MOVE_SPEED;
             //animacio
         }
         else {
@@ -771,7 +772,7 @@ void Player::handleJumpingAnimations()
 {
     if (Game::instance().getKey(GLFW_KEY_UP)) {
 		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
-			posPlayer.y -= MOVE_SPEED;
+			//posPlayer.y -= MOVE_SPEED;
 		}
 		else {
             if (isRightFacing())
@@ -783,7 +784,7 @@ void Player::handleJumpingAnimations()
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
 		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
-			posPlayer.y += MOVE_SPEED;
+			//posPlayer.y += MOVE_SPEED;
 		}
 		else {
 			if (isRightFacing())
@@ -811,7 +812,7 @@ void Player::handleFallingAnimations()
 {
     if (Game::instance().getKey(GLFW_KEY_UP)) {
 		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
-			posPlayer.y -= MOVE_SPEED;
+			//posPlayer.y -= MOVE_SPEED;
 		}
 		else {
 			if (isRightFacing())
@@ -823,7 +824,7 @@ void Player::handleFallingAnimations()
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
 		if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
-			posPlayer.y += MOVE_SPEED;
+			//posPlayer.y += MOVE_SPEED;
 		}
 		else {
             if (isRightFacing())
