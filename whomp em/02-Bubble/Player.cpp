@@ -705,6 +705,12 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 void Player::handleHorizontalMovement()
 {
     if (Game::instance().getKey(GLFW_KEY_LEFT)) {
+        posPlayer.x -= MOVE_SPEED;
+        if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32))) {
+            posPlayer.x += MOVE_SPEED;
+
+            sprite->changeAnimation(STAND_LEFT);
+        }
         if (Game::instance().getKey(GLFW_KEY_X)) {
             isAttacking = true;
             if (sprite->animation() != ATK_LEFT_MOVING)
@@ -713,13 +719,14 @@ void Player::handleHorizontalMovement()
         else if (sprite->animation() != MOVE_LEFT)
             sprite->changeAnimation(MOVE_LEFT);
 
-        posPlayer.x -= MOVE_SPEED;
-        if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32))) {
-            posPlayer.x += MOVE_SPEED;
-            sprite->changeAnimation(STAND_LEFT);
-        }
+        
     }
     else if (Game::instance().getKey(GLFW_KEY_RIGHT)) {
+        posPlayer.x += MOVE_SPEED;
+        if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32))) {
+            posPlayer.x -= MOVE_SPEED;
+            sprite->changeAnimation(STAND_RIGHT);
+        }
         if (Game::instance().getKey(GLFW_KEY_X)) {
             isAttacking = true;
             if (sprite->animation() != ATK_RIGHT_MOVING)
@@ -728,11 +735,7 @@ void Player::handleHorizontalMovement()
         else if (sprite->animation() != MOVE_RIGHT)
             sprite->changeAnimation(MOVE_RIGHT);
 
-        posPlayer.x += MOVE_SPEED;
-        if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32))) {
-            posPlayer.x -= MOVE_SPEED;
-            sprite->changeAnimation(STAND_RIGHT);
-        }
+        
     }
     else if (Game::instance().getKey(GLFW_KEY_X)) {
         isAttacking = true;
