@@ -45,6 +45,8 @@ public:
 	bool isGod();
 	void isWithBoss(bool a);
 	bool esta();
+	void drawTotem();
+	bool winGame();
 private:
     // Helper methods for cleaner code organization
     void handleHorizontalMovement();
@@ -88,7 +90,10 @@ private:
     bool lava = false;
     bool isClimbingLadder = false; 
     bool estaboss = false;// New variable to track ladder climbing state
-
+    Sprite* totSprite;
+	Texture texTotem;
+    bool totemD = false;
+    bool win = false;
 };
 
 #endif // _PLAYER_INCLUDE

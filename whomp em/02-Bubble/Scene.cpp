@@ -48,7 +48,16 @@ void Scene::init()
     jocComencat = false;
     showControls = false;
     spacePressed = false;
-    
+    counterW = -1;
+    win = false;
+
+	spritesheetWin.loadFromFile("images/winTitle.png", TEXTURE_PIXEL_FORMAT_RGBA);
+    pantallaWin = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), glm::vec2(1.f, 1.f), &spritesheetWin, &texProgram);
+    pantallaWin->setNumberAnimations(1);
+    pantallaWin->setAnimationSpeed(0, 1);
+    pantallaWin->addKeyframe(0, glm::vec2(0.f, 0.f));
+    pantallaWin->setPosition(glm::vec2(0.f, 0.f));
+
     spritesheet.loadFromFile("images/titol.png", TEXTURE_PIXEL_FORMAT_RGBA);
     pantallaTitol = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), glm::vec2(1.f, 1.f), &spritesheet, &texProgram);
 	pantallaTitol->setNumberAnimations(1);
@@ -443,7 +452,24 @@ void Scene::update(int deltaTime)
     }
     
 
-
+    if (player->winGame()) {
+        std::cout << "[DEBUG] winGame() = true" << std::endl;
+        if (counterW > 0) {
+            std::cout << "[DEBUG] counterW now = " << counterW << std::endl;
+            counterW -= deltaTime;
+        }
+        else if (counterW == -1) {
+            counterW = 2000;
+            std::cout << "[DEBUG] counterW initialized to 2000" << std::endl;
+        }
+		else if (counterW <= 0) {
+            win = true;
+            std::cout << "[DEBUG] win set to true" << std::endl;
+		}
+        if (Game::instance().getKey(GLFW_KEY_R)) {
+            resetLevel();  // Al pulsar R reinicia todo
+        }
+    }
 
 
     float centerX = SCREEN_WIDTH / 8.0f;
@@ -496,6 +522,18 @@ void Scene::render()
         else
             pantallaTitol->render();
         return;
+	}
+	if (win) {
+        cout << "Nashe\n";
+        glm::mat4 titleProjection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
+        texProgram.use();
+        texProgram.setUniformMatrix4f("projection", titleProjection);
+        texProgram.setUniformMatrix4f("view", glm::mat4(1.0f));
+        texProgram.setUniformMatrix4f("modelview", glm::mat4(1.0f));
+        texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+        texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);  // Asegurarse de que no se aplica ningún desplazamiento
+		pantallaWin->render();
+		return;
 	}
 
     glm::mat4 modelview;
