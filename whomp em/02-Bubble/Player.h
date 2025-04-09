@@ -51,15 +51,14 @@ public:
 	void drawTotem();
 	bool winGame();
 private:
-    // Helper methods for cleaner code organization
+
     void handleHorizontalMovement();
     void handleVerticalKeys();
     void handleJumpingAndFalling();
     void handleJumpingAnimations();
     void handleFallingAnimations();
-    void handleLadderMovement(); // New method for ladder movement
+    void handleLadderMovement(); 
 
-    // State checking methods
     bool isRightFacing() const;
     bool isLeftFacing() const;
     void setIdleAnimation();
@@ -92,7 +91,7 @@ private:
     bool levitar = false;
     bool lava = false;
     bool isClimbingLadder = false; 
-    bool estaboss = false;// New variable to track ladder climbing state
+    bool estaboss = false;
     Sprite* totSprite;
 	Texture texTotem;
     bool totemD = false;

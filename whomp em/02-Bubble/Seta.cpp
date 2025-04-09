@@ -41,7 +41,7 @@ void Seta::update(int deltaTime)
 {
     if (vida <= 0) return;
 
-    //cout << abs(posEnemy.y - posPlayer.y) << endl;
+
     if (abs(posEnemy.x - posPlayer.x) > 200 || abs(posEnemy.y - posPlayer.y)>180) {
         vida = 0;
 
@@ -51,9 +51,9 @@ void Seta::update(int deltaTime)
 
     if (bJumping)
     {
-		//cout << "Jumping" << endl;
+
         jumpAngle += JUMP_ANGLE_STEP;
-		//cout << jumpAngle << endl;
+
         if (jumpAngle == 184)
         {
             bJumping = false;
@@ -85,14 +85,7 @@ void Seta::update(int deltaTime)
     }
     else
     {
-        /*posEnemy.y += FALL_STEP;
-        if (map->collisionMoveDown(posEnemy, glm::ivec2(32, 32), &posEnemy.y)) {
-            
-            bJumping = true;
-            jumpAngle = 0;
-            startY = posEnemy.y;
-            
-        }*/
+
 
         
         
@@ -119,7 +112,7 @@ void Seta::update(int deltaTime)
             }
         }
     }
-	//cout << "posEnemy: " << posEnemy.x << ", " << posEnemy.y << endl;
+
     if (groundTimer <= 0) {
         if (movingRight)
         {
@@ -141,7 +134,7 @@ void Seta::update(int deltaTime)
         }
     }
 
-    // Update animation based on state
+
     if (movingRight)
     {
         sprite->changeAnimation(bJumping ? saltantDreta : terraDreta);
@@ -192,7 +185,6 @@ void Seta::spawn(int x, int y)
     if (vida <= 0) {
         setPosition(glm::vec2((x) * 16, (y) * 16));
         cout << "Seta spawned" << endl;
-        //posEnemy = glm::vec2(16, 16);
         vida = 1;
         
     }

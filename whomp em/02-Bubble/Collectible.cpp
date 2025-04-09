@@ -42,8 +42,8 @@ glm::vec2 Collectible::getPosition() const {
 
 bool Collectible::collidesWith(const Player& player) const {
     glm::vec2 playerPos = player.getPosition();
-    glm::ivec2 playerSize(32, 32);  // Ajustar según el tamaño real del jugador
-    glm::ivec2 colSize(16, 16);     // Tamaño base del collectible
+    glm::ivec2 playerSize(32, 32);  
+    glm::ivec2 colSize(16, 16);   
 
     bool colX = playerPos.x + playerSize.x > pos.x &&
         playerPos.x < pos.x + colSize.x;
@@ -63,7 +63,7 @@ void Collectible::applyGravity(int deltaTime, TileMap* map) {
     glm::vec2 nextPos = pos;
     nextPos.y += velocity.y * dt;
 
-    int tempY = int(nextPos.y + 16); // Simula el borde inferior
+    int tempY = int(nextPos.y + 16); 
     int* ptrY = &tempY;
 
     bool grounded = map->collisionMoveDown(nextPos, glm::ivec2(16, 16), ptrY);
@@ -71,7 +71,6 @@ void Collectible::applyGravity(int deltaTime, TileMap* map) {
         pos.y += velocity.y * dt;
     }
     else {
-        //pos.y = float(*ptrY) - 16; // Alinear el collectible con el suelo
         velocity.y = 0.f;
     }
 

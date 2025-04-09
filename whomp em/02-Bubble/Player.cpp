@@ -5,13 +5,13 @@
 #include "Game.h"
 #include "Boss.h"
 
-// Constants
+
 #define JUMP_ANGLE_STEP 4
 #define JUMP_HEIGHT 50
 #define FALL_STEP 5
 #define MOVE_SPEED 2
 
-// Animation indices
+
 enum PlayerAnims {
     STAND_RIGHT, STAND_LEFT,
     MOVE_LEFT, MOVE_RIGHT,
@@ -37,11 +37,11 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     totSprite->setNumberAnimations(1);
     spritesheet.loadFromFile("images/whomp_em_usa.png", TEXTURE_PIXEL_FORMAT_RGBA);
 
-    // Initialize main sprite
+
     sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.125, 0.125), &spritesheet, &shaderProgram);
     sprite->setNumberAnimations(COUNT);
 
-    // Initialize weapon sprites
+
     lanza = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(0.125, 0.125), &spritesheet, &shaderProgram);
     lanza->setNumberAnimations(2);
 
@@ -56,24 +56,22 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 
 
-    // Weapon animations
-    // Right
     lanza->setAnimationSpeed(0, 8);
     lanza->addKeyframe(0, glm::vec2(0.25f, 0.375f));
     lanza->addKeyframe(0, glm::vec2(0.5f, 0.375f));
     lanza->addKeyframe(0, glm::vec2(0.75f, 0.375f));
 
-    // Left
+
     lanza->setAnimationSpeed(1, 8);
     lanza->addKeyframe(1, glm::vec2(0.375f, 0.375f));
     lanza->addKeyframe(1, glm::vec2(0.625f, 0.375f));
     lanza->addKeyframe(1, glm::vec2(0.875f, 0.375f));
 
-    // Up
+
     lanzaAdalt->setAnimationSpeed(0, 8);
     lanzaAdalt->addKeyframe(0, glm::vec2(0.5f, 0.625f));
 
-    // Down
+
     lanzaAbaix->setAnimationSpeed(0, 8);
     lanzaAbaix->addKeyframe(0, glm::vec2(0.625f, 0.625f));
 
@@ -85,14 +83,14 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     totemFoc->addKeyframe(1, glm::vec2(0.5625f, 0.5f));
     totemFoc->addKeyframe(1, glm::vec2(0.5625f, 0.5625f));
 
-    // Standing animations
+
     sprite->setAnimationSpeed(STAND_RIGHT, 8);
     sprite->addKeyframe(STAND_RIGHT, glm::vec2(0.f, 0.125f));
 
     sprite->setAnimationSpeed(STAND_LEFT, 8);
     sprite->addKeyframe(STAND_LEFT, glm::vec2(0.5f, 0.125f));
 
-    // Moving animations
+
     sprite->setAnimationSpeed(MOVE_LEFT, 8);
     sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.625f, 0.125f));
     sprite->addKeyframe(MOVE_LEFT, glm::vec2(0.750f, 0.125f));
@@ -103,7 +101,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.25, 0.125f));
     sprite->addKeyframe(MOVE_RIGHT, glm::vec2(0.375, 0.125f));
 
-    // Looking animations
+
     sprite->setAnimationSpeed(LOOK_UP_R, 8);
     sprite->addKeyframe(LOOK_UP_R, glm::vec2(0.f, 0.375f));
 
@@ -116,7 +114,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     sprite->setAnimationSpeed(LOOK_DOWN_L, 8);
     sprite->addKeyframe(LOOK_DOWN_L, glm::vec2(0.25f, 0.5f));
 
-    // Attack animations
+
     sprite->setAnimationSpeed(ATK_LEFT_DOWN, 8);
     sprite->addKeyframe(ATK_LEFT_DOWN, glm::vec2(0.375f, 0.5f));
 
@@ -139,7 +137,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     sprite->setAnimationSpeed(ATK_LEFT_STANDING, 8);
     sprite->addKeyframe(ATK_LEFT_STANDING, glm::vec2(0.5f, 0.25f));
 
-    // Jumping attack animations
+
     sprite->setAnimationSpeed(ATK_JUMPING_UP_R, 8);
     sprite->addKeyframe(ATK_JUMPING_UP_R, glm::vec2(0.f, 0.625f));
 
@@ -152,7 +150,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     sprite->setAnimationSpeed(ATK_JUMPING_DOWN_L, 8);
     sprite->addKeyframe(ATK_JUMPING_DOWN_L, glm::vec2(0.375f, 0.625f));
 
-    // Hurt animations
+
     sprite->setAnimationSpeed(PLORANT_DRETA, 8);
     sprite->addKeyframe(PLORANT_DRETA, glm::vec2(0.625f, 0.0f));
 
@@ -176,7 +174,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     totSprite->setAnimationSpeed(0, 8);
     totSprite->addKeyframe(0, glm::vec2(0.f, 0.f));
 
-    // Set initial states
+
     sprite->changeAnimation(0);
     tileMapDispl = tileMapPos;
     sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -264,14 +262,14 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
             godModeKeyPressed = false;
         }
 
-        // Handle hurt state
+
         if (plorantTimer > 0) {
             plorantTimer -= deltaTime;
             if (plorantTimer <= 0) {
                 plorantTimer = 0;
             }
 
-            // Basic movement still allowed when hurt
+
             if (Game::instance().getKey(GLFW_KEY_LEFT)) {
                 posPlayer.x -= MOVE_SPEED;
                 sprite->changeAnimation(PLORANT_ESQUERRA);
@@ -360,7 +358,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                 }
             }
 
-            // Handle jumping/falling when hurt
+
             if (bJumping) {
                 saltarPlata = false;
                 handleJumpingAnimations();
@@ -385,7 +383,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                 }
             }
             else if (platform) {
-                // 🔹 Si está sobre una plataforma, no aplicar gravedad
+
                 if (Game::instance().getKey(GLFW_KEY_Z)) {
                     platform = false;
                     cout << "Salto\n";
@@ -396,7 +394,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                 }
             }
             else {
-                // 🔹 Aplica gravedad normalmente
+
                 posPlayer.y += FALL_STEP;
                 if (map->collisionLava(posPlayer, glm::ivec2(32.f, 32.f))) {
                     lava = true;
@@ -420,9 +418,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
             }
         }
         else {
-            // Normal gameplay when not hurt
-
-            // Handle horizontal movement
+            
 
             if (map->isOnLadder(posPlayer, glm::ivec2(32, 32)) && !map->collisionMoveDown(posPlayer, glm::ivec2(32, 33), &posPlayer.y)) {
 
@@ -448,26 +444,16 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                     posPlayer.y += MOVE_SPEED;
                 }
 
-                //cout << "PosPlayer: " << posPlayer.x << ", " << posPlayer.y << endl;
-
-                // Handle jumping and falling
-
-
-
-
-                // Handle weapon state
-                
 
                 handleHorizontalMovement();
 
-                // Handle vertical keys
+  
                 handleVerticalKeys();
 
                 handleJumpingAndFalling();
 
                 
 
-                // Handle special attack positions
                 if (sprite->animation() == ATK_JUMPING_UP_R) {
                     atacantAdalt = true;
                     posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
@@ -531,10 +517,10 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 
 
 
-            // Check collisions with enemy
+     
             for (int i = 0; i < setas.size();i++) {
                 Seta& seta = *setas[i];
-                //cout << inmortalTimer << endl;
+
                 if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode && inmortalTimer <= 0) {
                     cout << "Collision with seta" << endl;
                     if (isRightFacing()) {
@@ -672,7 +658,6 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
                         boss.takeDamage(0.66f);
                         if (soundEngine) soundEngine->play2D("media/hit.wav", false);
                     }
-                    // o 1.0f, lo que quieras
                 }
 
 
@@ -701,7 +686,7 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
         else delayAudioSpear -= deltaTime;
         
 
-        // Update sprite positions
+
         sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
         lanza->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
         lanzaAdalt->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
@@ -772,7 +757,7 @@ void Player::handleVerticalKeys()
     if (Game::instance().getKey(GLFW_KEY_UP)) {
         if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
             posPlayer.y -= MOVE_SPEED;
-            //animacio
+
         }
         else {
             if (Game::instance().getKey(GLFW_KEY_X)) {
@@ -799,7 +784,7 @@ void Player::handleVerticalKeys()
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
         if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
             posPlayer.y += MOVE_SPEED;
-            //animacio
+
         }
         else {
             if (Game::instance().getKey(GLFW_KEY_X)) {
@@ -852,7 +837,7 @@ void Player::handleJumpingAndFalling()
         }
     }
     else if (platform) {
-        // 🔹 Si está sobre una plataforma, no aplicar gravedad
+
         if (Game::instance().getKey(GLFW_KEY_Z)) {
             platform = false;
             cout << "Salto\n";
@@ -863,7 +848,7 @@ void Player::handleJumpingAndFalling()
         }
     }
     else if (!levitar) {
-        // 🔹 Aplica gravedad normalmente
+     
         posPlayer.y += FALL_STEP;
         if (map->collisionLava(posPlayer, glm::ivec2(32.f, 32.f))) {
             lava = true;
@@ -998,27 +983,27 @@ void Player::setIdleAnimation()
 
 void Player::render()
 {
-    // Render hitboxes
-    renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
+
+    renderHitbox(posPlayer, glm::ivec2(32, 32));
     renderHitbox(posLanza, glm::ivec2(32, 32));
     frameCount++;
 
     
 
-    // Render the player sprite
+   
     if (plorantTimer <= 0 || (frameCount % 2 == 1) || (inmortalTimer <= 0 && plorantTimer <= 0)) {
-        renderHitbox(posPlayer, glm::ivec2(32, 32)); // Player hitbox
+        renderHitbox(posPlayer, glm::ivec2(32, 32)); 
         sprite->render();
     }
 
-    // Render the weapon sprites if attacking
+    
     if (atacantAdalt) {
         lanzaAdalt->render();
-        renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
+        renderHitbox(posLanza, glm::ivec2(32, 32));  
     }
     else if (atacantAbaix) {
         lanzaAbaix->render();
-        renderHitbox(posLanza, glm::ivec2(32, 32));  // Lanza hitbox
+        renderHitbox(posLanza, glm::ivec2(32, 32));  
     }
     else if (isAttacking) {
         renderHitbox(posLanza, glm::ivec2(32, 32));
@@ -1036,7 +1021,7 @@ void Player::render()
 }
 
 
-//no funciona ns pq
+
 void Player::renderHitbox(const glm::vec2& position, const glm::ivec2& size)
 {
     glDisable(GL_TEXTURE_2D);
@@ -1207,29 +1192,29 @@ bool Player::playerIsPlorant() {
 
 void Player::handleLadderMovement()
 {
-    // When on ladder, player can only move up and down
+    
     if (Game::instance().getKey(GLFW_KEY_UP)) {
-        // Move up on ladder
+       
         posPlayer.y -= MOVE_SPEED;
         if (sprite->animation() != ESCALANT)
             sprite->changeAnimation(ESCALANT);
-        // Set appropriate animation
+       
 
     }
     else if (Game::instance().getKey(GLFW_KEY_DOWN)) {
-        // Move down on ladder
+       
         posPlayer.y += MOVE_SPEED;
         if (sprite->animation() != ESCALANT)
             sprite->changeAnimation(ESCALANT);
-        // Set appropriate animation
+        
 
     }
     else {
-        // If not moving, use idle animation
+       
         sprite->changeAnimation(ESCALANT);
     }
 
-    // Allow attacking to the sides while on ladder
+
     if (Game::instance().getKey(GLFW_KEY_X)) {
         isAttacking = true;
 

@@ -3,6 +3,6 @@
 
 class Lampara : public Collectible {
 public:
-    using Collectible::init; // reutiliza init() de la clase base
+    using Collectible::init; 
     void onCollect(Player& player) override;
 };

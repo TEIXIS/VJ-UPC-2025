@@ -18,7 +18,7 @@ public:
     void render();
 
     bool collidesWithPlayer(const Player& player) const;
-    void setInvisibleTime(float seconds); // Para personalizar duración invisible
+    void setInvisibleTime(float seconds); 
     void reset();
 
 private:
@@ -40,6 +40,6 @@ private:
     } phase;
 
     float elapsedTime = 0.f;
-    float invisibleTime = 2.f; // tiempo en que está invisible (configurable)
+    float invisibleTime = 2.f; 
     int totalFrames = 4;
 };

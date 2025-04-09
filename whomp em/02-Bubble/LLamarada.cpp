@@ -15,17 +15,17 @@ void Llamarada::init(const glm::vec2& position, const glm::ivec2& tileMapOffset,
     loadTexture(dir);
 
     if (dir == UP || dir == DOWN)size = glm::ivec2(16, 32);
-    else size = glm::ivec2(32, 16); // ajustalo según tus sprites
+    else size = glm::ivec2(32, 16); 
     sprite = Sprite::createSprite(size, glm::vec2(0.25f, 1.0f), &spritesheet, &shader);
     sprite->setNumberAnimations(1);
 
-    sprite->setAnimationSpeed(0, 8); // No se usará, pero debe configurarse
+    sprite->setAnimationSpeed(0, 8); 
     for (int i = 0; i < totalFrames; ++i) {
         sprite->addKeyframe(0, glm::vec2(i * 0.25f, 0.f));
     }
 
     sprite->changeAnimation(0);
-    sprite->setKeyframe(0); // invisible
+    sprite->setKeyframe(0); 
     sprite->setPosition(glm::vec2(tileMapDispl.x + pos.x, tileMapDispl.y + pos.y));
 
     phase = INVISIBLE;
@@ -51,7 +51,7 @@ void Llamarada::update(int deltaTime) {
     elapsedTime += dt;
 
     updateAnimationFrame();
-    //sprite->update(deltaTime); // mantiene consistencia si tenés alguna lógica interna
+
     sprite->setPosition(glm::vec2(tileMapDispl.x + pos.x, tileMapDispl.y + pos.y));
 }
 
@@ -60,7 +60,7 @@ void Llamarada::updateAnimationFrame() {
         if (elapsedTime >= invisibleTime) {
             phase = CHARGING;
             elapsedTime = 0.f;
-            sprite->setKeyframe(1); // charging (no daña)
+            sprite->setKeyframe(1);
         }
     }
     else if (phase == CHARGING) {
@@ -70,13 +70,13 @@ void Llamarada::updateAnimationFrame() {
         }
     }
     else if (phase == ACTIVE) {
-        int activeFrame = (int(elapsedTime * 2)) % 2; // alterna cada 0.5s
-        sprite->setKeyframe(2 + activeFrame); // frames 2 y 3
+        int activeFrame = (int(elapsedTime * 2)) % 2; 
+        sprite->setKeyframe(2 + activeFrame); 
 
         if (elapsedTime >= 3.0f) {
             phase = INVISIBLE;
             elapsedTime = 0.f;
-            sprite->setKeyframe(0); // volver a invisible
+            sprite->setKeyframe(0); 
         }
     }
 }
@@ -85,7 +85,7 @@ bool Llamarada::collidesWithPlayer(const Player& player) const {
     if (phase != ACTIVE) return false;
 
     glm::vec2 playerPos = player.getPosition();
-    glm::ivec2 playerSize(32, 32); // ajustar según tu jugador
+    glm::ivec2 playerSize(32, 32); 
 
     glm::vec2 flamePos = pos;
     glm::ivec2 flameSize = size;

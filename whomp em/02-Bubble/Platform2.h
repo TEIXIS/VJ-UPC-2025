@@ -28,7 +28,7 @@ private:
     float maxOffset;
     float speed;
     bool movingUp;
-    float lastDeltaY; // Guarda el último delta de movimiento vertical
+    float lastDeltaY; 
 
     Sprite* sprite;
     Texture spritesheet;

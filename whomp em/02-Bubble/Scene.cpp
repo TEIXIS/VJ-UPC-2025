@@ -16,9 +16,7 @@ using namespace irrklang;
 
 #define INIT_PLAYER_X_TILES 1
 #define INIT_PLAYER_Y_TILES 97
-//#define INIT_PLAYER_X_TILES 70
-//#define INIT_PLAYER_X_TILES 2128/16
-//#define INIT_PLAYER_Y_TILES 154/16
+
 
 Scene::Scene()
 {
@@ -48,8 +46,18 @@ void Scene::init()
     jocComencat = false;
     showControls = false;
     spacePressed = false;
+	showingCredits = false;
     counterW = -1;
     win = false;
+
+	spritesheetCredits.loadFromFile("images/credits.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	pantallaCredits = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), glm::vec2(1.f, 1.f), &spritesheetCredits, &texProgram);
+	pantallaCredits->setNumberAnimations(1);
+	pantallaCredits->setAnimationSpeed(0, 1);
+	pantallaCredits->addKeyframe(0, glm::vec2(0.f, 0.f));
+	pantallaCredits->setPosition(glm::vec2(0.f, 0.f));
+
+
 
 	spritesheetWin.loadFromFile("images/winTitle.png", TEXTURE_PIXEL_FORMAT_RGBA);
     pantallaWin = Sprite::createSprite(glm::ivec2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), glm::vec2(1.f, 1.f), &spritesheetWin, &texProgram);
@@ -73,10 +81,10 @@ void Scene::init()
 	pantallaControles->setPosition(glm::vec2(0.f, 0.f));
 
 
-    // ⚡ Cámara inicial para primer render
+
     glm::vec2 playerPos = player->getPosition();
     float centerX = SCREEN_WIDTH / 8.0f;
-    glm::vec3 cameraPos = glm::vec3(playerPos.x - centerX, 1460, 0.0f); // O usa una altura inicial adaptada
+    glm::vec3 cameraPos = glm::vec3(playerPos.x - centerX, 1460, 0.0f); 
     view = glm::translate(glm::mat4(1.0f), -cameraPos);
 
     boss = new Boss();
@@ -84,9 +92,7 @@ void Scene::init()
     boss->setTileMap(map);
     boss->setPosition(glm::vec2(3300, 300));
 
-    // Suponiendo que texProgram, SCREEN_X, SCREEN_Y están definidos y accesibles aquí
 
-// Crear varias plataformas del tipo Platform1
     for (int i = 0; i < 3; ++i) {
         Platform1* plataforma = new Platform1();
         glm::vec2 plataformaPos = glm::vec2((1 + 100 + i * 4) * 16, (98) * 16+i*2);
@@ -100,7 +106,7 @@ void Scene::init()
         plataformas1.push_back(plataforma);
     }
 
-    // Crear varias plataformas del tipo Platform2
+
     for (int i = 0; i < 2; ++i) {
         Platform2* plataforma2 = new Platform2();
         glm::vec2 plataformaPos2 = glm::vec2((INIT_PLAYER_X_TILES + 158 + i * 9) * 16, (INIT_PLAYER_Y_TILES - 86) * 16);
@@ -114,41 +120,21 @@ void Scene::init()
         plataforma2->init(plataformaPos2, texProgram, glm::ivec2(SCREEN_X, SCREEN_Y), 60.f);
         plataformas2.push_back(plataforma2);
     }
-
-    /*cor1 = new LittleHeart();
-    cor1->init(glm::vec2((INIT_PLAYER_X_TILES + 10) * 16, (INIT_PLAYER_Y_TILES-5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/heart1.png");
-
-    cor2 = new BigHeart();
-    cor2->init(glm::vec2((INIT_PLAYER_X_TILES + 20) * 16, (INIT_PLAYER_Y_TILES-5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/heart2.png");
-
-    calabaza1 = new Calabaza();
-    calabaza1->init(glm::vec2((INIT_PLAYER_X_TILES + 25) * 16, (INIT_PLAYER_Y_TILES - 5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/calabaza1.png");
-
-    lamp = new Lampara();
-    lamp->init(glm::vec2((INIT_PLAYER_X_TILES + 30) * 16, (INIT_PLAYER_Y_TILES - 5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/lamp.png");
-
-	capa = new Capa();
-	capa->init(glm::vec2((INIT_PLAYER_X_TILES + 35) * 16, (INIT_PLAYER_Y_TILES - 5) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/capa.png");
-
-    flam = new Llamarada();
-	flam->init(glm::vec2((INIT_PLAYER_X_TILES + 40) * 16, (INIT_PLAYER_Y_TILES-1) * 16), glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::UP);
-    */
-
     
         Llamarada* flame = new Llamarada();
-        // Calcula la posición de cada llama; en este ejemplo se desplazan en x
+  
         glm::vec2 flamePos = glm::vec2((INIT_PLAYER_X_TILES + 136) * 16, (INIT_PLAYER_Y_TILES - 24) * 16);
         flame->init(flamePos, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::UP);
         llamas.push_back(flame);
 
         Llamarada* flame1 = new Llamarada();
-        // Calcula la posición de cada llama; en este ejemplo se desplazan en x
+       
          flamePos = glm::vec2((INIT_PLAYER_X_TILES + 134) * 16, (INIT_PLAYER_Y_TILES - 27) * 16);
         flame1->init(flamePos, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::UP);
         llamas.push_back(flame1);
 
         Llamarada* flame2 = new Llamarada();
-        // Calcula la posición de cada llama; en este ejemplo se desplazan en x
+   
          flamePos = glm::vec2((INIT_PLAYER_X_TILES + 132) * 16, (INIT_PLAYER_Y_TILES - 30) * 16);
         flame2->init(flamePos, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, Llamarada::DOWN);
         llamas.push_back(flame2);
@@ -160,11 +146,7 @@ void Scene::init()
     hud = new HUD();
     hud->init(texProgram, player);
 
-	/*seta = new Seta();
-	seta->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 
-	fenix = new Fenix();
-	fenix->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);*/
 
 	mag = new Mag();
 	mag->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
@@ -173,14 +155,7 @@ void Scene::init()
 	mag2->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	
     
-	//enemy->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), 26 * map->getTileSize()));
-    //seta->setPosition(glm::vec2(INIT_PLAYER_X_TILES * 16, INIT_PLAYER_Y_TILES * 16));
-    //seta->setTileMap(map);
 
-    //fenix->setPosition(glm::vec2((INIT_PLAYER_X_TILES + 8) * 16, (INIT_PLAYER_Y_TILES) * 16));
-    //fenix->setTileMap(map);
-
-	//mag->setPosition(glm::vec2((INIT_PLAYER_X_TILES) * 16, (INIT_PLAYER_Y_TILES + 2) * 16));
 	mag->setTileMap(map);
 	mag2->setTileMap(map);
     
@@ -209,37 +184,34 @@ void Scene::update(int deltaTime)
     if (!jocComencat) {
         bool currentSpace = Game::instance().getKey(GLFW_KEY_SPACE);
 
-        // Solo actúa si SPACE se acaba de presionar (flanco de bajada)
         if (currentSpace && !spacePressed) {
             if (showControls) {
-                jocComencat = true;  // Si ya se muestran controles, inicia el juego
+                jocComencat = true; 
                 std::cout << "[DEBUG] Iniciando el nivel\n";
                 if (soundEngine) soundEngine->play2D("media/sonidoCorrecto.wav", false);
                 if (soundEngine) {
                     soundEngine->play2D("media/musica.wav", true);
-                    soundEngine->play2D("media/volcan.wav", true); // true = bucle
+                    soundEngine->play2D("media/volcan.wav", true); 
                 }
-                // Cambia ruta si está en otro lado
+
             }
             else {
-                showControls = true;  // De lo contrario, se muestra la pantalla de controles
+                showControls = true;  
                 std::cout << "[DEBUG] Mostrando controles\n";
-                if (soundEngine) soundEngine->play2D("media/sonidoCorrecto.wav", false); // Cambia ruta si está en otro lado
+                if (soundEngine) soundEngine->play2D("media/sonidoCorrecto.wav", false); 
             }
         }
 
-        // Actualiza el estado anterior de la tecla SPACE
+
         spacePressed = currentSpace;
 
-        return;  // No ejecutar la lógica del juego si aún no se ha iniciado
+        return;  
     }
     else {
         if (Game::instance().getKey(GLFW_KEY_R)) {
-            resetLevel();  // Al pulsar R reinicia todo
+            resetLevel();  
         }
         currentTime += deltaTime;
-        /*seta->update(deltaTime);
-        fenix->update(deltaTime);*/
         mag->update(deltaTime);
         mag2->update(deltaTime);
         map->update(deltaTime / 1000.f);
@@ -261,7 +233,7 @@ void Scene::update(int deltaTime)
         float deltaY = 0.f;
         bool collisionDetected = false;
 
-        // Revisar colisiones desde arriba con plataformas1
+
         for (auto& plataforma : plataformas1) {
             if (plataforma->checkCollisionFromAbove(*player)) {
                 if (!map->collisionMoveDown(playerPos, glm::ivec2(32, 32), ptr)) {
@@ -278,12 +250,11 @@ void Scene::update(int deltaTime)
                 player->setPlatform(true);
                 collisionDetected = true;
             }
-			else plataforma->returnToOriginalPosition(deltaTime); // Actualiza la posición de la plataforma si no hay colisión
+			else plataforma->returnToOriginalPosition(deltaTime); 
         }
 
 
 
-        // Si no hay colisión con ninguna plataforma1 ni plataforma2
         if (!collisionDetected) {
             bool anyCollision = false;
             for (auto& plataforma : plataformas1) {
@@ -301,15 +272,15 @@ void Scene::update(int deltaTime)
 
             if (!anyCollision) {
                 for (auto& plataforma : plataformas1) plataforma->returnToOriginalPosition(deltaTime);
-                //for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
+               
 
                 if (!plataformas2.empty())
-                    deltaY = plataformas2[0]->getLastDeltaY(); // Podrías sumar todos los deltaY si hay más
+                    deltaY = plataformas2[0]->getLastDeltaY(); 
                 player->setPlatform(false);
             }
         }
 
-        // Revisar colisiones desde arriba con plataformas2
+   
         for (auto& plataforma : plataformas2) {
             if (plataforma->checkCollisionFromAbove(*player)) {
                 if (!player->isJumpingPlat()) {
@@ -329,13 +300,12 @@ void Scene::update(int deltaTime)
 			else plataforma->update(deltaTime);
         }
 
-        // Revisar colisiones desde abajo con plataformas2
+   
 
-
-        // Si no pasó nada con plataformas2, igual se actualizan
+      
         if (!collisionDetected) {
             player->setPlatform(false);
-            //for (auto& plataforma : plataformas2) plataforma->update(deltaTime);
+
         }
 
 
@@ -381,7 +351,7 @@ void Scene::update(int deltaTime)
         for (auto flame : llamas) {
             if (flame->collidesWithPlayer(*player) && !player->getCapaActiva() && !player->playerIsPlorant() && !player->isGod()) {
                 player->setPlorantTimer();
-                player->takeDamage(0.66f); // o el método que uses
+                player->takeDamage(0.66f); 
             }
         }
         
@@ -447,25 +417,41 @@ void Scene::update(int deltaTime)
     
 
     if (player->winGame()) {
-        std::cout << "[DEBUG] winGame() = true" << std::endl;
-        if (counterW > 0) {
-            std::cout << "[DEBUG] counterW now = " << counterW << std::endl;
-            counterW -= deltaTime;
+        if (!win) {
+
+            std::cout << "[DEBUG] winGame() = true" << std::endl;
+            if (counterW == -1) {
+                counterW = 2000;
+                soundEngine->stopAllSounds();
+                if (soundEngine) soundEngine->play2D("media/win.wav", false);
+                std::cout << "[DEBUG] counterW initialized to 2000" << std::endl;
+            }
+            else if (counterW > 0) {
+                counterW -= deltaTime;
+            }
+            else {
+                win = true;  
+                counterCredits = 5000;  
+                std::cout << "[DEBUG] win set to true" << std::endl;
+            }
         }
-        else if (counterW == -1) {
-            counterW = 2000;
-            soundEngine->stopAllSounds();
-			if (soundEngine) soundEngine->play2D("media/win.wav", false);
-            std::cout << "[DEBUG] counterW initialized to 2000" << std::endl;
+        else if (win && !showingCredits) {
+            if (counterCredits > 0) {
+                counterCredits -= deltaTime;
+            }
+            else {
+                showingCredits = true;
+                std::cout << "[DEBUG] Showing credits now\n";
+            }
         }
-		else if (counterW <= 0) {
-            win = true;
-            std::cout << "[DEBUG] win set to true" << std::endl;
-		}
+
         if (Game::instance().getKey(GLFW_KEY_R)) {
-            resetLevel();  // Al pulsar R reinicia todo
+            resetLevel();  
         }
+
+        return; 
     }
+
 
 
     float centerX = SCREEN_WIDTH / 8.0f;
@@ -484,25 +470,19 @@ void Scene::update(int deltaTime)
     else if (playerPos.x >=3588)
         cameraPos = glm::vec3(3630 - centerX, 20, 0.0f);
 	
-    //2158,1542
-    // 2350 54
-	//printf("Player position: %f, %f\n", playerPos.x, playerPos.y);
+
 
     int mapWidth = SCREEN_WIDTH;
     int mapHeight = SCREEN_HEIGHT;
 
-    //cameraPos.x = glm::max(0.0f, cameraPos.x);
-   // cameraPos.y = glm::max(0.0f, cameraPos.y);
 
-   // cameraPos.x = glm::min(float(mapWidth - SCREEN_WIDTH / 2), cameraPos.x);
-   // cameraPos.y = glm::min(float(mapHeight - SCREEN_HEIGHT / 2), cameraPos.y);
 
     view = glm::translate(glm::mat4(1.0f), -cameraPos);
 }
 
 void Scene::render()
 {
-    glClearColor(0.2f, 0.2f, 0.2f, 1.0f); // gris oscuro o lo que prefieras
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (!jocComencat) {
@@ -512,13 +492,24 @@ void Scene::render()
         texProgram.setUniformMatrix4f("view", glm::mat4(1.0f));
         texProgram.setUniformMatrix4f("modelview", glm::mat4(1.0f));
         texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-        texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);  // Asegurarse de que no se aplica ningún desplazamiento
+        texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);  
         if (showControls)
             pantallaControles->render();
         else
             pantallaTitol->render();
         return;
 	}
+    if (showingCredits) {
+        glm::mat4 titleProjection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
+        texProgram.use();
+        texProgram.setUniformMatrix4f("projection", titleProjection);
+        texProgram.setUniformMatrix4f("view", glm::mat4(1.0f));
+        texProgram.setUniformMatrix4f("modelview", glm::mat4(1.0f));
+        texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+        texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+        pantallaCredits->render();
+        return;
+    }
 	if (win) {
         cout << "Nashe\n";
         glm::mat4 titleProjection = glm::ortho(0.f, float(SCREEN_WIDTH) / 2, float(SCREEN_HEIGHT) / 2, 0.f);
@@ -527,7 +518,7 @@ void Scene::render()
         texProgram.setUniformMatrix4f("view", glm::mat4(1.0f));
         texProgram.setUniformMatrix4f("modelview", glm::mat4(1.0f));
         texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
-        texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);  // Asegurarse de que no se aplica ningún desplazamiento
+        texProgram.setUniform2f("texCoordDispl", 0.f, 0.f); 
 		pantallaWin->render();
 		return;
 	}
@@ -543,11 +534,7 @@ void Scene::render()
     texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
     map->render();
     texProgram.use();
-    /*r1->render();
-    cor2->render();
-    calabaza1->render();
-    lamp->render();
-	capa->render();*/
+
 	for (auto& collectible : collectibles) {
 		collectible->render();
 	}
@@ -555,7 +542,7 @@ void Scene::render()
     for (auto flame : llamas) {
         flame->render();
     }
-    // HUD usa coordenadas de pantalla
+
     
     
 
@@ -565,8 +552,7 @@ void Scene::render()
     player->render();
     if (boss && boss->isAlive()) boss->render();
 
-    /*seta->render();
-	fenix->render();*/
+
 	for (auto& seta : setas) seta->render();
 	for (auto& fenn : fenixes) fenn->render();
     for (auto* p : plataformas1) p->render();
@@ -618,7 +604,7 @@ void Scene::initShaders()
 
 void Scene::resetLevel()
 {
-    // 🧹 Borrar todo lo anterior
+
     delete player;
     player = nullptr;
 
@@ -663,18 +649,18 @@ void Scene::resetLevel()
 
     cor1 = nullptr; cor2 = nullptr; calabaza1 = nullptr; lamp = nullptr; capa = nullptr; flam = nullptr;
 
-    // 🌀 Reiniciar tiempo y estado
+
     currentTime = 0.0f;
     jocComencat = false;
 	showControls = false;
 
-    // 🔄 Volver a iniciar todo
+
     init();
 }
 
 void Scene::spawnRandomCollectible(const glm::vec2& position) {
-    // Número aleatorio entre 0 y 3 (por ejemplo, 4 tipos de coleccionables)
-    int r = rand() % 4;
+
+    int r = rand() % 5;
     Collectible* item = nullptr;
 
     
@@ -704,6 +690,12 @@ void Scene::spawnRandomCollectible(const glm::vec2& position) {
         item = lamp;
         break;
     }
+	case 4: {
+		Capa* cape = new Capa();
+		cape->init(position, glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, "images/capa.png");
+		item = cape;
+		break;
+	}
     default:
         break;
     }

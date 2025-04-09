@@ -46,9 +46,9 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	//Seta* seta;
+
 	vector<Seta*> setas;
-	//Fenix* fenix;
+
 	vector<Fenix*> fenixes;
 	Mag* mag;
 	Mag* mag2;
@@ -71,16 +71,21 @@ private:
 	Sprite* pantallaTitol;
 	Sprite* pantallaControles;
 	Sprite* pantallaWin;
+	Sprite* pantallaCredits;
 	bool jocComencat = false;
-	Texture spritesheet;           // Usado para el título
+	Texture spritesheet;           
 	Texture spritesheetControls; 
-	Texture spritesheetWin;// Usado para los controles
+	Texture spritesheetWin;
+	Texture spritesheetCredits;
+
 	bool s = false;
 	bool showControls = false;
 	bool spacePressed = false;
 	irrklang::ISoundEngine* soundEngine;
 	bool win = false;
 	int counterW = 1000;
+	int counterCredits = 0;
+	bool showingCredits = false;
 
 };
 #endif // _SCENE_INCLUDE

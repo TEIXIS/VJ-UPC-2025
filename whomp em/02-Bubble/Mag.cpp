@@ -92,7 +92,6 @@ void Mag::update(int deltaTime)
         }
     }
 
-	//cout << abs(posEnemy.x - posPlayer.x) << endl;
 
     if (abs(posEnemy.x - posPlayer.x) > 200) {
         vida = 0;
@@ -215,7 +214,7 @@ void Mag::restarVida()
         }
         else {
             invulnerable = true;
-            invulnerableTimer = 500; // 0.5 segundos
+            invulnerableTimer = 500; 
         }
     }
 }
@@ -235,7 +234,7 @@ void Mag::spawn(int x, int y)
 	if (vida <= 0) {
         setPosition(glm::vec2((x) * 16, (y) * 16));
         cout << "Mag spawned" << endl;
-		//posEnemy = glm::vec2(16, 16);
+		
 		vida = 3;
 		spawnB = true;
 	}

@@ -144,7 +144,6 @@ void HUD::render()
     
 
 
-    // arma al lado de los corazones (alineada al primero)
     weaponSprite->setPosition(glm::vec2(10.f, 10.f));
     lampSprite->setPosition(glm::vec2(28, 10.f));
      

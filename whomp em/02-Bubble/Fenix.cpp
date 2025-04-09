@@ -45,7 +45,6 @@ void Fenix::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     foc2->changeAnimation(0);
 
     tileMapDispl = tileMapPos;
-    //originalHeight = glm::vec2(float(tileMapDispl.x + posEnemy.x), float(tileMapDispl.y + posEnemy.y));
     sprite->setPosition(originalHeight);
 	posSpawnItem = originalHeight;
     foc->setPosition(originalHeight);
@@ -63,11 +62,9 @@ void Fenix::update(int deltaTime)
 {
     if (vida <= 0 && !focActiu) return;
 
-	//cout << posFoc.x << endl;
-    //cout << abs(posEnemy.x - posPlayer.x) << endl;
+
     if (abs(posEnemy.x - posPlayer.x) > 195 && !focActiu || abs(posEnemy.y - posPlayer.y) > 195 && !focActiu) {
         vida = 0;
-		//focActiu = false;
 		posFoc.x = -100;
 		posFoc2.x = -100;
 		posEnemy.x = -100;
@@ -114,16 +111,7 @@ void Fenix::update(int deltaTime)
 	}
 	
     
-    /*if (map->collisionMoveRight(posEnemy, glm::ivec2(16, 16)))
- 	{
- 		posEnemy.x -= MOVE_SPEED;
- 		movingRight = false;
- 	}
- 	else if (map->collisionMoveLeft(posEnemy, glm::ivec2(16, 16)) || posEnemy.x==0)
- 	{
- 		posEnemy.x += MOVE_SPEED;
- 		movingRight = true;
- 	}*/
+
     if (posEnemy.x >= posPlayer.x + 175) {
         posEnemy.x -= MOVE_SPEED;
         movingRight = false;
@@ -223,7 +211,6 @@ void Fenix::spawn(int x, int y)
         habaixat = false;
 		attacking = false;
         setPosition(glm::vec2((x) * 16, (y) * 16));
-        cout << "Fenix spawned" << endl;
 	}
 }
 

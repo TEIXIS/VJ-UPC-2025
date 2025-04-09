@@ -255,9 +255,7 @@ void TileMap::prepareArrays(const glm::vec2 &minCoords, ShaderProgram &program)
 	texCoordLocation = program.bindVertexAttribute("texCoord", 2, 4*sizeof(float), (void *)(2*sizeof(float)));
 }
 
-// Collision tests for axis aligned bounding boxes.
-// Method collisionMoveDown also corrects Y coordinate if the box is
-// already intersecting a tile below.
+
 
 bool TileMap::collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const
 {
@@ -298,31 +296,30 @@ bool TileMap::collisionMoveDown(const glm::ivec2& pos, const glm::ivec2& size, i
 {
 	int x0, x1, y;
 
-	// Calculamos el tile en X que ocupa la parte izquierda y derecha del bounding box
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
 
-	// Calculamos el tile en Y que ocupa la parte inferior del bounding box
+
 	y = (pos.y + size.y - 1) / tileSize;
 
 	for (int x = x0; x <= x1; x++)
 	{
-		// Verificamos si el tile en [y, x] es sólido
+
 		if (collisions.find(map[y * mapSize.x + x]) != collisions.end())
 		{
-			// Calcula la coordenada en píxeles de la parte superior de ese tile
+
 			int tileTop = y * tileSize;
 
-			// Calcula la parte inferior del bounding box
+
 			int boxBottom = *posY + size.y;
 
-			// Si la parte inferior del bounding box está por debajo de la parte superior del tile...
+		
 			if (boxBottom > tileTop)
 			{
-				// ... corregimos la posición para que "toque" justo el tile
+				
 				*posY = tileTop - size.y;
 
-				// Chequeo opcional de lava, etc.
+		
 
 				return true;
 			}
@@ -335,25 +332,25 @@ bool TileMap::collisionLava(const glm::ivec2& pos, const glm::ivec2& size) const
 {
 	int x0, x1, y;
 
-	// Calculamos el tile en X que ocupa la parte izquierda y derecha del bounding box
+	
 	x0 = pos.x / tileSize;
 	x1 = (pos.x + size.x - 1) / tileSize;
 
-	// Calculamos el tile en Y que ocupa la parte inferior del bounding box
+	
 	y = (pos.y + size.y - 1) / tileSize;
 
 	for (int x = x0; x <= x1; x++)
 	{
-		// Verificamos si el tile en [y, x] es sólido
+		
 		if (lava.find(map[y * mapSize.x + x]) != lava.end())
 		{
-			// Calcula la coordenada en píxeles de la parte superior de ese tile
+			
 			int tileTop = y * tileSize;
 
-			// Calcula la parte inferior del bounding box
+			
 			int boxBottom = pos.y + size.y;
-			std::cout << "Tile debajo del jugador: " << map[y * mapSize.x + x] << std::endl;
-			// Si la parte inferior del bounding box está por debajo de la parte superior del tile...
+			//std::cout << "Tile debajo del jugador: " << map[y * mapSize.x + x] << std::endl;
+
 			if (boxBottom > tileTop)
 			{
 				
@@ -377,7 +374,7 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int
 	{
 		if (collisions.find(map[y * mapSize.x + x]) != collisions.end())
 		{
-			if (tileSize * (y + 1) - *posY <= 16) // margen de 16 px, opcional
+			if (tileSize * (y + 1) - *posY <= 16) 
 			{
 				if (map[y * mapSize.x + x] != 74 && map[y * mapSize.x + x] != 75 && map[y * mapSize.x + x] != 68 && map[y * mapSize.x + x] != 59 && map[y * mapSize.x + x] != 60 && map[y * mapSize.x + x] != 90 && map[y * mapSize.x + x] != 85 && map[y * mapSize.x + x] != 84 && map[y * mapSize.x + x] != 82 && map[y * mapSize.x + x] != 81 && map[y * mapSize.x + x] != 17 && map[y * mapSize.x + x] != 15 && map[y * mapSize.x + x] != 14 && map[y * mapSize.x + x] != 13) {
 					*posY = tileSize * (y + 1);
@@ -391,23 +388,21 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size, int
 }
 bool TileMap::isOnLadder(const glm::ivec2& pos, const glm::ivec2& size) const
 {
-	// Calculate the tile coordinates that the character occupies
+	
 	int x0 = pos.x / tileSize;
 	int x1 = (pos.x + size.x - 1) / tileSize;
 	int y0 = pos.y / tileSize;
 	int y1 = (pos.y + size.y - 1) / tileSize;
 
-	// Check if the character's center is aligned with a ladder tile
+	
 	int centerX = pos.x + (size.x / 2);
 	int centerTileX = centerX / tileSize;
 
-	// Check all tiles that the character overlaps
+	
 	for (int y = y0; y <= y1; y++)
 	{
 		for (int x = x0; x <= x1; x++)
 		{
-			// For exact ladder alignment, we can check if the character's center
-			// is within the ladder tile
 			if (x == centerTileX && ladder.find(map[y * mapSize.x + x]) != ladder.end())
 			{
 				return true;

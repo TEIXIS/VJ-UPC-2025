@@ -2,6 +2,6 @@
 #include <iostream>
 
 void Capa::onCollect(Player& player) {
-    player.setCapaActiva(true); // reemplazá por tu método real de sumar vidas
+    player.setCapaActiva(true); 
     destroy();
 }

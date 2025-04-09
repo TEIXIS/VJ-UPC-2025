@@ -10,7 +10,7 @@
 #define SCREEN_HEIGHT 480
 
 
-// Game is a singleton (a class with a single instance) that represents our whole application
+
 
 
 class Game
@@ -41,9 +41,9 @@ public:
 	bool getKey(int key) const;
 
 private:
-	bool bPlay; // Continue to play game?
-	bool keys[GLFW_KEY_LAST+1]; // Store key states so that 
-							    // we can have access at any time
+	bool bPlay; 
+	bool keys[GLFW_KEY_LAST+1]; 
+							    
 	Scene scene;
 
 };

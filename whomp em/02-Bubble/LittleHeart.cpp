@@ -2,6 +2,6 @@
 #include <iostream>
 
 void LittleHeart::onCollect(Player& player) {
-    player.heal1Live(); // reemplazá por tu método real de sumar vidas
+    player.heal1Live();
     destroy();
 }

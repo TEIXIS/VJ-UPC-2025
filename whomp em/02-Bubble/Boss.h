@@ -43,5 +43,5 @@ private:
     BossPhase currentPhase;
 	int inmortalTimer;
     int frameCount = 0;
-    glm::vec2 infinityCenter;  // centro del movimiento ∞
+    glm::vec2 infinityCenter;  
 };

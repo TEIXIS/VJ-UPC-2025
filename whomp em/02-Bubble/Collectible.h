@@ -30,6 +30,6 @@ protected:
     Texture spritesheet;
     Sprite* sprite = nullptr;
     bool collected = false;
-    glm::vec2 velocity = glm::vec2(0.f);  // Velocidad (x, y)
+    glm::vec2 velocity = glm::vec2(0.f); 
     float gravity = 300.f;
 };

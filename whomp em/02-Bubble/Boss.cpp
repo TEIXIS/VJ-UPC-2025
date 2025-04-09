@@ -26,7 +26,7 @@ void Boss::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram) {
     position = glm::vec2(3750, 100);
     velocity = glm::vec2(2.0f, -2.0f);
     position = glm::vec2(3750, 100);
-    infinityCenter = position; // guardar como centro del movimiento
+    infinityCenter = position; 
     inmortalTimer = 0;
     health = 8.0f;
     alive = true;
@@ -45,12 +45,11 @@ void Boss::update(int deltaTime, Player& player) {
     attackCooldown -= deltaTime;
 	inmortalTimer -= deltaTime;
 	frameCount++;
-    // Cambiar de fase cada 8 segundos
-    // Solo cambiar de fase si está en el centro del ∞
+
     if (phaseTimer >= 8000) {
         float distanceToCenter = glm::distance(position, infinityCenter);
 
-        // Consideramos un margen de error por redondeo (5 píxeles)
+
         if (distanceToCenter <= 5.f) {
             currentPhase = (currentPhase == PHASE_INFINITE) ? PHASE_BOUNCE : PHASE_INFINITE;
             phaseTimer = 0;
@@ -68,7 +67,7 @@ void Boss::update(int deltaTime, Player& player) {
 
 
     if (currentPhase == PHASE_INFINITE) {
-        // Movimiento en forma de ∞
+
         float a = 100.0f;
         float t = timeAccum;
         float x = a * cos(t) / (1 + sin(t) * sin(t));
@@ -87,7 +86,7 @@ void Boss::update(int deltaTime, Player& player) {
 
     sprite->setPosition(position);
 
-    // Colisión con el jugador
+
     glm::vec2 playerPos = player.getPosition();
     glm::vec2 size = glm::vec2(32, 32);
     glm::vec2 playerSize = glm::vec2(32, 32);
@@ -95,11 +94,9 @@ void Boss::update(int deltaTime, Player& player) {
     bool colY = position.y + size.y > playerPos.y && position.y < playerPos.y + playerSize.y;
 
     if (colX && colY && attackCooldown <= 0) {
-        cout << "collide player\n";
         if (!player.getCapaActiva() && !player.playerIsPlorant() && !player.isGod() && inmortalTimer <= 0) {
             player.setPlorantTimer();
             player.takeDamage(1.0f);
-            //attackCooldown = 1500;
         }
     }
 }
