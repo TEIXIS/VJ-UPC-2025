@@ -20,7 +20,7 @@ enum PlayerAnims {
     ATK_LEFT_MOVING, ATK_RIGHT_MOVING,
     ATK_LEFT_DOWN, ATK_RIGHT_DOWN,
     ATK_JUMPING_UP_R, ATK_JUMPING_DOWN_R, ATK_JUMPING_UP_L, ATK_JUMPING_DOWN_L, PLORANT_DRETA, PLORANT_ESQUERRA,
-    ESCALANT, ATK_ESCALANT_R, ATK_ESCALANT_L, COUNT
+    ESCALANT, ATK_ESCALANT_R, ATK_ESCALANT_L, WIN, COUNT
 };
 
 void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
@@ -31,6 +31,9 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     atacantAbaix = false;
     plorantTimer = 0;
 
+    texTotem.loadFromFile("images/totem.png", TEXTURE_PIXEL_FORMAT_RGBA);
+    totSprite = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(1.f, 1.f), &texTotem, &shaderProgram);
+    totSprite->setNumberAnimations(1);
     spritesheet.loadFromFile("images/whomp_em_usa.png", TEXTURE_PIXEL_FORMAT_RGBA);
 
     // Initialize main sprite
@@ -49,6 +52,8 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
     totemFoc = Sprite::createSprite(glm::ivec2(16, 16), glm::vec2(0.0625, 0.0625), &spritesheet, &shaderProgram);
     totemFoc->setNumberAnimations(2);
+
+
 
     // Weapon animations
     // Right
@@ -164,6 +169,12 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
     sprite->setAnimationSpeed(ATK_ESCALANT_L, 8);
     sprite->addKeyframe(ATK_ESCALANT_L, glm::vec2(0.375f, 0.75f));
 
+    sprite->setAnimationSpeed(WIN, 8);
+    sprite->addKeyframe(WIN, glm::vec2(0.375f, 0.f));
+
+    totSprite->setAnimationSpeed(0, 8);
+    totSprite->addKeyframe(0, glm::vec2(0.f, 0.f));
+
     // Set initial states
     sprite->changeAnimation(0);
     tileMapDispl = tileMapPos;
@@ -189,478 +200,506 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 
 void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes, Mag& mag, Mag& mag2, Boss& boss)
 {
-    // Update all sprites
-    sprite->update(deltaTime);
-    lanza->update(deltaTime);
-    lanzaAbaix->update(deltaTime);
-    lanzaAdalt->update(deltaTime);
-    totemFoc->update(deltaTime);
+    if (!totemD) {
+        sprite->update(deltaTime);
+        lanza->update(deltaTime);
+        lanzaAbaix->update(deltaTime);
+        lanzaAdalt->update(deltaTime);
+        totemFoc->update(deltaTime);
 
-    this->checkImmortalTimer(deltaTime);
-
-
-    static bool levitateKey = false;
-
-    if (Game::instance().getKey(GLFW_KEY_L)) {
-        if (!levitateKey) {
-            levitar = !levitar;
-            levitateKey = true;
-        }
-    }
-    else {
-        levitateKey = false;
-    }
-
-    static bool healKey = false;
-
-    if (Game::instance().getKey(GLFW_KEY_H)) {
-        if (!healKey) {
-            lives = hMax;
-            lamps = 2;
-            healKey = true;
-        }
-    }
-    else {
-        healKey = false;
-    }
+        this->checkImmortalTimer(deltaTime);
 
 
-    static bool totemKey = false;
+        static bool levitateKey = false;
 
-    if (Game::instance().getKey(GLFW_KEY_T)) {
-        if (!totemKey) {
-            totemFocActiu = !totemFocActiu;
-            std::cout << "Totem: " << (totemFocActiu ? "ON" : "OFF") << std::endl;
-            totemKey = true;
-        }
-    }
-    else {
-        totemKey = false;
-    }
-
-
-    static bool godModeKeyPressed = false;
-
-    if (Game::instance().getKey(GLFW_KEY_G)) {
-        if (!godModeKeyPressed) {
-            godMode = !godMode;
-            std::cout << "God mode: " << (godMode ? "ON" : "OFF") << std::endl;
-            godModeKeyPressed = true;
-        }
-    }
-    else {
-        godModeKeyPressed = false;
-    }
-
-    // Handle hurt state
-    if (plorantTimer > 0) {
-        plorantTimer -= deltaTime;
-        if (plorantTimer <= 0) {
-            plorantTimer = 0;
-        }
-
-        // Basic movement still allowed when hurt
-        if (Game::instance().getKey(GLFW_KEY_LEFT)) {
-            posPlayer.x -= MOVE_SPEED;
-            sprite->changeAnimation(PLORANT_ESQUERRA);
-            if (Game::instance().getKey(GLFW_KEY_X)) {
-                isAttacking = true;
-                if (sprite->animation() != ATK_LEFT_MOVING)
-                    sprite->changeAnimation(ATK_LEFT_MOVING);
-            }
-            if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32))) {
-                posPlayer.x += MOVE_SPEED;
+        if (Game::instance().getKey(GLFW_KEY_L)) {
+            if (!levitateKey) {
+                levitar = !levitar;
+                levitateKey = true;
             }
         }
-        else if (Game::instance().getKey(GLFW_KEY_RIGHT)) {
-            posPlayer.x += MOVE_SPEED;
-            sprite->changeAnimation(PLORANT_DRETA);
-            if (Game::instance().getKey(GLFW_KEY_X)) {
-                isAttacking = true;
-                if (sprite->animation() != ATK_RIGHT_MOVING)
-                    sprite->changeAnimation(ATK_RIGHT_MOVING);
+        else {
+            levitateKey = false;
+        }
+
+        static bool healKey = false;
+
+        if (Game::instance().getKey(GLFW_KEY_H)) {
+            if (!healKey) {
+                lives = hMax;
+                lamps = 2;
+                healKey = true;
             }
-            if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32))) {
+        }
+        else {
+            healKey = false;
+        }
+
+
+        static bool totemKey = false;
+
+        if (Game::instance().getKey(GLFW_KEY_T)) {
+            if (!totemKey) {
+                totemFocActiu = !totemFocActiu;
+                std::cout << "Totem: " << (totemFocActiu ? "ON" : "OFF") << std::endl;
+                totemKey = true;
+            }
+        }
+        else {
+            totemKey = false;
+        }
+
+
+        static bool godModeKeyPressed = false;
+
+        if (Game::instance().getKey(GLFW_KEY_G)) {
+            if (!godModeKeyPressed) {
+                godMode = !godMode;
+                std::cout << "God mode: " << (godMode ? "ON" : "OFF") << std::endl;
+                godModeKeyPressed = true;
+            }
+        }
+        else {
+            godModeKeyPressed = false;
+        }
+
+        // Handle hurt state
+        if (plorantTimer > 0) {
+            plorantTimer -= deltaTime;
+            if (plorantTimer <= 0) {
+                plorantTimer = 0;
+            }
+
+            // Basic movement still allowed when hurt
+            if (Game::instance().getKey(GLFW_KEY_LEFT)) {
                 posPlayer.x -= MOVE_SPEED;
+                sprite->changeAnimation(PLORANT_ESQUERRA);
+                if (Game::instance().getKey(GLFW_KEY_X)) {
+                    isAttacking = true;
+                    if (sprite->animation() != ATK_LEFT_MOVING)
+                        sprite->changeAnimation(ATK_LEFT_MOVING);
+                }
+                if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32))) {
+                    posPlayer.x += MOVE_SPEED;
+                }
             }
-        }
-        else if (Game::instance().getKey(GLFW_KEY_X)) {
-            isAttacking = true;
-            if (sprite->animation() == STAND_RIGHT || sprite->animation() == ATK_RIGHT_MOVING || sprite->animation() == PLORANT_DRETA)
-                sprite->changeAnimation(ATK_RIGHT_STANDING);
-            else if (sprite->animation() == STAND_LEFT || sprite->animation() == ATK_LEFT_MOVING || sprite->animation() == PLORANT_ESQUERRA)
-                sprite->changeAnimation(ATK_LEFT_STANDING);
-        }
-
-        if (sprite->animation() == ATK_JUMPING_UP_R) {
-            atacantAdalt = true;
-            posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
-        }
-        else if (sprite->animation() == ATK_JUMPING_UP_L) {
-            atacantAdalt = true;
-            posLanza = glm::vec2(posPlayer.x, posPlayer.y - 32);
-        }
-        else {
-            atacantAdalt = false;
-        }
-
-        if (sprite->animation() == ATK_JUMPING_DOWN_R) {
-            atacantAbaix = true;
-            posLanza = glm::vec2(posPlayer.x + 7, posPlayer.y + 25);
-        }
-        else if (sprite->animation() == ATK_JUMPING_DOWN_L) {
-            atacantAbaix = true;
-            posLanza = glm::vec2(posPlayer.x, posPlayer.y + 25);
-        }
-        else {
-            atacantAbaix = false;
-        }
-
-        if (!Game::instance().getKey(GLFW_KEY_X)) {
-            isAttacking = false;
-        }
-        else {
-            isAttacking = true;
-            if (isRightFacing()) {
-                if (totemFocActiu) {
-                    lanza->changeAnimation(0);
-                    if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
-                    offsetTotem = 8;
+            else if (Game::instance().getKey(GLFW_KEY_RIGHT)) {
+                posPlayer.x += MOVE_SPEED;
+                sprite->changeAnimation(PLORANT_DRETA);
+                if (Game::instance().getKey(GLFW_KEY_X)) {
+                    isAttacking = true;
+                    if (sprite->animation() != ATK_RIGHT_MOVING)
+                        sprite->changeAnimation(ATK_RIGHT_MOVING);
                 }
-                else {
-                    if (lanza->animation() != 0) lanza->changeAnimation(0);
+                if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32))) {
+                    posPlayer.x -= MOVE_SPEED;
                 }
-
-                posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
             }
-            else if (isLeftFacing()) {
-                if (totemFocActiu) {
-                    lanza->changeAnimation(1);
-                    if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
-
-                    offsetTotem = 8;
-                }
-                else {
-                    if (lanza->animation() != 1) lanza->changeAnimation(1);
-                }
-
-                posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+            else if (Game::instance().getKey(GLFW_KEY_X)) {
+                isAttacking = true;
+                if (sprite->animation() == STAND_RIGHT || sprite->animation() == ATK_RIGHT_MOVING || sprite->animation() == PLORANT_DRETA)
+                    sprite->changeAnimation(ATK_RIGHT_STANDING);
+                else if (sprite->animation() == STAND_LEFT || sprite->animation() == ATK_LEFT_MOVING || sprite->animation() == PLORANT_ESQUERRA)
+                    sprite->changeAnimation(ATK_LEFT_STANDING);
             }
-        }
 
-        // Handle jumping/falling when hurt
-        if (bJumping) {
-            saltarPlata = false;
-            handleJumpingAnimations();
-
-            jumpAngle += JUMP_ANGLE_STEP;
-            if (jumpAngle == 180) {
-                bJumping = false;
-                posPlayer.y = startY;
+            if (sprite->animation() == ATK_JUMPING_UP_R) {
+                atacantAdalt = true;
+                posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
+            }
+            else if (sprite->animation() == ATK_JUMPING_UP_L) {
+                atacantAdalt = true;
+                posLanza = glm::vec2(posPlayer.x, posPlayer.y - 32);
             }
             else {
-                posPlayer.y = int(startY - JUMP_HEIGHT * sin(3.14159f * jumpAngle / 180.f));
+                atacantAdalt = false;
+            }
 
-                if (jumpAngle < 90) {
-                    if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
-                        bJumping = false;
-                        jumpAngle = 180;
+            if (sprite->animation() == ATK_JUMPING_DOWN_R) {
+                atacantAbaix = true;
+                posLanza = glm::vec2(posPlayer.x + 7, posPlayer.y + 25);
+            }
+            else if (sprite->animation() == ATK_JUMPING_DOWN_L) {
+                atacantAbaix = true;
+                posLanza = glm::vec2(posPlayer.x, posPlayer.y + 25);
+            }
+            else {
+                atacantAbaix = false;
+            }
+
+            if (!Game::instance().getKey(GLFW_KEY_X)) {
+                isAttacking = false;
+            }
+            else {
+                isAttacking = true;
+                if (isRightFacing()) {
+                    if (totemFocActiu) {
+                        lanza->changeAnimation(0);
+                        if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
+                        offsetTotem = 8;
                     }
+                    else {
+                        if (lanza->animation() != 0) lanza->changeAnimation(0);
+                    }
+
+                    posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+                }
+                else if (isLeftFacing()) {
+                    if (totemFocActiu) {
+                        lanza->changeAnimation(1);
+                        if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
+
+                        offsetTotem = 8;
+                    }
+                    else {
+                        if (lanza->animation() != 1) lanza->changeAnimation(1);
+                    }
+
+                    posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+                }
+            }
+
+            // Handle jumping/falling when hurt
+            if (bJumping) {
+                saltarPlata = false;
+                handleJumpingAnimations();
+
+                jumpAngle += JUMP_ANGLE_STEP;
+                if (jumpAngle == 180) {
+                    bJumping = false;
+                    posPlayer.y = startY;
                 }
                 else {
-                    bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
+                    posPlayer.y = int(startY - JUMP_HEIGHT * sin(3.14159f * jumpAngle / 180.f));
+
+                    if (jumpAngle < 90) {
+                        if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
+                            bJumping = false;
+                            jumpAngle = 180;
+                        }
+                    }
+                    else {
+                        bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y);
+                    }
                 }
             }
-        }
-        else if (platform) {
-            // 🔹 Si está sobre una plataforma, no aplicar gravedad
-            if (Game::instance().getKey(GLFW_KEY_Z)) {
-                platform = false;
-                cout << "Salto\n";
-                bJumping = true;
-                jumpAngle = 0;
-                startY = posPlayer.y;
-                saltarPlata = true;
-            }
-        }
-        else {
-            // 🔹 Aplica gravedad normalmente
-            posPlayer.y += FALL_STEP;
-            if (map->collisionLava(posPlayer, glm::ivec2(32.f, 32.f))) {
-                lava = true;
-            }
-            else lava = false;
-            if (lava && !godMode && inmortalTimer <= 0) {
-                if (plorantTimer <= 0) {
-                    plorantTimer = 1000;
-                    this->takeDamage(0.33f);
-                }
-            }
-            if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
+            else if (platform) {
+                // 🔹 Si está sobre una plataforma, no aplicar gravedad
                 if (Game::instance().getKey(GLFW_KEY_Z)) {
+                    platform = false;
+                    cout << "Salto\n";
                     bJumping = true;
                     jumpAngle = 0;
                     startY = posPlayer.y;
+                    saltarPlata = true;
+                }
+            }
+            else {
+                // 🔹 Aplica gravedad normalmente
+                posPlayer.y += FALL_STEP;
+                if (map->collisionLava(posPlayer, glm::ivec2(32.f, 32.f))) {
+                    lava = true;
+                }
+                else lava = false;
+                if (lava && !godMode && inmortalTimer <= 0) {
+                    if (plorantTimer <= 0) {
+                        plorantTimer = 1000;
+                        this->takeDamage(0.33f);
+                    }
+                }
+                if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
+                    if (Game::instance().getKey(GLFW_KEY_Z)) {
+                        bJumping = true;
+                        jumpAngle = 0;
+                        startY = posPlayer.y;
+                        saltarPlata = false;
+                    }
                     saltarPlata = false;
                 }
-                saltarPlata = false;
+            }
+        }
+        else {
+            // Normal gameplay when not hurt
+
+            // Handle horizontal movement
+
+            if (map->isOnLadder(posPlayer, glm::ivec2(32, 32)) && !map->collisionMoveDown(posPlayer, glm::ivec2(32, 33), &posPlayer.y)) {
+
+                handleLadderMovement();
             }
 
-        }
-    }
-    else {
-        // Normal gameplay when not hurt
-
-        // Handle horizontal movement
-
-        
-        
-
-        if (Game::instance().getKey(GLFW_KEY_W)) {
-            posPlayer.y -= MOVE_SPEED;
-        }
-        else if (Game::instance().getKey(GLFW_KEY_S)) {
-            posPlayer.y += MOVE_SPEED;
-        }
-
-        //cout << "PosPlayer: " << posPlayer.x << ", " << posPlayer.y << endl;
-
-        // Handle jumping and falling
+            else {
+                if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
+                    if (Game::instance().getKey(GLFW_KEY_DOWN)) {
+                        posPlayer.y += 5;
+                    }
+                    else if (Game::instance().getKey(GLFW_KEY_UP)) {
+                        posPlayer.y -= 5;
+                    }
+                }
 
 
 
+                if (Game::instance().getKey(GLFW_KEY_W)) {
+                    posPlayer.y -= MOVE_SPEED;
+                }
+                else if (Game::instance().getKey(GLFW_KEY_S)) {
+                    posPlayer.y += MOVE_SPEED;
+                }
 
-        // Handle weapon state
+                //cout << "PosPlayer: " << posPlayer.x << ", " << posPlayer.y << endl;
+
+                // Handle jumping and falling
 
 
-        handleHorizontalMovement();
 
-        // Handle vertical keys
-        handleVerticalKeys();
 
-        handleJumpingAndFalling();
+                // Handle weapon state
+                
 
-        // Handle special attack positions
-        if (sprite->animation() == ATK_JUMPING_UP_R) {
-            atacantAdalt = true;
-            posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
-        }
-        else if (sprite->animation() == ATK_JUMPING_UP_L) {
-            atacantAdalt = true;
-            posLanza = glm::vec2(posPlayer.x, posPlayer.y - 32);
-        }
-        else {
-            atacantAdalt = false;
-        }
+                handleHorizontalMovement();
 
-        if (sprite->animation() == ATK_JUMPING_DOWN_R) {
-            atacantAbaix = true;
-            posLanza = glm::vec2(posPlayer.x + 7, posPlayer.y + 25);
-        }
-        else if (sprite->animation() == ATK_JUMPING_DOWN_L) {
-            atacantAbaix = true;
-            posLanza = glm::vec2(posPlayer.x, posPlayer.y + 25);
-        }
-        else {
-            atacantAbaix = false;
-        }
+                // Handle vertical keys
+                handleVerticalKeys();
 
-        if (!Game::instance().getKey(GLFW_KEY_X)) {
-            isAttacking = false;
-        }
-        else {
-            isAttacking = true;
-            if (isRightFacing()) {
-                if (totemFocActiu) {
-                    lanza->changeAnimation(0);
-                    if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
-                    offsetTotem = 8;
+                handleJumpingAndFalling();
+
+                
+
+                // Handle special attack positions
+                if (sprite->animation() == ATK_JUMPING_UP_R) {
+                    atacantAdalt = true;
+                    posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
+                }
+                else if (sprite->animation() == ATK_JUMPING_UP_L) {
+                    atacantAdalt = true;
+                    posLanza = glm::vec2(posPlayer.x, posPlayer.y - 32);
                 }
                 else {
-                    if (lanza->animation() != 0) lanza->changeAnimation(0);
+                    atacantAdalt = false;
                 }
 
-                posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
-            }
-            else if (isLeftFacing()) {
-                if (totemFocActiu) {
-                    lanza->changeAnimation(1);
-                    if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
-
-                    offsetTotem = 8;
+                if (sprite->animation() == ATK_JUMPING_DOWN_R) {
+                    atacantAbaix = true;
+                    posLanza = glm::vec2(posPlayer.x + 7, posPlayer.y + 25);
+                }
+                else if (sprite->animation() == ATK_JUMPING_DOWN_L) {
+                    atacantAbaix = true;
+                    posLanza = glm::vec2(posPlayer.x, posPlayer.y + 25);
                 }
                 else {
-                    if (lanza->animation() != 1) lanza->changeAnimation(1);
+                    atacantAbaix = false;
                 }
 
-                posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
-            }
-        }
-        
 
+                if (!atacantAbaix && !atacantAdalt) {
+                    if (!Game::instance().getKey(GLFW_KEY_X)) {
+                        isAttacking = false;
+                    }
+                    else {
+                        isAttacking = true;
+                        if (isRightFacing()) {
+                            if (totemFocActiu) {
+                                lanza->changeAnimation(0);
+                                if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
+                                offsetTotem = 8;
+                            }
+                            else {
+                                if (lanza->animation() != 0) lanza->changeAnimation(0);
+                            }
 
+                            posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+                        }
+                        else if (isLeftFacing()) {
+                            if (totemFocActiu) {
+                                lanza->changeAnimation(1);
+                                if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
 
-        // Check collisions with enemy
-        for (int i = 0; i < setas.size();i++) {
-            Seta& seta = *setas[i];
-            //cout << inmortalTimer << endl;
-            if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode && inmortalTimer <= 0) {
-                cout << "Collision with seta" << endl;
-                if (isRightFacing()) {
-                    sprite->changeAnimation(PLORANT_DRETA);
+                                offsetTotem = 8;
+                            }
+                            else {
+                                if (lanza->animation() != 1) lanza->changeAnimation(1);
+                            }
+
+                            posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+                        }
+                    }
                 }
-                else if (isLeftFacing()) {
-                    sprite->changeAnimation(PLORANT_ESQUERRA);
-                }
-                if (plorantTimer <= 0) {
-                    plorantTimer = 1000;
-                    this->takeDamage(0.66f);
-                }
-
+                
             }
-        }
 
 
 
-        for (int i = 0; i < fenixes.size(); i++) {
-            Fenix& fenix = *fenixes[i];
-            if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode && inmortalTimer <= 0) {
-                cout << "Collision with fenix" << endl;
-                if (isRightFacing()) {
-                    sprite->changeAnimation(PLORANT_DRETA);
-                }
-                else if (isLeftFacing()) {
-                    sprite->changeAnimation(PLORANT_ESQUERRA);
-                }
-                if (plorantTimer <= 0) {
-                    plorantTimer = 1000;
-                    this->takeDamage(0.66f);
-                }
-            }
-
-            if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode && inmortalTimer <= 0) {
-                cout << "Collision with fenix fire" << endl;
-                if (isRightFacing()) {
-                    sprite->changeAnimation(PLORANT_DRETA);
-                }
-                else if (isLeftFacing()) {
-                    sprite->changeAnimation(PLORANT_ESQUERRA);
-                }
-                if (plorantTimer <= 0) {
-                    plorantTimer = 1000;
-                    this->takeDamage(0.33f);
-                }
-            }
-        }
-
-
-        if (checkCollision(mag.getPosition(), glm::ivec2(32, 32)) && !godMode && inmortalTimer <= 0) {
-            cout << "Collision with mag" << endl;
-            if (isRightFacing()) {
-                sprite->changeAnimation(PLORANT_DRETA);
-            }
-            else if (isLeftFacing()) {
-                sprite->changeAnimation(PLORANT_ESQUERRA);
-            }
-            if (plorantTimer <= 0) {
-                plorantTimer = 1000;
-                this->takeDamage(0.66f);
-            }
-        }
-
-        if (checkCollision(mag2.getPosition(), glm::ivec2(32, 32)) && !godMode && inmortalTimer <= 0) {
-            cout << "Collision with mag2" << endl;
-            if (isRightFacing()) {
-                sprite->changeAnimation(PLORANT_DRETA);
-            }
-            else if (isLeftFacing()) {
-                sprite->changeAnimation(PLORANT_ESQUERRA);
-            }
-            if (plorantTimer <= 0) {
-                plorantTimer = 1000;
-                this->takeDamage(0.66f);
-            }
-        }
-
-        if (checkCollision(mag.getPosProjectile(), glm::ivec2(8, 8)) && !godMode && inmortalTimer <= 0) {
-            cout << "Collision with mag projectile" << endl;
-            if (isRightFacing()) {
-                sprite->changeAnimation(PLORANT_DRETA);
-            }
-            else if (isLeftFacing()) {
-                sprite->changeAnimation(PLORANT_ESQUERRA);
-            }
-            if (plorantTimer <= 0) {
-                plorantTimer = 1000;
-                this->takeDamage(0.33f);
-            }
-        }
-
-        if (checkCollision(mag2.getPosProjectile(), glm::ivec2(8, 8)) && !godMode && inmortalTimer <= 0) {
-            cout << "Collision with mag2 projectile" << endl;
-            if (isRightFacing()) {
-                sprite->changeAnimation(PLORANT_DRETA);
-            }
-            else if (isLeftFacing()) {
-                sprite->changeAnimation(PLORANT_ESQUERRA);
-            }
-            if (plorantTimer <= 0) {
-                plorantTimer = 1000;
-                this->takeDamage(0.33f);
-            }
-        }
-
-
-        if (isAttacking || atacantAbaix || atacantAdalt) {
+            // Check collisions with enemy
             for (int i = 0; i < setas.size();i++) {
                 Seta& seta = *setas[i];
-                if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
-                    seta.restarVida();
+                //cout << inmortalTimer << endl;
+                if (checkCollision(seta.getPosition(), glm::ivec2(16, 16)) && !godMode && inmortalTimer <= 0) {
+                    cout << "Collision with seta" << endl;
+                    if (isRightFacing()) {
+                        sprite->changeAnimation(PLORANT_DRETA);
+                    }
+                    else if (isLeftFacing()) {
+                        sprite->changeAnimation(PLORANT_ESQUERRA);
+                    }
+                    if (plorantTimer <= 0) {
+                        plorantTimer = 1000;
+                        this->takeDamage(0.66f);
+                    }
+
                 }
             }
+
 
 
             for (int i = 0; i < fenixes.size(); i++) {
                 Fenix& fenix = *fenixes[i];
-                if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(16, 16))) {
-                    fenix.restarVida();
+                if (checkCollision(fenix.getPosition(), glm::ivec2(32, 16)) && !godMode && inmortalTimer <= 0) {
+                    cout << "Collision with fenix" << endl;
+                    if (isRightFacing()) {
+                        sprite->changeAnimation(PLORANT_DRETA);
+                    }
+                    else if (isLeftFacing()) {
+                        sprite->changeAnimation(PLORANT_ESQUERRA);
+                    }
+                    if (plorantTimer <= 0) {
+                        plorantTimer = 1000;
+                        this->takeDamage(0.66f);
+                    }
+                }
+
+                if (checkCollision(fenix.getPosFoc(), glm::ivec2(16, 16)) && !godMode && inmortalTimer <= 0) {
+                    cout << "Collision with fenix fire" << endl;
+                    if (isRightFacing()) {
+                        sprite->changeAnimation(PLORANT_DRETA);
+                    }
+                    else if (isLeftFacing()) {
+                        sprite->changeAnimation(PLORANT_ESQUERRA);
+                    }
+                    if (plorantTimer <= 0) {
+                        plorantTimer = 1000;
+                        this->takeDamage(0.33f);
+                    }
                 }
             }
-            if (checkCollisionLanza(mag.getPosition(), glm::ivec2(32, 32))) {
-                mag.restarVida();
-            }
-            if (checkCollisionLanza(mag2.getPosition(), glm::ivec2(32, 32))) {
-                mag2.restarVida();
-            }
-            if (checkCollisionLanza(boss.getPosition(), glm::ivec2(64, 64))) {
-                if (boss.getCooldown() <= 0) {
-                    boss.takeDamage(0.66f);
+
+
+            if (checkCollision(mag.getPosition(), glm::ivec2(32, 32)) && !godMode && inmortalTimer <= 0) {
+                cout << "Collision with mag" << endl;
+                if (isRightFacing()) {
+                    sprite->changeAnimation(PLORANT_DRETA);
                 }
-                // o 1.0f, lo que quieras
+                else if (isLeftFacing()) {
+                    sprite->changeAnimation(PLORANT_ESQUERRA);
+                }
+                if (plorantTimer <= 0) {
+                    plorantTimer = 1000;
+                    this->takeDamage(0.66f);
+                }
+            }
+
+            if (checkCollision(mag2.getPosition(), glm::ivec2(32, 32)) && !godMode && inmortalTimer <= 0) {
+                cout << "Collision with mag2" << endl;
+                if (isRightFacing()) {
+                    sprite->changeAnimation(PLORANT_DRETA);
+                }
+                else if (isLeftFacing()) {
+                    sprite->changeAnimation(PLORANT_ESQUERRA);
+                }
+                if (plorantTimer <= 0) {
+                    plorantTimer = 1000;
+                    this->takeDamage(0.66f);
+                }
+            }
+
+            if (checkCollision(mag.getPosProjectile(), glm::ivec2(8, 8)) && !godMode && inmortalTimer <= 0) {
+                cout << "Collision with mag projectile" << endl;
+                if (isRightFacing()) {
+                    sprite->changeAnimation(PLORANT_DRETA);
+                }
+                else if (isLeftFacing()) {
+                    sprite->changeAnimation(PLORANT_ESQUERRA);
+                }
+                if (plorantTimer <= 0) {
+                    plorantTimer = 1000;
+                    this->takeDamage(0.33f);
+                }
+            }
+
+            if (checkCollision(mag2.getPosProjectile(), glm::ivec2(8, 8)) && !godMode && inmortalTimer <= 0) {
+                cout << "Collision with mag2 projectile" << endl;
+                if (isRightFacing()) {
+                    sprite->changeAnimation(PLORANT_DRETA);
+                }
+                else if (isLeftFacing()) {
+                    sprite->changeAnimation(PLORANT_ESQUERRA);
+                }
+                if (plorantTimer <= 0) {
+                    plorantTimer = 1000;
+                    this->takeDamage(0.33f);
+                }
             }
 
 
+            if (isAttacking || atacantAbaix || atacantAdalt) {
+                for (int i = 0; i < setas.size();i++) {
+                    Seta& seta = *setas[i];
+                    if (checkCollisionLanza(seta.getPosition(), glm::ivec2(16, 16))) {
+                        seta.restarVida();
+                    }
+                }
 
+
+                for (int i = 0; i < fenixes.size(); i++) {
+                    Fenix& fenix = *fenixes[i];
+                    if (checkCollisionLanza(fenix.getPosition(), glm::ivec2(16, 16))) {
+                        fenix.restarVida();
+                    }
+                }
+                if (checkCollisionLanza(mag.getPosition(), glm::ivec2(32, 32))) {
+                    mag.restarVida();
+                }
+                if (checkCollisionLanza(mag2.getPosition(), glm::ivec2(32, 32))) {
+                    mag2.restarVida();
+                }
+                if (checkCollisionLanza(boss.getPosition(), glm::ivec2(64, 64))) {
+                    if (boss.getCooldown() <= 0) {
+                        boss.takeDamage(0.66f);
+                    }
+                    // o 1.0f, lo que quieras
+                }
+
+
+
+            }
         }
+
+        for (int i = 0; i < fenixes.size(); i++) {
+            Fenix& fenix = *fenixes[i];
+            fenix.getPosPlayer(posPlayer);
+        }
+        mag.getPosPlayer(posPlayer);
+        mag2.getPosPlayer(posPlayer);
+        for (int i = 0; i < setas.size(); i++) {
+            Seta& seta = *setas[i];
+            seta.getPosPlayer(posPlayer);
+        }
+
+        // Update sprite positions
+        sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
+        lanza->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
+        lanzaAdalt->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
+        lanzaAbaix->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
+        totemFoc->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x + offsetTotem), float(tileMapDispl.y + posLanza.y + 10)));
     }
 
-    for (int i = 0; i < fenixes.size(); i++) {
-        Fenix& fenix = *fenixes[i];
-        fenix.getPosPlayer(posPlayer);
+    if (!boss.isAlive()) {
+        sprite->changeAnimation(WIN);
+        totSprite->changeAnimation(0);
+        drawTotem();
+        win = true;
+        return;
     }
-    mag.getPosPlayer(posPlayer);
-    mag2.getPosPlayer(posPlayer);
-    for (int i = 0; i < setas.size(); i++) {
-        Seta& seta = *setas[i];
-        seta.getPosPlayer(posPlayer);
-    }
-
-    // Update sprite positions
-    sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
-    lanza->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
-    lanzaAdalt->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
-    lanzaAbaix->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x), float(tileMapDispl.y + posLanza.y)));
-    totemFoc->setPosition(glm::vec2(float(tileMapDispl.x + posLanza.x + offsetTotem), float(tileMapDispl.y + posLanza.y + 10)));
 }
 
 void Player::handleHorizontalMovement()
@@ -705,6 +744,7 @@ void Player::handleHorizontalMovement()
     else if (!Game::instance().getKey(GLFW_KEY_UP) && !Game::instance().getKey(GLFW_KEY_DOWN)) {
         setIdleAnimation();
     }
+
 }
 
 void Player::handleVerticalKeys()
@@ -763,6 +803,7 @@ void Player::handleVerticalKeys()
         }
 
     }
+
 }
 
 void Player::handleJumpingAndFalling()
@@ -812,12 +853,6 @@ void Player::handleJumpingAndFalling()
             if (plorantTimer <= 0) {
                 plorantTimer = 1000;
                 this->takeDamage(0.33f);
-                if (isRightFacing()) {
-                    sprite->changeAnimation(PLORANT_DRETA);
-                }
-                else if (isLeftFacing()) {
-                    sprite->changeAnimation(PLORANT_ESQUERRA);
-                }
             }
         }
         if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
@@ -968,6 +1003,9 @@ void Player::render()
         if (totemFocActiu) totemFoc->render();
     }
 
+    if (totemD) {
+        totSprite->render();
+    }
 
 
 
@@ -1244,4 +1282,14 @@ void Player::isWithBoss(bool a) {
 
 bool Player::esta() {
     return estaboss;
+}
+
+void Player::drawTotem() {
+    totSprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y - 10)));
+    totemD = true;
+    totSprite->render();
+}
+
+bool Player::winGame() {
+    return win;
 }
