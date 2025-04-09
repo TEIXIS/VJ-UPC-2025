@@ -4,6 +4,7 @@
 class Player;
 #include "Sprite.h"
 #include "ShaderProgram.h"
+#include <irrKlang.h>
 
 enum BossPhase {
     PHASE_INFINITE,
@@ -33,7 +34,7 @@ private:
     Texture spritesheet;
     Sprite* sprite;
     TileMap* map;
-
+    irrklang::ISoundEngine* soundEngine;
     float health;
     bool alive;
     int attackCooldown;
