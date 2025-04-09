@@ -413,104 +413,90 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 
         // Handle horizontal movement
 
-        if (map->isOnLadder(posPlayer, glm::ivec2(32, 32)) && !map->collisionMoveDown(posPlayer, glm::ivec2(32, 33), &posPlayer.y)) {
+        
+        
 
-            handleLadderMovement();
+        if (Game::instance().getKey(GLFW_KEY_W)) {
+            posPlayer.y -= MOVE_SPEED;
+        }
+        else if (Game::instance().getKey(GLFW_KEY_S)) {
+            posPlayer.y += MOVE_SPEED;
         }
 
+        //cout << "PosPlayer: " << posPlayer.x << ", " << posPlayer.y << endl;
+
+        // Handle jumping and falling
+
+
+
+
+        // Handle weapon state
+
+
+        handleHorizontalMovement();
+
+        // Handle vertical keys
+        handleVerticalKeys();
+
+        handleJumpingAndFalling();
+
+        // Handle special attack positions
+        if (sprite->animation() == ATK_JUMPING_UP_R) {
+            atacantAdalt = true;
+            posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
+        }
+        else if (sprite->animation() == ATK_JUMPING_UP_L) {
+            atacantAdalt = true;
+            posLanza = glm::vec2(posPlayer.x, posPlayer.y - 32);
+        }
         else {
-            if (map->isOnLadder(posPlayer, glm::ivec2(32, 32))) {
-                if (Game::instance().getKey(GLFW_KEY_DOWN)) {
-                    posPlayer.y += 5;
+            atacantAdalt = false;
+        }
+
+        if (sprite->animation() == ATK_JUMPING_DOWN_R) {
+            atacantAbaix = true;
+            posLanza = glm::vec2(posPlayer.x + 7, posPlayer.y + 25);
+        }
+        else if (sprite->animation() == ATK_JUMPING_DOWN_L) {
+            atacantAbaix = true;
+            posLanza = glm::vec2(posPlayer.x, posPlayer.y + 25);
+        }
+        else {
+            atacantAbaix = false;
+        }
+
+        if (!Game::instance().getKey(GLFW_KEY_X)) {
+            isAttacking = false;
+        }
+        else {
+            isAttacking = true;
+            if (isRightFacing()) {
+                if (totemFocActiu) {
+                    lanza->changeAnimation(0);
+                    if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
+                    offsetTotem = 8;
                 }
-                else if (Game::instance().getKey(GLFW_KEY_UP)) {
-                    posPlayer.y -= 5;
+                else {
+                    if (lanza->animation() != 0) lanza->changeAnimation(0);
                 }
+
+                posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
             }
+            else if (isLeftFacing()) {
+                if (totemFocActiu) {
+                    lanza->changeAnimation(1);
+                    if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
 
-
-
-            if (Game::instance().getKey(GLFW_KEY_W)) {
-                posPlayer.y -= MOVE_SPEED;
-            }
-            else if (Game::instance().getKey(GLFW_KEY_S)) {
-                posPlayer.y += MOVE_SPEED;
-            }
-
-            //cout << "PosPlayer: " << posPlayer.x << ", " << posPlayer.y << endl;
-
-            // Handle jumping and falling
-
-
-
-
-            // Handle weapon state
-            
-
-            handleHorizontalMovement();
-
-            // Handle vertical keys
-            handleVerticalKeys();
-
-            handleJumpingAndFalling();
-
-            // Handle special attack positions
-            if (sprite->animation() == ATK_JUMPING_UP_R) {
-                atacantAdalt = true;
-                posLanza = glm::vec2(posPlayer.x + 6, posPlayer.y - 32);
-            }
-            else if (sprite->animation() == ATK_JUMPING_UP_L) {
-                atacantAdalt = true;
-                posLanza = glm::vec2(posPlayer.x, posPlayer.y - 32);
-            }
-            else {
-                atacantAdalt = false;
-            }
-
-            if (sprite->animation() == ATK_JUMPING_DOWN_R) {
-                atacantAbaix = true;
-                posLanza = glm::vec2(posPlayer.x + 7, posPlayer.y + 25);
-            }
-            else if (sprite->animation() == ATK_JUMPING_DOWN_L) {
-                atacantAbaix = true;
-                posLanza = glm::vec2(posPlayer.x, posPlayer.y + 25);
-            }
-            else {
-                atacantAbaix = false;
-            }
-
-            if (!Game::instance().getKey(GLFW_KEY_X)) {
-                isAttacking = false;
-            }
-            else {
-                isAttacking = true;
-                if (isRightFacing()) {
-                    if (totemFocActiu) {
-                        lanza->changeAnimation(0);
-                        if (totemFoc->animation() != 1) totemFoc->changeAnimation(1);
-                        offsetTotem = 8;
-                    }
-                    else {
-                        if (lanza->animation() != 0) lanza->changeAnimation(0);
-                    }
-
-                    posLanza = glm::vec2(posPlayer.x + 26, sprite->animation() == ATK_RIGHT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+                    offsetTotem = 8;
                 }
-                else if (isLeftFacing()) {
-                    if (totemFocActiu) {
-                        lanza->changeAnimation(1);
-                        if (totemFoc->animation() != 0) totemFoc->changeAnimation(0);
-
-                        offsetTotem = 8;
-                    }
-                    else {
-                        if (lanza->animation() != 1) lanza->changeAnimation(1);
-                    }
-
-                    posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
+                else {
+                    if (lanza->animation() != 1) lanza->changeAnimation(1);
                 }
+
+                posLanza = glm::vec2(posPlayer.x - 27, sprite->animation() == ATK_LEFT_DOWN ? posPlayer.y + 8 : posPlayer.y);
             }
         }
+        
 
 
 

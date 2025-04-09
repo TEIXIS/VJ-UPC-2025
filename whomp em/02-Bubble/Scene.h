@@ -70,13 +70,17 @@ private:
 	glm::mat4 view;
 	Sprite* pantallaTitol;
 	Sprite* pantallaControles;
+	Sprite* pantallaWin;
 	bool jocComencat = false;
 	Texture spritesheet;           // Usado para el título
-	Texture spritesheetControls;   // Usado para los controles
+	Texture spritesheetControls; 
+	Texture spritesheetWin;// Usado para los controles
 	bool s = false;
 	bool showControls = false;
 	bool spacePressed = false;
 	irrklang::ISoundEngine* soundEngine;
+	bool win = false;
+	int counterW = 1000;
 
 };
 #endif // _SCENE_INCLUDE
