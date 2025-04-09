@@ -19,7 +19,9 @@
 #include "Lampara.h"
 #include "Capa.h"
 #include "LLamarada.h"
-
+#include "Boss.h"
+#include <irrKlang.h>
+using namespace irrklang;
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
@@ -56,6 +58,7 @@ private:
 	Lampara* lamp;
 	Capa* capa;
 	Llamarada* flam;
+	Boss* boss;
 	vector<Platform1*> plataformas1;
 	vector<Platform2*> plataformas2;
 	vector<Llamarada*> llamas;
@@ -73,8 +76,8 @@ private:
 	bool s = false;
 	bool showControls = false;
 	bool spacePressed = false;
+	irrklang::ISoundEngine* soundEngine;
+
 };
-
-
 #endif // _SCENE_INCLUDE
 

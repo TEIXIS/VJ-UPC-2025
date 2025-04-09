@@ -20,6 +20,7 @@ void HUD::init(ShaderProgram& shaderProgram, Player* p)
     player = p;
 
     heartTexture.loadFromFile("images/HUD.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	bHeartTexture.loadFromFile("images/BHearts.png", TEXTURE_PIXEL_FORMAT_RGBA);
     weaponTexture.loadFromFile("images/HUD.png", TEXTURE_PIXEL_FORMAT_RGBA); // arma actual
     lampTexture.loadFromFile("images/lamp.png", TEXTURE_PIXEL_FORMAT_RGBA);
     capaTexture.loadFromFile("images/capa.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -34,6 +35,17 @@ void HUD::init(ShaderProgram& shaderProgram, Player* p)
     heartSprite->addKeyframe(MEMPTY, glm::vec2(0.5f, 0.f));
     heartSprite->setAnimationSpeed(EMPTY, 8);
     heartSprite->addKeyframe(EMPTY, glm::vec2(0.75f, 0.f));
+
+    bHeartSprite = Sprite::createSprite(glm::ivec2(8, 8), glm::vec2(0.25f, 1.f), &bHeartTexture, shader);
+    bHeartSprite->setNumberAnimations(4);
+    bHeartSprite->setAnimationSpeed(FULL, 8);
+    bHeartSprite->addKeyframe(FULL, glm::vec2(0.f, 0.f));
+    bHeartSprite->setAnimationSpeed(MFULL, 8);
+    bHeartSprite->addKeyframe(MFULL, glm::vec2(0.25f, 0.f));
+    bHeartSprite->setAnimationSpeed(MEMPTY, 8);
+    bHeartSprite->addKeyframe(MEMPTY, glm::vec2(0.5f, 0.f));
+    bHeartSprite->setAnimationSpeed(EMPTY, 8);
+    bHeartSprite->addKeyframe(EMPTY, glm::vec2(0.75f, 0.f));
 
     weaponSprite->setNumberAnimations(2);
     weaponSprite->setAnimationSpeed(0, 8);
@@ -101,6 +113,36 @@ void HUD::render()
         if (x[i] == 4) heartSprite->changeAnimation(EMPTY);
         heartSprite->render();
     }
+	if (showBoss) {
+        int numHearts = 8.0f;
+        health = hBoss;
+        vector<int> x(numHearts);
+        for (int i = 0; i < numHearts; ++i) {
+            if (health >= 1.f) {
+                x[i] = 1;
+                health -= 1;
+            }
+            else if (health >= 0.50f && health <= 0.75) {
+                x[i] = 2;
+                health = 0.f;
+            }
+            else if (health >= 0.25f && health <= 0.40) {
+                x[i] = 3;
+                health = 0.f;
+            }
+            else x[i] = 4;
+        }
+        for (int i = 0; i < numHearts; ++i) {
+            bHeartSprite->setPosition(glm::vec2(10.f + 10.f, 29.f + i * 8.f));
+            if (x[i] == 1) bHeartSprite->changeAnimation(FULL);
+            if (x[i] == 2) bHeartSprite->changeAnimation(MFULL);
+            if (x[i] == 3) bHeartSprite->changeAnimation(MEMPTY);
+            if (x[i] == 4) bHeartSprite->changeAnimation(EMPTY);
+            bHeartSprite->render();
+        }
+	}
+    
+
 
     // arma al lado de los corazones (alineada al primero)
     weaponSprite->setPosition(glm::vec2(10.f, 10.f));
@@ -118,4 +160,12 @@ void HUD::render()
 		capaSprite->setPosition(glm::vec2(28 + i * 16, 10.f));
 		capaSprite->render();
 	}
+}
+
+void HUD::setBoss(bool a) {
+	showBoss = a;
+}
+
+void HUD::setHBoss(float h) {
+	hBoss = h;
 }

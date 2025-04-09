@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include "Player.h"
 #include "Game.h"
+#include "Boss.h"
 
 // Constants
 #define JUMP_ANGLE_STEP 4
@@ -186,7 +187,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	frameCount = 0;
 }
 
-void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes, Mag& mag, Mag& mag2)
+void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes, Mag& mag, Mag& mag2, Boss& boss)
 {
     // Update all sprites
     sprite->update(deltaTime);
@@ -567,6 +568,13 @@ void Player::update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes
 			if (checkCollisionLanza(mag2.getPosition(), glm::ivec2(32, 32))) {
 				mag2.restarVida();
 			}
+            if (checkCollisionLanza(boss.getPosition(), glm::ivec2(64, 64))) {
+				if (boss.getCooldown() <= 0) {
+                    boss.takeDamage(0.66f);
+				}
+  // o 1.0f, lo que quieras
+            }
+
 
 
         }
@@ -1158,4 +1166,12 @@ void Player::handleLadderMovement()
 }
 bool Player::isGod() {
 	return godMode;
+}
+
+void Player::isWithBoss(bool a) {
+	estaboss = a;
+}
+
+bool Player::esta() {
+	return estaboss;
 }

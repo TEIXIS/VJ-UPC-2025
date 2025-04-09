@@ -16,6 +16,8 @@ public:
     void init(ShaderProgram& shaderProgram, Player* player);
     void render();
 	void update(int deltaTime);
+    void setBoss(bool a);
+    void setHBoss(float h);
 
 private:
     ShaderProgram* shader;
@@ -23,6 +25,9 @@ private:
 
     Texture heartTexture;
     Sprite* heartSprite;
+
+	Texture bHeartTexture;
+	Sprite* bHeartSprite;
 
     Texture weaponTexture;
     Sprite* weaponSprite;
@@ -32,6 +37,9 @@ private:
 
     Texture capaTexture;
 	Sprite* capaSprite;
+
+    bool showBoss = false;
+	float hBoss = 8.f;
 };
 
 

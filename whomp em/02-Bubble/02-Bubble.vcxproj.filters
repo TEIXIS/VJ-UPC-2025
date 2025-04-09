@@ -22,6 +22,8 @@
     <ClCompile Include="Calabaza.cpp" />
     <ClCompile Include="Lampara.cpp" />
     <ClCompile Include="Capa.cpp" />
+    <ClCompile Include="LLamarada.cpp" />
+    <ClCompile Include="Boss.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimKeyframes.h" />
@@ -45,5 +47,7 @@
     <ClInclude Include="Calabaza.h" />
     <ClInclude Include="Lampara.h" />
     <ClInclude Include="Capa.h" />
+    <ClInclude Include="Llamarada.h" />
+    <ClInclude Include="Boss.h" />
   </ItemGroup>
 </Project>

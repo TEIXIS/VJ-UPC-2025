@@ -6,12 +6,13 @@
 #include "Seta.h"
 #include "Fenix.h"
 #include "Mag.h"
+#include "Boss.h"
 
 class Player
 {
 public:
     void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram);
-    void update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes, Mag& mag, Mag& mag2);
+    void update(int deltaTime, vector<Seta*>& setas, vector<Fenix*>& fenixes, Mag& mag, Mag& mag2, Boss& boss);
     void render();
 
     void setTileMap(TileMap* tileMap);
@@ -42,7 +43,8 @@ public:
     void setPlorantTimer();
     bool playerIsPlorant();
 	bool isGod();
-
+	void isWithBoss(bool a);
+	bool esta();
 private:
     // Helper methods for cleaner code organization
     void handleHorizontalMovement();
@@ -84,7 +86,8 @@ private:
     bool capaActiva = false;
     bool levitar = false;
     bool lava = false;
-    bool isClimbingLadder = false; // New variable to track ladder climbing state
+    bool isClimbingLadder = false; 
+    bool estaboss = false;// New variable to track ladder climbing state
 
 };
 

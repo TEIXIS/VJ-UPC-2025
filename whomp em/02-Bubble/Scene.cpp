@@ -8,6 +8,8 @@
 #include "Platform2.h"
 #include "Llamarada.h"
 #include <iostream>
+#include <irrKlang.h>
+using namespace irrklang;
 
 #define SCREEN_X 32
 #define SCREEN_Y 16
@@ -30,6 +32,10 @@ Scene::~Scene()
         delete map;
     if (player != NULL)
         delete player;
+    if (soundEngine) {
+        soundEngine->drop();
+    }
+
 }
 
 void Scene::init()
@@ -37,6 +43,7 @@ void Scene::init()
     initShaders();
     map = TileMap::createTileMap("levels/Level.csv", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
     player = new Player();
+    soundEngine = irrklang::createIrrKlangDevice();
 
     jocComencat = false;
     showControls = false;
@@ -63,6 +70,10 @@ void Scene::init()
     glm::vec3 cameraPos = glm::vec3(playerPos.x - centerX, 1460, 0.0f); // O usa una altura inicial adaptada
     view = glm::translate(glm::mat4(1.0f), -cameraPos);
 
+    boss = new Boss();
+    boss->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+    boss->setTileMap(map);
+    boss->setPosition(glm::vec2(3300, 300));
 
     // Suponiendo que texProgram, SCREEN_X, SCREEN_Y están definidos y accesibles aquí
 
@@ -187,10 +198,12 @@ void Scene::update(int deltaTime)
             if (showControls) {
                 jocComencat = true;  // Si ya se muestran controles, inicia el juego
                 std::cout << "[DEBUG] Iniciando el nivel\n";
+                if (soundEngine) soundEngine->play2D("media/sonidoCorrecto.wav", false); // Cambia ruta si está en otro lado
             }
             else {
                 showControls = true;  // De lo contrario, se muestra la pantalla de controles
                 std::cout << "[DEBUG] Mostrando controles\n";
+                if (soundEngine) soundEngine->play2D("media/sonidoCorrecto.wav", false); // Cambia ruta si está en otro lado
             }
         }
 
@@ -325,7 +338,10 @@ void Scene::update(int deltaTime)
         }
 
 
-        player->update(deltaTime, setas, fenixes, *mag, *mag2);
+        player->update(deltaTime, setas, fenixes, *mag, *mag2, *boss);
+
+        if (boss && boss->isAlive()) boss->update(deltaTime, *player);
+
 
         if (mag->spawnItem()) {
 			spawnRandomCollectible(mag->getPositionSpawn());
@@ -420,6 +436,10 @@ void Scene::update(int deltaTime)
         if (playerPos.x == 3278) {
             setas[7]->spawn(213, 2);
         }
+		if (playerPos.x >= 3600) {
+			player->isWithBoss(true);
+		}
+		else player->isWithBoss(false);
     }
     
 
@@ -509,6 +529,8 @@ void Scene::render()
 	mag->render();
 	mag2->render();
     player->render();
+    if (boss && boss->isAlive()) boss->render();
+
     /*seta->render();
 	fenix->render();*/
 	for (auto& seta : setas) seta->render();
@@ -523,6 +545,10 @@ void Scene::render()
     texProgram.setUniformMatrix4f("projection", hudProjection);
     texProgram.setUniformMatrix4f("view", glm::mat4(1.0f));
     texProgram.setUniformMatrix4f("modelview", glm::mat4(1.0f));
+    if (player->esta())hud->setBoss(true);
+    else hud->setBoss(false);
+	float hB = boss->getHealth();
+	hud->setHBoss(hB);
     hud->render();
 }
 
@@ -589,6 +615,10 @@ void Scene::resetLevel()
 
 	for (auto* c : collectibles) delete c;
 	collectibles.clear();
+
+    delete boss;
+    boss = nullptr;
+
 
     delete cor1;
     delete cor2;
